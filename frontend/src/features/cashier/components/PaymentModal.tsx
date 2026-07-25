@@ -1,4 +1,5 @@
 import {
+    useEffect,
     useState,
     type CSSProperties,
 } from 'react'
@@ -42,6 +43,12 @@ function formatCurrency(value: number) {
     return `${value.toLocaleString()} đ`
 }
 
+function methodDisplay(method: string) {
+    if (method === 'CASH') return { icon: '💵', label: 'Tiền mặt' }
+    if (method === 'QRCODE') return { icon: '💳', label: 'Thẻ / VNPay' }
+    return { icon: '💳', label: method }
+}
+
 export default function PaymentModal({
                                          orderId,
                                          orderDetail,
@@ -59,6 +66,12 @@ export default function PaymentModal({
     const [processing, setProcessing] =
         useState<boolean>(false)
 
+    const [paymentMethods, setPaymentMethods] =
+        useState<string[]>([])
+
+    const [loadingMethods, setLoadingMethods] =
+        useState<boolean>(true)
+
     const originalFinalAmount =
         orderDetail.finalAmount
 
@@ -75,6 +88,30 @@ export default function PaymentModal({
         amountReceived >= finalAmount
             ? amountReceived - finalAmount
             : 0
+
+    useEffect(() => {
+        let active = true
+        const controller = new AbortController()
+
+        cashierApi.getPaymentMethods(controller.signal)
+            .then((response) => {
+                if (active) setPaymentMethods(response.data)
+            })
+            .catch((requestError: unknown) => {
+                if (!isRequestCanceled(requestError)) {
+                    console.error('[CASHIER_PAYMENT_METHODS_ERROR]', requestError)
+                    if (active) setPaymentMethods(['CASH', 'QRCODE'])
+                }
+            })
+            .finally(() => {
+                if (active) setLoadingMethods(false)
+            })
+
+        return () => {
+            active = false
+            controller.abort()
+        }
+    }, [])
 
     async function handleCloseModal() {
         try {
@@ -254,29 +291,30 @@ export default function PaymentModal({
                     </div>
 
                     {method === null && (
-                        <div style={methodGridStyle}>
-                            <button
-                                type="button"
-                                className="secondary-button"
-                                style={methodButtonStyle}
-                                onClick={() =>
-                                    setMethod('CASH')
-                                }
-                            >
-                                💵 Tiền mặt
-                            </button>
-
-                            <button
-                                type="button"
-                                className="secondary-button"
-                                style={methodButtonStyle}
-                                onClick={() =>
-                                    setMethod('QRCODE')
-                                }
-                            >
-                                💳 Thẻ / VNPay
-                            </button>
-                        </div>
+                        loadingMethods ? (
+                            <p style={{ textAlign: 'center', color: '#64748b' }}>
+                                Đang tải phương thức thanh toán...
+                            </p>
+                        ) : (
+                            <div style={methodGridStyle}>
+                                {paymentMethods.map((m) => {
+                                    const { icon, label } = methodDisplay(m)
+                                    return (
+                                        <button
+                                            key={m}
+                                            type="button"
+                                            className="secondary-button"
+                                            style={methodButtonStyle}
+                                            onClick={() =>
+                                                setMethod(m as PaymentMethodType)
+                                            }
+                                        >
+                                            {icon} {label}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        )
                     )}
 
                     {method === 'CASH' && (

@@ -66,6 +66,12 @@ export default function PaymentResultManager({
     const pointsEarned =
         paymentResult.pointsEarned ?? 0
 
+    const amountPaid =
+        paymentResult.amountPaid ?? 0
+
+    const excessAmount =
+        paymentResult.excessAmount ?? 0
+
     const paymentMethodLabel =
         getPaymentMethodLabel(
             paymentResult.paymentMethod,
@@ -135,10 +141,10 @@ export default function PaymentResultManager({
                             style={tableHeaderStyle}
                         >
                             <span style={cellStyle}>Món ăn</span>
-                            <span style={{centerTextStyle, cellStyle}}>
+                            <span style={{...centerTextStyle, ...cellStyle}}>
                                 SL
                             </span>
-                            <span style={{rightTextStyle, cellStyle}}>
+                            <span style={{...rightTextStyle, ...cellStyle}}>
                                 Thành tiền
                             </span>
                         </div>
@@ -158,11 +164,11 @@ export default function PaymentResultManager({
                                             {item.dishName}
                                         </span>
 
-                                        <span style={{rightTextStyle, cellStyle}}>
+                                        <span style={{...rightTextStyle, ...cellStyle}}>
                                             {item.quantity}
                                         </span>
 
-                                        <span style={{rightTextStyle, cellStyle}}>
+                                        <span style={{...rightTextStyle, ...cellStyle}}>
                                             {formatCurrency(item.subTotal)}
                                         </span>
                                     </div>
@@ -231,6 +237,20 @@ export default function PaymentResultManager({
                         <span>Phương thức thanh toán:</span>
                         <span>{paymentMethodLabel}</span>
                     </div>
+
+                    {paymentResult.paymentMethod === 'CASH' && (
+                        <>
+                            <SummaryRow
+                                label="Khách trả:"
+                                value={formatCurrency(amountPaid)}
+                            />
+                            <SummaryRow
+                                label="Tiền thừa:"
+                                value={formatCurrency(excessAmount)}
+                                color="#16a34a"
+                            />
+                        </>
+                    )}
                 </div>
 
                 <div style={actionGridStyle}>
