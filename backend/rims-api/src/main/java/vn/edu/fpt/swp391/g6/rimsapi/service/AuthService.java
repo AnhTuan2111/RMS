@@ -16,5 +16,5 @@ public interface AuthService
 
     UserProfileResponse getCurrentUser(UserPrincipal principal);
 
-    LogoutResponse logout(UserPrincipal principal, String rawAccessToken);
+    LogoutResponse logout(UserPrincipal principal, String rawAccessToken, String rawRefreshToken);
 }

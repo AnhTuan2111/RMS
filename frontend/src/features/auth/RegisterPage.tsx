@@ -301,7 +301,7 @@ const loginTextStyle: CSSProperties = {
 }
 
 const loginLinkStyle: CSSProperties = {
-    color: '#4f46e5',
+    color: '#7a1030',
     textDecoration: 'none',
     fontWeight: 600,
 }

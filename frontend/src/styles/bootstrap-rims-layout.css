@@ -1053,3 +1053,119 @@
     }
 }
 
+/* =========================================================
+   THEME RIÊNG CHO CUSTOMER (vàng kim / burgundy, đồng bộ trang public)
+   ========================================================= */
+
+.theme-customer .rims-sidebar {
+    background: radial-gradient(
+            circle at 10% 0%,
+            rgba(212, 175, 55, 0.22),
+            transparent 34%
+    ),
+    radial-gradient(
+            circle at 95% 85%,
+            rgba(122, 16, 48, 0.3),
+            transparent 38%
+    ),
+    linear-gradient(
+            180deg,
+            #1a0d0d 0%,
+            #14090b 55%,
+            #0d0607 100%
+    );
+}
+
+.theme-customer .rims-sidebar-logo {
+    background: linear-gradient(
+            135deg,
+            #d4af37,
+            #b8942e 48%,
+            #7a1030
+    );
+    box-shadow: 0 12px 30px rgba(122, 16, 48, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+
+.theme-customer .rims-sidebar-role {
+    border-color: rgba(212, 175, 55, 0.22);
+    background: linear-gradient(
+            135deg,
+            rgba(212, 175, 55, 0.16),
+            rgba(122, 16, 48, 0.14)
+    );
+}
+
+.theme-customer .rims-role-icon {
+    color: #d4af37;
+}
+
+.theme-customer .rims-sidebar-link:hover {
+    border-color: rgba(212, 175, 55, 0.2);
+    color: #f5ecd8;
+}
+
+.theme-customer .rims-sidebar-link.active {
+    border-color: rgba(212, 175, 55, 0.32);
+    background: linear-gradient(
+            100deg,
+            #7a1030,
+            #9a1a3f 55%,
+            #b8942e
+    );
+    box-shadow: 0 14px 32px rgba(122, 16, 48, 0.35);
+}
+
+.theme-customer .rims-menu-icon {
+    color: #f2e2b8;
+}
+
+.theme-customer .rims-topbar-eyebrow {
+    color: #7a1030;
+}
+
+.theme-customer .rims-current-role {
+    border-color: rgba(212, 175, 55, 0.25);
+    background: linear-gradient(
+            135deg,
+            #fbf3e3,
+            #f5e9d0
+    );
+}
+
+.theme-customer .rims-current-role-icon {
+    background: linear-gradient(
+            135deg,
+            #f2e2b8,
+            #ead9b3
+    );
+}
+
+.theme-customer .rims-current-role strong {
+    color: #241512;
+}
+
+.theme-customer .rims-actor-switcher select:focus {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
+}
+
+.theme-customer .app-content,
+.theme-customer .rims-app-content {
+    background: radial-gradient(
+            circle at 85% 5%,
+            rgba(212, 175, 55, 0.08),
+            transparent 32%
+    ),
+    radial-gradient(
+            circle at 15% 90%,
+            rgba(122, 16, 48, 0.06),
+            transparent 30%
+    ),
+    #f8f3ea;
+}
+
+.theme-customer .rims-sidebar-brand h2 {
+    font-size: 19px;
+    letter-spacing: 0.02em;
+}

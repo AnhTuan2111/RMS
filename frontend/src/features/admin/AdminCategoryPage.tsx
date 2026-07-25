@@ -144,7 +144,7 @@ export default function AdminCategoryPage() {
                     name: formData.name.trim(),
                     description: formData.description
                 });
-                alert("Tạo danh mục mới thành công! 🎉");
+                alert("Tạo danh mục mới thành công!");
             } else if (view === 'EDIT' && selectedCategory) {
                 await categoryApi.updateCategory(selectedCategory.id, {
                     name: formData.name.trim(),
@@ -172,7 +172,7 @@ export default function AdminCategoryPage() {
         if (deleteModal.id === null) return;
         try {
             await categoryApi.deleteCategory(deleteModal.id);
-            alert("Xóa danh mục thành công! 🎉");
+            alert("Xóa danh mục thành công!");
             setDeleteModal({ open: false, id: null });
             await loadCategories(true, true);
         } catch (err: unknown) {

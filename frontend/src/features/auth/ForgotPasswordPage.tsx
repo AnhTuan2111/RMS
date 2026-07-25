@@ -225,7 +225,7 @@ export default function ForgotPasswordPage() {
                                             index < currentStepIdx
                                                 ? '#22c55e'
                                                 : index === currentStepIdx
-                                                    ? '#4f46e5'
+                                                    ? '#7a1030'
                                                     : '#e5e7eb',
                                         color:
                                             index <= currentStepIdx
@@ -243,7 +243,7 @@ export default function ForgotPasswordPage() {
                                         ...stepLabelStyle,
                                         color:
                                             index === currentStepIdx
-                                                ? '#4f46e5'
+                                                ? '#7a1030'
                                                 : '#9ca3af',
                                         fontWeight:
                                             index === currentStepIdx
@@ -543,7 +543,7 @@ const backToEmailButtonStyle: CSSProperties = {
     padding: 10,
     background: 'none',
     border: 'none',
-    color: '#4f46e5',
+    color: '#7a1030',
     cursor: 'pointer',
     fontSize: 13,
 }

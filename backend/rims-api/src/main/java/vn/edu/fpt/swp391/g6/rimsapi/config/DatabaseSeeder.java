@@ -82,33 +82,37 @@ public class DatabaseSeeder implements CommandLineRunner
     }
 
     // ══════════════════════════════════════════════════════════════════
-    // Users – 6 tài khoản: 1 admin, 1 chef, 1 waiter, 1 cashier, 2 customer
+    // Users – 8 tài khoản: 1 admin, 1 chef, 1 waiter, 1 cashier, 6 customer
     // ══════════════════════════════════════════════════════════════════
     private void seedUsers()
     {
         if (userRepository.count() > 0) return;
 
-        record UserDef(String username, String fullName, String email, String phone, RoleType role)
+        record UserDef(String username, String fullName, String email, String phone, RoleType role, int rewardPoints)
         {
         }
 
         List<UserDef> defs = List.of(
-                new UserDef("admin", "Nguyễn Thành Vinh", "admin@rims.local", "0900000001", RoleType.ADMIN),
-                new UserDef("chef", "Phạm Minh Nghĩa", "chef@rims.local", "0900000002", RoleType.CHEF),
-                new UserDef("waiter", "Nguyễn Anh Tuấn", "waiter@rims.local", "0900000003", RoleType.WAITER),
-                new UserDef("cashier", "Phạm Tuấn Anh", "cashier@rims.local", "0900000004", RoleType.CASHIER),
-                new UserDef("customer1", "Nguyễn Thị Thu Hiền", "customer1@rims.local", "0900000005", RoleType.CUSTOMER),
-                new UserDef("customer2", "Nguyễn Xuân Bắc", "customer2@rims.local", "0900000006", RoleType.CUSTOMER)
+                new UserDef("admin", "Nguyễn Thành Vinh", "admin@rims.local", "0900000001", RoleType.ADMIN, 0),
+                new UserDef("chef", "Phạm Minh Nghĩa", "chef@rims.local", "0900000002", RoleType.CHEF, 0),
+                new UserDef("waiter", "Nguyễn Anh Tuấn", "waiter@rims.local", "0900000003", RoleType.WAITER, 0),
+                new UserDef("cashier", "Phạm Tuấn Anh", "cashier@rims.local", "0900000004", RoleType.CASHIER, 0),
+                new UserDef("customer1", "Nguyễn Thị Thu Hiền", "customer1@rims.local", "0900000005", RoleType.CUSTOMER, 0),
+                new UserDef("customer2", "Nguyễn Xuân Bắc", "customer2@rims.local", "0900000006", RoleType.CUSTOMER, 0),
+                new UserDef("customer3", "Trần Văn Long", "customer3@rims.local", "0900000007", RoleType.CUSTOMER, 100),
+                new UserDef("customer4", "Lê Thị Mai Anh", "customer4@rims.local", "0900000008", RoleType.CUSTOMER, 500),
+                new UserDef("customer5", "Đỗ Quang Huy", "customer5@rims.local", "0900000009", RoleType.CUSTOMER, 1500),
+                new UserDef("customer6", "Vũ Thị Ngọc Ánh", "customer6@rims.local", "0900000010", RoleType.CUSTOMER, 3000)
         );
 
         List<User> users = defs.stream()
-                .map(d -> buildUser(d.username(), d.fullName(), d.email(), d.phone(), d.role()))
+                .map(d -> buildUser(d.username(), d.fullName(), d.email(), d.phone(), d.role(), d.rewardPoints()))
                 .toList();
 
         userRepository.saveAll(users);
     }
 
-    private User buildUser(String username, String fullName, String email, String phone, RoleType role)
+    private User buildUser(String username, String fullName, String email, String phone, RoleType role, int rewardPoints)
     {
         User user = new User();
         user.setUsername(username);
@@ -118,6 +122,7 @@ public class DatabaseSeeder implements CommandLineRunner
         user.setRole(role);
         user.setPasswordHash(passwordEncoder.encode(DEFAULT_PASSWORD));
         user.setActive(true);
+        user.setRewardPoints(rewardPoints);
         return user;
     }
 
@@ -167,65 +172,181 @@ public class DatabaseSeeder implements CommandLineRunner
 
 
     // ══════════════════════════════════════════════════════════════════
-    // Categories & Dishes – 6 category, 30 món theo phong cách Nhật Bản
-    //   Sushi (6) · Sashimi (4) · Món chính Nhật (8) · Khai vị (4)
-    //   Tráng miệng (3) · Đồ uống (5)
+    // Categories & Dishes – 12 category, 125 món theo phong cách Trung Hoa
+    //   Lẩu (10) · Dimsum (10) · Tứ Xuyên (10) · Quảng Đông (10) ·
+    //   Mì & Sợi (10) · Cơm & Cháo (10) · Nướng & Xiên (10) · Khai vị (10) ·
+    //   Hải sản (10) · Tráng miệng (10) · Món Việt (10) · Đồ uống (15)
     // ══════════════════════════════════════════════════════════════════
     private void seedCategoriesAndDishes()
     {
         if (dishRepository.count() > 0) return;
 
-        Category sushi = buildCategory("Sushi", "Các loại sushi nigiri và maki tươi ngon");
-        Category sashimi = buildCategory("Sashimi", "Cá và hải sản tươi sống thái lát kiểu Nhật");
-        Category mainDish = buildCategory("Món chính Nhật Bản", "Các món chính đặc trưng ẩm thực Nhật: ramen, udon, teriyaki...");
-        Category appetizer = buildCategory("Khai vị Nhật Bản", "Các món khai vị và món phụ kiểu Nhật");
-        Category dessert = buildCategory("Tráng miệng", "Bánh và món tráng miệng kiểu Nhật");
-        Category drink = buildCategory("Đồ uống", "Đồ uống Nhật Bản và giải khát các loại");
-        categoryRepository.saveAll(List.of(sushi, sashimi, mainDish, appetizer, dessert, drink));
+        Category hotpot = buildCategory("Lẩu", "Các loại lẩu đặc trưng vùng miền Trung Hoa, phục vụ theo nồi 4 người");
+        Category dimsum = buildCategory("Dimsum / Điểm tâm", "Các món điểm tâm kiểu Quảng Đông: há cảo, xíu mại, bánh bao...");
+        Category sichuan = buildCategory("Món Tứ Xuyên", "Các món chính đặc trưng ẩm thực Tứ Xuyên: cay, tê, đậm vị");
+        Category canton = buildCategory("Món Quảng Đông", "Các món chính đặc trưng ẩm thực Quảng Đông: thanh nhẹ, ít dầu mỡ");
+        Category noodle = buildCategory("Mì & Sợi", "Các món mì, miến đặc trưng vùng miền Trung Hoa");
+        Category riceCongee = buildCategory("Cơm & Cháo", "Các món cơm và cháo đặc trưng ẩm thực Trung Hoa");
+        Category grill = buildCategory("Nướng & Xiên Trung Hoa", "Các món nướng và xiên đặc trưng ẩm thực Trung Hoa");
+        Category coldApp = buildCategory("Khai vị / Món nguội", "Các món khai vị và món nguội ăn kèm kiểu Trung Hoa");
+        Category seafood = buildCategory("Hải sản Trung Hoa", "Các món hải sản cao cấp đặc trưng ẩm thực Trung Hoa");
+        Category dessertCn = buildCategory("Tráng miệng Trung Hoa", "Các món tráng miệng ngọt đặc trưng ẩm thực Trung Hoa");
+        Category vietnamese = buildCategory("Món Việt", "Các món ăn đặc trưng ẩm thực Việt Nam");
+        Category drink = buildCategory("Đồ uống", "Đồ uống đa dạng: trà Trung Hoa, nước ngọt, nước ép và các loại giải khát khác");
+
+        categoryRepository.saveAll(List.of(hotpot, dimsum, sichuan, canton, noodle, riceCongee,
+                grill, coldApp, seafood, dessertCn, vietnamese, drink));
 
         List<Dish> dishes = new ArrayList<>();
 
-        // 6 Sushi
-        dishes.add(buildDish("Nigiri cá hồi - 2 miếng", "Sushi nigiri cá hồi Na Uy tươi, cơm giấm chuẩn vị Nhật", 55_000, "nigiri-ca-hoi.jpg", sushi));
-        dishes.add(buildDish("Nigiri cá ngừ - 2 miếng", "Sushi nigiri cá ngừ đại dương tươi ngon, thịt săn chắc", 60_000, "nigiri-ca-ngu.jpg", sushi));
-        dishes.add(buildDish("Nigiri tôm - 2 miếng", "Sushi nigiri tôm sú hấp chín, ngọt thanh tự nhiên", 48_000, "nigiri-tom.jpg", sushi));
-        dishes.add(buildDish("Maki cá hồi bơ - 8 cuộn", "Cuộn sushi cá hồi kết hợp bơ béo ngậy, rong biển giòn", 79_000, "maki-ca-hoi-bo.jpg", sushi));
-        dishes.add(buildDish("California Roll - 8 cuộn", "Sushi cuộn kiểu Mỹ với thanh cua, bơ và trứng cá tobiko", 89_000, "california-roll.jpg", sushi));
-        dishes.add(buildDish("Dragon Roll - 8 cuộn", "Sushi cuộn lươn nướng phủ bơ và sốt unagi đặc trưng", 119_000, "dragon-roll.jpg", sushi));
+        // 10 Lẩu (giá tính theo nồi, phục vụ 4 người)
+        dishes.add(buildDish("Lẩu Tứ Xuyên cay tê (Mala) - nồi 4 người", "Nồi lẩu Tứ Xuyên vị mala cay tê đặc trưng, sả ớt và hoa tiêu, phục vụ 2-4 người", 399_000, "lau-tu-xuyen-mala.jpg", hotpot));
+        dishes.add(buildDish("Lẩu Trùng Khánh dầu ớt - nồi 4 người", "Nồi lẩu Trùng Khánh đậm vị dầu ớt cay nồng, đặc sản vùng Tây Nam Trung Quốc, phục vụ 2-4 người", 399_000, "lau-trung-khanh.jpg", hotpot));
+        dishes.add(buildDish("Lẩu Vân Nam nấm rừng - nồi 4 người", "Nồi lẩu nước dùng thanh ngọt từ các loại nấm rừng Vân Nam, phục vụ 2-4 người", 359_000, "lau-van-nam-nam-rung.jpg", hotpot));
+        dishes.add(buildDish("Lẩu Vũ Hán sườn bò - nồi 4 người", "Nồi lẩu sườn bò hầm kiểu Vũ Hán, nước dùng đậm đà, phục vụ 2-4 người", 459_000, "lau-vu-han-suon-bo.jpg", hotpot));
+        dishes.add(buildDish("Lẩu Quảng Đông hải sản - nồi 4 người", "Nồi lẩu hải sản tươi kiểu Quảng Đông, nước dùng thanh ngọt tự nhiên, phục vụ 2-4 người", 599_000, "lau-quang-dong-hai-san.jpg", hotpot));
+        dishes.add(buildDish("Lẩu Bắc Kinh cừu nhúng - nồi 4 người", "Nồi lẩu đồng cừu nhúng kiểu Bắc Kinh truyền thống, chấm sốt mè, phục vụ 2-4 người", 459_000, "lau-bac-kinh-cuu-nhung.jpg", hotpot));
+        dishes.add(buildDish("Lẩu Quý Châu chua cay - nồi 4 người", "Nồi lẩu chua cay đặc trưng Quý Châu, cà chua lên men và ớt tươi, phục vụ 2-4 người", 359_000, "lau-quy-chau-chua-cay.jpg", hotpot));
+        dishes.add(buildDish("Lẩu Hồ Nam cá cay - nồi 4 người", "Nồi lẩu cá cay kiểu Hồ Nam, vị cay nồng đặc trưng miền Trung Trung Quốc, phục vụ 2-4 người", 399_000, "lau-ho-nam-ca-cay.jpg", hotpot));
+        dishes.add(buildDish("Lẩu Thượng Hải gà ác thuốc bắc - nồi 4 người", "Nồi lẩu gà ác tần thuốc bắc kiểu Thượng Hải, bồi bổ sức khoẻ, phục vụ 2-4 người", 429_000, "lau-thuong-hai-ga-ac.jpg", hotpot));
+        dishes.add(buildDish("Lẩu Sa Tế Triều Châu bò - nồi 4 người", "Nồi lẩu sa tế bò kiểu Triều Châu, nước dùng sa tế thơm béo, phục vụ 2-4 người", 429_000, "lau-satay-trieu-chau-bo.jpg", hotpot));
 
-        // 4 Sashimi
-        dishes.add(buildDish("Sashimi cá hồi - 6 lát", "Cá hồi tươi thái lát mỏng, ăn kèm wasabi và nước tương", 129_000, "sashimi-ca-hoi.jpg", sashimi));
-        dishes.add(buildDish("Sashimi cá ngừ - 6 lát", "Cá ngừ đại dương thái lát, thịt đỏ tươi đậm đà", 139_000, "sashimi-ca-ngu.jpg", sashimi));
-        dishes.add(buildDish("Sashimi cá trắng - 6 lát", "Cá tráp trắng thái lát mỏng, vị thanh nhẹ tinh tế", 119_000, "sashimi-ca-trang.jpg", sashimi));
-        dishes.add(buildDish("Sashimi bạch tuộc - 6 lát", "Bạch tuộc tươi thái lát, giòn sần sật đặc trưng", 109_000, "sashimi-bach-tuoc.jpg", sashimi));
+        // 10 Dimsum
+        dishes.add(buildDish("Há cảo tôm", "Há cảo tôm hấp kiểu Quảng Đông, vỏ bột mỏng trong suốt, nhân tôm tươi", 65_000, "ha-cao-tom.jpg", dimsum));
+        dishes.add(buildDish("Xíu mại tôm thịt", "Xíu mại tôm thịt hấp truyền thống, topping trứng cá cam", 59_000, "xiu-mai-tom-thit.jpg", dimsum));
+        dishes.add(buildDish("Bánh bao xá xíu nướng", "Bánh bao nướng nhân xá xíu, vỏ ngoài giòn ngọt kiểu Hồng Kông", 55_000, "banh-bao-xa-xiu-nuong.jpg", dimsum));
+        dishes.add(buildDish("Bánh cuốn tôm Quảng Đông", "Bánh cuốn gạo mềm mịn nhân tôm, chan nước tương ngọt", 65_000, "banh-cuon-tom-quang-dong.jpg", dimsum));
+        dishes.add(buildDish("Chân gà sốt đậu đen (Phượng trảo)", "Chân gà hấp sốt đậu đen lên men, món điểm tâm đặc trưng Quảng Đông", 55_000, "chan-ga-sot-dau-den.jpg", dimsum));
+        dishes.add(buildDish("Bánh củ cải chiên", "Bánh củ cải hấp rồi áp chảo giòn, ăn kèm tương ớt", 49_000, "banh-cu-cai-chien.jpg", dimsum));
+        dishes.add(buildDish("Bánh xếp hẹ tôm hấp", "Bánh xếp nhân hẹ và tôm hấp, vỏ bột gạo mỏng", 55_000, "banh-xep-he-tom.jpg", dimsum));
+        dishes.add(buildDish("Sườn heo hấp đậu đen", "Sườn heo non hấp sốt đậu đen tỏi ớt, mềm và đậm đà", 69_000, "suon-heo-hap-dau-den.jpg", dimsum));
+        dishes.add(buildDish("Bánh bao kim sa trứng muối", "Bánh bao nhân kem trứng muối chảy, ngọt béo đặc trưng", 59_000, "banh-bao-kim-sa.jpg", dimsum));
+        dishes.add(buildDish("Chả tôm cuốn rong biển chiên", "Chả tôm cuộn rong biển chiên giòn, món điểm tâm phổ biến", 65_000, "cha-tom-cuon-rong-bien.jpg", dimsum));
 
-        // 8 Món chính Nhật
-        dishes.add(buildDish("Ramen Tonkotsu - 1 tô", "Mì ramen nước dùng xương heo ninh 12 giờ, chả cá và trứng lòng đào", 109_000, "ramen-tonkotsu.jpg", mainDish));
-        dishes.add(buildDish("Ramen Miso - 1 tô", "Mì ramen nước dùng miso đậm đà, bắp ngô và rong biển", 119_000, "ramen-miso.jpg", mainDish));
-        dishes.add(buildDish("Udon bò - 1 tô", "Mì udon dai mềm cùng thịt bò xào sốt teriyaki", 99_000, "udon-bo.jpg", mainDish));
-        dishes.add(buildDish("Tempura tôm - 5 con", "Tôm tẩm bột chiên giòn kiểu Nhật, chấm sốt tentsuyu", 99_000, "tempura-tom.jpg", mainDish));
-        dishes.add(buildDish("Gà Teriyaki - 1 phần", "Đùi gà áp chảo sốt teriyaki ngọt mặn hài hoà", 139_000, "ga-teriyaki.jpg", mainDish));
-        dishes.add(buildDish("Donburi bò - 1 tô", "Cơm phủ thịt bò xào hành tây sốt dashi kiểu Nhật", 109_000, "donburi-bo.jpg", mainDish));
-        dishes.add(buildDish("Cơm cà ri Nhật - 1 phần", "Cơm trắng dẻo cùng cà ri Nhật sánh mịn vị ngọt dịu", 99_000, "com-cari-nhat.jpg", mainDish));
-        dishes.add(buildDish("Lẩu Sukiyaki - 1 suất", "Lẩu Sukiyaki bò Mỹ, đậu phụ và rau củ nấu cùng sốt shoyu", 329_000, "sukiyaki.jpg", mainDish));
+        // 10 Món Tứ Xuyên
+        dishes.add(buildDish("Mapo đậu hũ Tứ Xuyên", "Đậu hũ non sốt cay tê đặc trưng Tứ Xuyên, thịt băm và hoa tiêu", 79_000, "mapo-dau-hu.jpg", sichuan));
+        dishes.add(buildDish("Gà cung bảo Tứ Xuyên", "Gà xào đậu phộng, ớt khô kiểu Tứ Xuyên, vị chua cay ngọt hài hoà", 109_000, "ga-cung-bao.jpg", sichuan));
+        dishes.add(buildDish("Cá thuỷ chử Tứ Xuyên", "Cá lát nấu ngập dầu ớt cay nồng, đặc sản trứ danh Tứ Xuyên", 189_000, "ca-thuy-chu.jpg", sichuan));
+        dishes.add(buildDish("Bò xào sa tế Tứ Xuyên", "Thịt bò xào khô sốt sa tế cay, đậm vị đặc trưng miền Tây Nam", 149_000, "bo-xao-sate-tu-xuyen.jpg", sichuan));
+        dishes.add(buildDish("Hồi oa nhục Tứ Xuyên", "Thịt heo ba chỉ luộc rồi xào lại với tỏi tây, món kinh điển Tứ Xuyên", 129_000, "heo-quay-tu-xuyen-hoi-oa-nhuc.jpg", sichuan));
+        dishes.add(buildDish("Đậu hũ thối chiên Tứ Xuyên", "Đậu hũ lên men chiên giòn, chấm tương ớt cay, món đường phố đặc trưng", 89_000, "dau-hu-thoi-tu-xuyen.jpg", sichuan));
+        dishes.add(buildDish("Tôm sốt cay Tứ Xuyên", "Tôm sú sốt cay kiểu Tứ Xuyên, đậm đà và thơm nồng hoa tiêu", 169_000, "tom-sot-tu-xuyen.jpg", sichuan));
+        dishes.add(buildDish("Ếch xào cay Tứ Xuyên", "Đùi ếch xào cay tê kiểu Tứ Xuyên, thịt dai ngọt tự nhiên", 159_000, "ech-xao-cay-tu-xuyen.jpg", sichuan));
+        dishes.add(buildDish("Mì đạm đạm Tứ Xuyên (Dan Dan)", "Mì trộn sốt vừng, thịt băm cay và hoa tiêu, món ăn đường phố nổi tiếng", 99_000, "mi-dam-dam-tu-xuyen.jpg", sichuan));
+        dishes.add(buildDish("Gà xé nước bọt Tứ Xuyên (Khẩu Thuỷ Kê)", "Gà luộc xé nhỏ trộn sốt cay tê đặc trưng, ăn lạnh khai vị", 129_000, "ga-xe-nuoc-bot-tu-xuyen.jpg", sichuan));
 
-        // 4 Khai vị
-        dishes.add(buildDish("Gyoza - 6 cái", "Bánh xếp nhân thịt heo chiên giòn đáy, kiểu Nhật truyền thống", 69_000, "gyoza.jpg", appetizer));
-        dishes.add(buildDish("Edamame - 1 đĩa", "Đậu nành Nhật luộc rắc muối biển, món khai vị thanh đạm", 45_000, "edamame.jpg", appetizer));
-        dishes.add(buildDish("Súp Miso - 1 chén", "Súp miso truyền thống với đậu phụ, rong biển wakame", 35_000, "sup-miso.jpg", appetizer));
-        dishes.add(buildDish("Chả cá viên chiên - 6 viên", "Chả cá viên Nhật chiên giòn, ăn kèm sốt mù tạt", 59_000, "cha-ca-vien.jpg", appetizer));
+        // 10 Món Quảng Đông
+        dishes.add(buildDish("Vịt quay Bắc Kinh phong cách Quảng Đông - phần nhỏ", "Vịt quay da giòn thái lát, cuốn bánh tráng mỏng và sốt hoisin", 249_000, "vit-quay-bac-kinh-mini.jpg", canton));
+        dishes.add(buildDish("Gà quay Quảng Đông", "Gà quay nguyên con da giòn vàng ươm, thịt mềm ngọt đậm đà", 199_000, "ga-quay-quang-dong.jpg", canton));
+        dishes.add(buildDish("Sườn xá xíu nướng", "Sườn heo ướp xá xíu nướng mật ong, ngọt mặn hài hoà kiểu Quảng Đông", 139_000, "suon-xa-xiu-nuong.jpg", canton));
+        dishes.add(buildDish("Cá hấp Hồng Kông", "Cá hấp xì dầu kiểu Hồng Kông, hành gừng thơm, vị thanh nhẹ tự nhiên", 189_000, "ca-hap-hong-kong.jpg", canton));
+        dishes.add(buildDish("Heo quay giòn bì Quảng Đông", "Thịt heo quay giòn bì đặc trưng Quảng Đông, chấm tương ớt", 149_000, "heo-quay-gion-bi.jpg", canton));
+        dishes.add(buildDish("Gà hấp hành gừng Quảng Đông", "Gà hấp nguyên con chấm mỡ hành gừng, món thanh đạm truyền thống", 159_000, "ga-hap-hanh-gung.jpg", canton));
+        dishes.add(buildDish("Bò lúc lắc Quảng Đông", "Thịt bò xào lúc lắc sốt tiêu đen kiểu Quảng Đông, mềm và đậm vị", 149_000, "bo-luc-lac-quang-dong.jpg", canton));
+        dishes.add(buildDish("Ngỗng quay Quảng Đông", "Ngỗng quay da giòn thơm, đặc sản trứ danh vùng Quảng Đông", 229_000, "ngan-quay-quang-dong.jpg", canton));
+        dishes.add(buildDish("Tôm hấp tỏi Quảng Đông", "Tôm sú hấp tỏi phi thơm, giữ vị ngọt tự nhiên của tôm", 179_000, "tom-hap-toi-quang-dong.jpg", canton));
+        dishes.add(buildDish("Đậu hũ non sốt hải sản Quảng Đông", "Đậu hũ non sốt hải sản kiểu Quảng Đông, béo mịn và thanh nhẹ", 119_000, "dau-hu-non-sot-hai-san.jpg", canton));
 
-        // 3 Tráng miệng
-        dishes.add(buildDish("Mochi - 2 bánh", "Bánh mochi Nhật nhân đậu đỏ, vỏ dẻo dai đặc trưng", 49_000, "mochi.jpg", dessert));
-        dishes.add(buildDish("Dorayaki - 2 bánh", "Bánh rán Nhật nhân đậu đỏ ngọt dịu, mềm xốp", 45_000, "dorayaki.jpg", dessert));
-        dishes.add(buildDish("Kem trà xanh - 1 cốc", "Kem matcha Nhật Bản béo mịn, vị trà xanh đậm đà", 55_000, "kem-tra-xanh.jpg", dessert));
+        // 10 Mì & Sợi
+        dishes.add(buildDish("Mì kéo Lan Châu bò", "Mì kéo tay Lan Châu nước dùng bò trong, thơm hồi quế đặc trưng Cam Túc", 99_000, "mi-keo-lan-chau-bo.jpg", noodle));
+        dishes.add(buildDish("Mì tương đen Bắc Kinh (Zhajiangmian)", "Mì trộn tương đậu nành lên men, thịt băm xào kiểu Bắc Kinh truyền thống", 89_000, "mi-tuong-den-bac-kinh.jpg", noodle));
+        dishes.add(buildDish("Mì bò cay Tứ Xuyên", "Mì nước dùng bò cay tê đậm vị Tứ Xuyên, thịt bò hầm mềm", 109_000, "mi-bo-cay-tu-xuyen.jpg", noodle));
+        dishes.add(buildDish("Mì vằn thắn Quảng Đông", "Mì sợi trứng dai cùng vằn thắn tôm thịt, nước dùng xương ngọt thanh", 89_000, "mi-van-than-quang-dong.jpg", noodle));
+        dishes.add(buildDish("Mì xào giòn Quảng Đông", "Mì trứng chiên giòn phủ sốt hải sản thập cẩm sánh đặc", 109_000, "mi-xao-gion-quang-dong.jpg", noodle));
+        dishes.add(buildDish("Mì trộn dầu hào Hồng Kông", "Mì sợi trứng trộn dầu hào và hành lá kiểu Hồng Kông, đơn giản mà đậm vị", 65_000, "mi-tron-dau-hao-hong-kong.jpg", noodle));
+        dishes.add(buildDish("Mì cay khô Vũ Hán (Reganmian)", "Mì khô trộn sốt mè và tương ớt kiểu Vũ Hán, món ăn sáng nổi tiếng", 79_000, "mi-cay-vu-han-reganmian.jpg", noodle));
+        dishes.add(buildDish("Miến xào cua Thượng Hải", "Miến xào cua kiểu Thượng Hải, sợi miến dai giòn thấm vị hải sản", 129_000, "mien-xao-thuong-hai-cua.jpg", noodle));
+        dishes.add(buildDish("Mì hải sản Phúc Kiến", "Mì nước dùng hải sản đậm đà kiểu Phúc Kiến, tôm mực tươi", 119_000, "mi-hai-san-phuc-kien.jpg", noodle));
+        dishes.add(buildDish("Mì trường thọ Trường Sinh", "Mì sợi dài truyền thống dùng trong dịp mừng thọ/sinh nhật, nước dùng thanh nhẹ", 99_000, "mi-truong-tho-sinh-nhat.jpg", noodle));
 
-        // 5 Đồ uống
-        dishes.add(buildDish("Trà xanh nóng - 1 cốc", "Trà xanh Nhật Bản nguyên chất, thanh mát tự nhiên", 25_000, "tra-xanh-nong.jpg", drink));
-        dishes.add(buildDish("Trà sữa Matcha - 500ml", "Trà sữa vị matcha Nhật đậm đà, béo ngậy vừa phải", 55_000, "tra-sua-matcha.jpg", drink));
-        dishes.add(buildDish("Soda chanh - 450ml", "Soda chanh tươi mát lạnh, sủi bọt sảng khoái", 39_000, "soda-chanh.jpg", drink));
-        dishes.add(buildDish("Ramune - 200ml", "Nước ngọt có ga Nhật Bản vị nguyên bản trong chai bi đặc trưng", 45_000, "ramune.jpg", drink));
-        dishes.add(buildDish("Coca Cola - 330ml", "Nước ngọt có ga Coca-Cola lon 330ml", 20_000, "coca-cola.jpg", drink));
+        // 10 Cơm & Cháo
+        dishes.add(buildDish("Cơm rang Dương Châu", "Cơm chiên trứng, tôm, xá xíu và đậu Hà Lan kiểu Dương Châu kinh điển", 79_000, "com-rang-duong-chau.jpg", riceCongee));
+        dishes.add(buildDish("Cơm gà Hải Nam", "Cơm nấu mỡ gà thơm béo, ăn cùng gà luộc và sốt gừng tỏi", 89_000, "com-ga-hai-nam.jpg", riceCongee));
+        dishes.add(buildDish("Cháo trứng bắc thảo thịt bằm Quảng Đông", "Cháo trắng ninh nhuyễn cùng trứng bắc thảo và thịt heo băm", 59_000, "chao-trung-bac-thao-quang-dong.jpg", riceCongee));
+        dishes.add(buildDish("Cháo cá Thuận Đức", "Cháo cá tươi thái lát mỏng kiểu Thuận Đức, ngọt thanh không tanh", 69_000, "chao-ca-thuan-duc.jpg", riceCongee));
+        dishes.add(buildDish("Cơm thố thịt kho Bắc Kinh", "Cơm nấu trong thố đất cùng thịt kho tàu kiểu Bắc Kinh, đậm đà", 99_000, "com-tho-bac-kinh.jpg", riceCongee));
+        dishes.add(buildDish("Cơm chiên trứng muối Triều Châu", "Cơm chiên trộn trứng muối béo bùi, phong cách Triều Châu", 89_000, "com-chien-trung-muoi-trieu-chau.jpg", riceCongee));
+        dishes.add(buildDish("Cháo hải sản Phúc Kiến", "Cháo hải sản tôm mực đậm đà kiểu Phúc Kiến, nêm tiêu hành", 89_000, "chao-hai-san-phuc-kien.jpg", riceCongee));
+        dishes.add(buildDish("Cơm nị cà ri gà Quảng Đông", "Cơm ăn cùng cà ri gà sánh vàng kiểu Quảng Đông, thơm sả và nước cốt dừa", 99_000, "com-ni-cari-ga-quang-dong.jpg", riceCongee));
+        dishes.add(buildDish("Cơm thố lạp xưởng Hồng Kông", "Cơm nấu thố đất cùng lạp xưởng và thịt gà, cháy cạnh thơm giòn kiểu Hồng Kông", 119_000, "com-tho-lap-xuong-hong-kong.jpg", riceCongee));
+        dishes.add(buildDish("Cháo trắng Quảng Đông ăn kèm quẩy", "Cháo trắng ninh nhuyễn thanh đạm, ăn kèm quẩy giòn kiểu Quảng Đông", 55_000, "chao-trang-quay-quang-dong.jpg", riceCongee));
+
+        // 10 Nướng & Xiên
+        dishes.add(buildDish("Thịt xiên nướng Tân Cương", "Thịt cừu xiên nướng than kiểu Tân Cương, ướp thì là và ớt bột cay nồng", 69_000, "thit-xien-nuong-tan-cuong.jpg", grill));
+        dishes.add(buildDish("Vịt quay Bắc Kinh nguyên con", "Vịt quay nguyên con da giòn kiểu Bắc Kinh chính hiệu, ăn kèm bánh tráng và sốt hoisin", 599_000, "vit-quay-bac-kinh-nguyen-con.jpg", grill));
+        dishes.add(buildDish("Sườn nướng mật ong ngũ vị", "Sườn heo nướng mật ong tẩm ngũ vị hương, thơm ngọt đậm đà", 179_000, "suon-nuong-mat-ong-trung-hoa.jpg", grill));
+        dishes.add(buildDish("Cánh gà nướng ngũ vị hương", "Cánh gà nướng tẩm ngũ vị hương truyền thống Trung Hoa, giòn thơm", 99_000, "canh-ga-nuong-ngu-vi-huong.jpg", grill));
+        dishes.add(buildDish("Mực nướng sa tế Trung Hoa", "Mực nướng phết sốt sa tế cay, thơm nức mùi than hoa", 129_000, "muc-nuong-sate-trung-hoa.jpg", grill));
+        dishes.add(buildDish("Đậu hũ nướng xiên Tân Cương", "Đậu hũ xiên nướng tẩm ớt bột và thì là kiểu Tân Cương, cay nhẹ", 69_000, "dau-hu-nuong-tan-cuong.jpg", grill));
+        dishes.add(buildDish("Bò cuộn hành nướng", "Thịt bò cuộn hành lá nướng than, thơm béo và mềm ngọt", 149_000, "bo-cuon-hanh-nuong.jpg", grill));
+        dishes.add(buildDish("Cá nướng cay Tứ Xuyên", "Cá nguyên con nướng phủ sốt cay Tứ Xuyên, đậu phộng và rau thơm", 259_000, "ca-nuong-tu-xuyen-cay.jpg", grill));
+        dishes.add(buildDish("Nấm nướng xiên thập cẩm", "Xiên nấm thập cẩm nướng than, tẩm dầu tỏi thơm béo", 69_000, "nam-nuong-xien-trung-hoa.jpg", grill));
+        dishes.add(buildDish("Heo sữa quay nguyên con", "Heo sữa quay nguyên con da giòn rụm đặc trưng, món tiệc cao cấp", 459_000, "heo-sua-quay-nguyen-con.jpg", grill));
+
+        // 10 Khai vị / Món nguội
+        dishes.add(buildDish("Trứng bách thảo dưa chua gừng", "Trứng bách thảo bổ đôi ăn kèm dưa gừng chua ngọt, món khai vị truyền thống", 45_000, "trung-bach-thao-dua-chua-gung.jpg", coldApp));
+        dishes.add(buildDish("Dưa chuột đập tỏi Trung Hoa", "Dưa chuột đập dập trộn tỏi ớt và dầu mè, giòn mát khai vị", 39_000, "dua-chuot-tron-toi-trung-hoa.jpg", coldApp));
+        dishes.add(buildDish("Đậu phộng ngũ vị Trung Hoa", "Đậu phộng rang tẩm ngũ vị hương, giòn bùi nhâm nhi", 35_000, "dau-phong-ngu-vi-trung-hoa.jpg", coldApp));
+        dishes.add(buildDish("Tai heo trộn Trung Hoa", "Tai heo luộc thái lát trộn dầu mè, tỏi ớt, món nguội giòn sần sật", 59_000, "tai-heo-tron-toi-trung-hoa.jpg", coldApp));
+        dishes.add(buildDish("Thịt heo ngâm tương Triều Châu", "Thịt heo ba chỉ ngâm nước tương kiểu Triều Châu, thái lát ăn nguội", 69_000, "thit-heo-ngam-tuong-trieu-chau.jpg", coldApp));
+        dishes.add(buildDish("Gà ngâm sốt nước bọt Tứ Xuyên", "Gà luộc thái miếng trộn sốt cay tê Tứ Xuyên, ăn lạnh khai vị", 79_000, "ga-ngam-hoa-tieu-trung-hoa.jpg", coldApp));
+        dishes.add(buildDish("Măng tây xào tỏi", "Măng tây xào tỏi giòn ngọt, món khai vị thanh nhẹ", 49_000, "mang-tay-xao-toi-trung-hoa.jpg", coldApp));
+        dishes.add(buildDish("Bò khô cay Tứ Xuyên", "Thịt bò khô tẩm cay kiểu Tứ Xuyên, dai giòn nhâm nhi", 89_000, "bo-kho-cay-tu-xuyen-lanh.jpg", coldApp));
+        dishes.add(buildDish("Đậu hũ thối Trường Sa", "Đậu hũ lên men chiên giòn kiểu Trường Sa, chấm tương ớt đặc trưng", 45_000, "dau-hu-thoi-truong-sa.jpg", coldApp));
+        dishes.add(buildDish("Rau cải trộn dầu mè", "Rau cải luộc trộn dầu mè và tỏi phi, món khai vị thanh đạm", 39_000, "rau-cai-tron-dau-me-trung-hoa.jpg", coldApp));
+
+        // 10 Hải sản Trung Hoa
+        dishes.add(buildDish("Tôm sốt trứng muối", "Tôm chiên giòn áo sốt trứng muối béo bùi, món hải sản được ưa chuộng", 189_000, "tom-sot-trung-muoi.jpg", seafood));
+        dishes.add(buildDish("Cua rang me", "Cua biển rang sốt me chua ngọt đậm đà, thấm vị đến từng thớ thịt", 349_000, "cua-rang-me.jpg", seafood));
+        dishes.add(buildDish("Cá hấp Hồ Nam cay", "Cá hấp sốt cay kiểu Hồ Nam, ớt tươi và tỏi phi thơm nồng", 199_000, "ca-hap-ho-nam-cay.jpg", seafood));
+        dishes.add(buildDish("Tôm hùm sốt gừng hành", "Tôm hùm sốt gừng hành thơm lừng, thịt ngọt chắc tự nhiên", 599_000, "tom-hum-sot-gung-hanh.jpg", seafood));
+        dishes.add(buildDish("Sò điệp hấp tỏi miến", "Sò điệp hấp tỏi phi cùng miến, giữ trọn vị ngọt tự nhiên", 229_000, "so-diep-hap-toi-trung-hoa.jpg", seafood));
+        dishes.add(buildDish("Mực xào sa tế", "Mực tươi xào sốt sa tế cay nhẹ, giòn sần sật đậm đà", 179_000, "muc-xao-sate-trung-hoa.jpg", seafood));
+        dishes.add(buildDish("Bào ngư sốt hào", "Bào ngư hầm sốt hào sánh đặc, món cao cấp trong ẩm thực Trung Hoa", 599_000, "bao-ngu-sot-hao-trung-hoa.jpg", seafood));
+        dishes.add(buildDish("Cá sông hấp xì dầu", "Cá nguyên con hấp xì dầu hành gừng, vị thanh nhẹ tự nhiên", 169_000, "ca-song-hap-xi-dau.jpg", seafood));
+        dishes.add(buildDish("Tôm chiên miếng quế", "Tôm tẩm bột chiên giòn tan, chấm sốt chua ngọt", 149_000, "tom-chien-mieng-que.jpg", seafood));
+        dishes.add(buildDish("Lươn xào sa tế Phúc Kiến", "Lươn xào sốt sa tế đậm đà kiểu Phúc Kiến, thịt lươn dai ngọt", 199_000, "luon-xao-sate-phuc-kien.jpg", seafood));
+
+        // 10 Tráng miệng Trung Hoa
+        dishes.add(buildDish("Bánh trứng Hồng Kông", "Bánh trứng nướng giòn xốp kiểu Hồng Kông, thơm bơ béo ngậy", 45_000, "banh-trung-hong-kong.jpg", dessertCn));
+        dishes.add(buildDish("Chè hạt sen tuyết yến", "Chè hạt sen nấu cùng tuyết yến thanh mát, bồi bổ sức khoẻ", 65_000, "che-hat-sen-tuyet-yen.jpg", dessertCn));
+        dishes.add(buildDish("Bánh quẩy đường chiên", "Bánh quẩy giòn rắc đường, món ăn vặt truyền thống Trung Hoa", 35_000, "banh-qua-duong-chien.jpg", dessertCn));
+        dishes.add(buildDish("Chè vừng đen Trung Hoa", "Chè mè đen sánh mịn, thơm béo và bổ dưỡng", 45_000, "che-vung-den-trung-hoa.jpg", dessertCn));
+        dishes.add(buildDish("Bánh trung thu mini", "Bánh trung thu nhân đậu xanh/hạt sen cỡ nhỏ, vỏ mềm dẻo", 55_000, "banh-trung-thu-mini.jpg", dessertCn));
+        dishes.add(buildDish("Xôi nước (Thang Viên) Trung Hoa", "Viên bột nếp nhân mè đen trong nước đường gừng ấm nóng", 49_000, "xoi-nuoc-trung-hoa-tangyuan.jpg", dessertCn));
+        dishes.add(buildDish("Chè đậu xanh Trung Hoa", "Chè đậu xanh nấu nhuyễn thanh mát, vị ngọt dịu nhẹ", 39_000, "che-dau-xanh-trung-hoa.jpg", dessertCn));
+        dishes.add(buildDish("Thạch hạnh nhân Trung Hoa", "Thạch hạnh nhân mềm mịn ăn cùng trái cây, thanh mát giải nhiệt", 45_000, "banh-trang-mieng-hanh-nhan.jpg", dessertCn));
+        dishes.add(buildDish("Bánh vừng chiên (Jian Dui)", "Bánh nếp chiên phủ mè rang, vỏ giòn nhân đậu ngọt bên trong", 49_000, "banh-bao-chien-dua-ngot.jpg", dessertCn));
+        dishes.add(buildDish("Chè xoài sago bưởi", "Chè xoài tươi cùng sago và bưởi, mát lạnh sảng khoái", 59_000, "che-xoai-sago-trung-hoa.jpg", dessertCn));
+
+        // 10 Món Việt
+        dishes.add(buildDish("Phở bò tái", "Phở bò truyền thống nước dùng hầm xương ninh nhiều giờ, thịt bò tái mềm", 79_000, "pho-bo-tai.jpg", vietnamese));
+        dishes.add(buildDish("Bún chả Hà Nội", "Bún ăn kèm chả nướng than hoa và nước chấm chua ngọt kiểu Hà Nội", 89_000, "bun-cha-ha-noi.jpg", vietnamese));
+        dishes.add(buildDish("Cơm tấm sườn bì chả", "Cơm tấm sườn nướng, bì và chả trứng, ăn kèm nước mắm chua ngọt", 89_000, "com-tam-suon-bi-cha.jpg", vietnamese));
+        dishes.add(buildDish("Gỏi cuốn tôm thịt", "Cuốn bánh tráng tôm thịt, bún và rau sống, chấm tương đậu phộng", 59_000, "goi-cuon-tom-thit.jpg", vietnamese));
+        dishes.add(buildDish("Chả giò (nem rán)", "Nem cuốn nhân thịt và mộc nhĩ chiên giòn, chấm nước mắm chua ngọt", 65_000, "cha-gio-nem-ran.jpg", vietnamese));
+        dishes.add(buildDish("Canh chua cá lóc", "Canh chua cá lóc nấu me, dứa và giá đỗ, đậm vị miền Tây Nam Bộ", 99_000, "canh-chua-ca-loc.jpg", vietnamese));
+        dishes.add(buildDish("Bò lá lốt nướng", "Thịt bò cuộn lá lốt nướng than, thơm mùi lá lốt đặc trưng", 109_000, "bo-la-lot-nuong.jpg", vietnamese));
+        dishes.add(buildDish("Gà kho gừng", "Gà kho gừng đậm đà, cay ấm và thơm nồng kiểu gia đình Việt", 99_000, "ga-kho-gung.jpg", vietnamese));
+        dishes.add(buildDish("Bún bò Huế", "Bún bò Huế cay nồng đặc trưng, giò heo và chả cua", 89_000, "bun-bo-hue.jpg", vietnamese));
+        dishes.add(buildDish("Cá kho tộ", "Cá lóc kho tộ đậm vị nước mắm và đường thắng, ăn cùng cơm trắng", 119_000, "ca-kho-to.jpg", vietnamese));
+
+        // 15 Đồ uống
+        dishes.add(buildDish("Trà hoa cúc Trung Hoa", "Trà hoa cúc thanh mát, thanh nhiệt và dịu nhẹ", 25_000, "tra-hoa-cuc-trung-hoa.jpg", drink));
+        dishes.add(buildDish("Trà ô long Đài Loan", "Trà ô long thơm đậm, hậu vị ngọt thanh đặc trưng Đài Loan", 35_000, "tra-o-long-dai-loan.jpg", drink));
+        dishes.add(buildDish("Trà sữa trân châu đường đen", "Trà sữa béo ngậy cùng trân châu đường đen dẻo dai", 55_000, "tra-sua-tran-chau-duong-den.jpg", drink));
+        dishes.add(buildDish("Nước mơ chua ngọt Trung Hoa", "Nước mơ chua ngọt giải khát kiểu Trung Hoa truyền thống", 39_000, "nuoc-mo-chua-ngot-trung-hoa.jpg", drink));
+        dishes.add(buildDish("Trà bí đao Trung Hoa", "Trà bí đao thanh mát, giải nhiệt và ít ngọt", 25_000, "tra-bi-dao-trung-hoa.jpg", drink));
+        dishes.add(buildDish("Sữa đậu nành nóng", "Sữa đậu nành nóng thơm béo, món uống sáng quen thuộc", 25_000, "sua-dau-nanh-nong.jpg", drink));
+        dishes.add(buildDish("Nước la hán quả", "Nước la hán quả thanh mát, vị ngọt dịu tự nhiên", 35_000, "nuoc-la-han-qua.jpg", drink));
+        dishes.add(buildDish("Trà vải Trung Hoa", "Trà trái vải thơm ngọt tự nhiên, giải khát sảng khoái", 45_000, "tra-vai-trung-hoa.jpg", drink));
+        dishes.add(buildDish("Trà nhài Trung Hoa", "Trà nhài thơm nhẹ nhàng, thanh đạm dễ uống", 25_000, "tra-nhai-trung-hoa.jpg", drink));
+        dishes.add(buildDish("Coca Cola lon", "Nước ngọt có ga Coca-Cola lon 330ml", 20_000, "coca-cola-lon.jpg", drink));
+        dishes.add(buildDish("Sprite lon", "Nước ngọt có ga vị chanh Sprite lon 330ml", 20_000, "sprite-lon.jpg", drink));
+        dishes.add(buildDish("Nước cam ép", "Nước cam vắt tươi nguyên chất, giàu vitamin C", 45_000, "nuoc-cam-ep.jpg", drink));
+        dishes.add(buildDish("Nước chanh dây", "Nước chanh dây chua ngọt sảng khoái, giải khát tự nhiên", 39_000, "nuoc-chanh-day.jpg", drink));
+        dishes.add(buildDish("Bia Tsingtao", "Bia Tsingtao Trung Quốc, vị nhẹ và thơm mát", 45_000, "bia-tsingtao.jpg", drink));
+        dishes.add(buildDish("Nước suối", "Nước khoáng đóng chai 500ml", 15_000, "nuoc-suoi-lavie.jpg", drink));
 
         dishRepository.saveAll(dishes);
     }
@@ -285,7 +406,8 @@ public class DatabaseSeeder implements CommandLineRunner
         LocalDateTime historyEnd = LocalDateTime.now().minusHours(3);
 
         // Sinh trước toàn bộ mốc thời gian rồi sort tăng dần, để khi insert theo
-        // đúng thứ tự này thì auto-increment ID cũng tăng dần theo thời gian tạo.
+        // đúng thứ tự này thì auto-increment ID của Order cũng tăng dần theo
+        // thời gian TẠO đơn.
         List<LocalDateTime> orderTimes = new ArrayList<>(HISTORICAL_ORDER_COUNT);
         for (int i = 0; i < HISTORICAL_ORDER_COUNT; i++)
         {
@@ -300,6 +422,14 @@ public class DatabaseSeeder implements CommandLineRunner
         List<Object[]> invoiceBackdates = new ArrayList<>();
         List<Object[]> paymentBackdates = new ArrayList<>();
         List<Object[]> transactionBackdates = new ArrayList<>();
+
+        // ─── Giai đoạn 1: tạo Order + OrderItem theo đúng thứ tự orderTime
+        // tăng dần (order_id tăng theo thời gian TẠO đơn). Chưa tạo Invoice/
+        // Payment ngay ở đây — chỉ tính trước invoiceDate và gom lại, để giai
+        // đoạn 2 sort riêng theo invoiceDate trước khi insert. ───
+        record PendingInvoice(Order order, LocalDateTime invoiceDate) {}
+
+        List<PendingInvoice> pendingInvoices = new ArrayList<>(HISTORICAL_ORDER_COUNT);
 
         for (LocalDateTime orderTime : orderTimes)
         {
@@ -333,6 +463,21 @@ public class DatabaseSeeder implements CommandLineRunner
             }
 
             LocalDateTime invoiceDate = orderTime.plusMinutes(60 + RNG.nextInt(90));
+            pendingInvoices.add(new PendingInvoice(order, invoiceDate));
+        }
+
+        // ─── Giai đoạn 2: tạo Invoice + Payment theo đúng thứ tự invoiceDate
+        // tăng dần — để invoice_id/payment_id tăng đúng theo thời gian THANH
+        // TOÁN thực tế (khách thanh toán trước nhận mã hóa đơn nhỏ hơn), độc
+        // lập với thứ tự tạo đơn ở giai đoạn 1. ───
+        List<PendingInvoice> sortedByInvoiceDate = new ArrayList<>(pendingInvoices);
+        sortedByInvoiceDate.sort(Comparator.comparing(PendingInvoice::invoiceDate));
+
+        for (PendingInvoice pending : sortedByInvoiceDate)
+        {
+            Order order = pending.order();
+            LocalDateTime invoiceDate = pending.invoiceDate();
+
             Invoice invoice = buildInvoice(order, invoiceDate);
             invoiceRepository.save(invoice);
             invoiceBackdates.add(new Object[]{Timestamp.valueOf(invoiceDate), invoice.getId()});
@@ -404,7 +549,17 @@ public class DatabaseSeeder implements CommandLineRunner
 
         int hour = 8 + RNG.nextInt(12);   // 8 - 19h
         int minute = RNG.nextInt(60);
-        return LocalDateTime.of(date, LocalTime.of(hour, minute));
+        LocalDateTime candidate = LocalDateTime.of(date, LocalTime.of(hour, minute));
+
+        // Nếu ngày random ra trùng đúng ngày cuối (end.toLocalDate()) thì giờ random
+        // ra không được vượt quá "end" thực tế (tránh sinh mốc thời gian tương lai
+        // khi ngày được chọn là hôm nay nhưng giờ hiện tại chưa tới 20h).
+        if (candidate.isAfter(end))
+        {
+            candidate = end;
+        }
+
+        return candidate;
     }
 
 

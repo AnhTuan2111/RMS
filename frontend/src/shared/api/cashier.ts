@@ -144,4 +144,13 @@ export const cashierApi = {
         apiClient.post<PaymentResponse>(
             `/cashier/orders/${orderId}/unlock`,
         ),
+
+    // API 7: Lấy danh sách phương thức thanh toán
+    getPaymentMethods: (signal?: AbortSignal) =>
+        apiClient.get<string[]>(
+            '/cashier/payment-methods',
+            {
+                signal,
+            },
+        ),
 };

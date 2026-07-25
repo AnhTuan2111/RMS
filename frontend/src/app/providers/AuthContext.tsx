@@ -95,7 +95,7 @@ export function AuthProvider({
                     requestError,
                 )
 
-                authApi.logout()
+                await authApi.logout()
                 setUser(null)
             } finally {
                 if (!controller.signal.aborted) {

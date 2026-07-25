@@ -1,3 +1,6 @@
+import {useActor} from '@/app/providers/ActorContext'
+import {RoleType} from '@/shared/types/auth'
+
 type DashboardTopbarProps = {
     onLogout: () => void
 }
@@ -5,20 +8,47 @@ type DashboardTopbarProps = {
 export function DashboardTopbar({
                                     onLogout,
                                 }: DashboardTopbarProps) {
+    const {actor} = useActor()
+    const isCustomer = actor === RoleType.CUSTOMER
+
+    const stored = localStorage.getItem('currentUser')
+    const currentUser = stored
+        ? JSON.parse(stored) as {fullName: string; username: string}
+        : null
+
     return (
         <header className="rims-topbar">
             <div className="rims-topbar-heading">
-                <span className="rims-topbar-eyebrow">
-                    <span className="rims-topbar-live-dot"/>
-                    TRUNG TÂM ĐIỀU HÀNH RIMS
-                </span>
+                {isCustomer ? (
+                    <>
+                        <span className="rims-topbar-eyebrow">
+                            <span className="rims-topbar-live-dot"/>
+                            MÃN VỊ LÂU
+                        </span>
 
-                <h1>Hệ thống quản lý nhà hàng</h1>
+                        <h1>
+                            Chào mừng, {currentUser?.fullName ?? currentUser?.username ?? 'Quý khách'}
+                        </h1>
 
-                <p>
-                    Theo dõi và điều phối hoạt động nhà hàng theo thời
-                    gian thực.
-                </p>
+                        <p>
+                            Quản lý đặt bàn và hồ sơ cá nhân của bạn.
+                        </p>
+                    </>
+                ) : (
+                    <>
+                        <span className="rims-topbar-eyebrow">
+                            <span className="rims-topbar-live-dot"/>
+                            TRUNG TÂM ĐIỀU HÀNH RIMS
+                        </span>
+
+                        <h1>Hệ thống quản lý nhà hàng</h1>
+
+                        <p>
+                            Theo dõi và điều phối hoạt động nhà hàng theo thời
+                            gian thực.
+                        </p>
+                    </>
+                )}
             </div>
 
             <div className="rims-topbar-actions">

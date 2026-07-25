@@ -274,9 +274,234 @@
 }
 
 /* =========================
-   ADMIN PAYMENT DETAIL
+   ADMIN INVOICE DETAIL
 ========================= */
 
+.admin-invoice-detail-page {
+    position: relative;
+
+    display: grid;
+    gap: 18px;
+
+    min-height: calc(100vh - 100px);
+    margin: -28px;
+    padding: 28px;
+
+    background: #f4f5f7;
+}
+
+.admin-invoice-detail-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 4px;
+    border-radius: 999px;
+
+    background: linear-gradient(90deg, #7c3aed 0%, #f97316 100%);
+}
+
+.admin-invoice-detail-card {
+    overflow: hidden;
+
+    border: 1px solid #e8eaed;
+    border-radius: 16px;
+
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.admin-invoice-detail-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 22px 24px 18px;
+}
+
+.admin-invoice-detail-back-button {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+
+    background: #ffffff;
+    color: #333333;
+
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.admin-invoice-detail-back-button:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.admin-invoice-detail-header h1 {
+    margin: 0;
+
+    color: #333333;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+.admin-invoice-detail-header p {
+    margin: 6px 0 0;
+
+    color: #555555;
+    font-size: 14px;
+}
+
+.admin-invoice-detail-table {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-invoice-detail-table-head,
+.admin-invoice-detail-row {
+    min-width: 640px;
+
+    display: grid;
+    grid-template-columns: minmax(220px, 2fr) 72px minmax(120px, 1fr) minmax(140px, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+}
+
+.admin-invoice-detail-table-head {
+    border-top: 1px solid #eef1f4;
+    border-bottom: 1px solid #eef1f4;
+
+    color: #555555;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+}
+
+.admin-invoice-detail-table-head span:nth-child(2) {
+    text-align: center;
+}
+
+.admin-invoice-detail-table-head span:nth-child(3),
+.admin-invoice-detail-table-head span:nth-child(4) {
+    text-align: right;
+}
+
+.admin-invoice-detail-row {
+    border-bottom: 1px solid #f1f3f5;
+
+    color: #333333;
+    font-size: 14px;
+}
+
+.admin-invoice-detail-row:last-of-type {
+    border-bottom: 0;
+}
+
+.admin-invoice-dish-name {
+    color: #333333;
+    font-weight: 700;
+}
+
+.admin-invoice-qty {
+    text-align: center;
+    color: #555555;
+}
+
+.admin-invoice-price,
+.admin-invoice-line-total {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.admin-invoice-line-total {
+    color: #333333;
+    font-weight: 800;
+}
+
+.admin-invoice-detail-empty {
+    min-width: 640px;
+    min-height: 140px;
+
+    display: grid;
+    place-items: center;
+
+    color: #64748b;
+    font-size: 14px;
+}
+
+.admin-invoice-summary-card {
+    padding: 20px 24px 22px;
+
+    display: grid;
+    gap: 10px;
+}
+
+.admin-invoice-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    color: #555555;
+    font-size: 14px;
+}
+
+.admin-invoice-summary-row span:last-child {
+    color: #333333;
+    font-variant-numeric: tabular-nums;
+}
+
+.admin-invoice-summary-row-total {
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid #eef1f4;
+
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.admin-invoice-summary-row-total span:first-child {
+    color: #333333;
+}
+
+.admin-invoice-summary-highlight {
+    color: #d32f2f !important;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.admin-invoice-detail-state {
+    min-height: 220px;
+    padding: 32px 24px;
+
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 12px;
+
+    color: #64748b;
+    text-align: center;
+}
+
+.admin-invoice-detail-state h2 {
+    margin: 0;
+    color: #333333;
+}
+
+.admin-invoice-detail-state p {
+    margin: 0;
+}
+
+/* Legacy aliases kept for any remaining references */
 .admin-payment-detail-page {
     display: grid;
     gap: 18px;
@@ -809,7 +1034,7 @@
     margin: 0;
 }
 
-.revenue-comparison-date-field > span {
+.revenue-comparison-date-field>span {
     color: #475569;
     font-size: 13px;
     font-weight: 850;
@@ -1559,6 +1784,21 @@
     gap: 1rem;
 }
 
+.admin-bestseller-dashboard-panel .order-shift-dashboard-header>div:first-child {
+    min-width: 260px;
+    flex: 1 1 320px;
+}
+
+.admin-bestseller-dashboard-panel .order-shift-filter-area {
+    flex: 0 0 auto;
+}
+
+.admin-bestseller-category-filter-row {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: -6px;
+}
+
 .admin-bestseller-category-filter {
     min-width: 220px;
     display: grid;
@@ -1857,7 +2097,7 @@
     font-size: 14px;
 }
 
-.reservation-summary-card + .reservation-summary-card {
+.reservation-summary-card+.reservation-summary-card {
     border-left: 1px solid #e5e7eb;
 }
 
@@ -2283,7 +2523,7 @@
     gap: 6px;
 }
 
-.weekly-overview-kpi-content > span {
+.weekly-overview-kpi-content>span {
     color: #64748b;
     font-size: 13px;
     font-weight: 850;
@@ -2441,7 +2681,7 @@
     background: #fef2f2;
 }
 
-.weekly-comparison-card > span {
+.weekly-comparison-card>span {
     color: #64748b;
     font-size: 13px;
     font-weight: 850;
@@ -2731,6 +2971,7 @@
 }
 
 @media (max-width: 560px) {
+
     .weekly-overview-dashboard,
     .weekly-overview-panel {
         padding: 18px;
@@ -3426,14 +3667,16 @@
 }
 
 .admin-revenue-date-field {
+    position: relative;
     min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.admin-revenue-date-field > span:first-child {
-    color: #334155;
+.admin-revenue-date-field>label,
+.admin-revenue-date-field>span:first-child {
+    color: #0b0f19;
     font-size: 13px;
     font-weight: 650;
 }
@@ -3444,10 +3687,10 @@
     align-items: center;
     gap: 10px;
     padding: 0 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
     background: #ffffff;
-    color: #64748b;
+    color: #111827;
 }
 
 .admin-revenue-date-input-shell:focus-within {
@@ -3482,6 +3725,179 @@
 
 .admin-revenue-date-input-shell input::placeholder {
     color: #9ca3af;
+}
+
+.admin-revenue-calendar-trigger {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #111827;
+    cursor: pointer;
+}
+
+.admin-revenue-calendar-trigger:hover,
+.admin-revenue-calendar-trigger:focus-visible {
+    background: #f1f5f9;
+}
+
+.admin-revenue-date-picker {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 50;
+    width: min(320px, calc(100vw - 48px));
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+}
+
+.admin-revenue-calendar-nav {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 34px;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-revenue-calendar-nav-button {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #111827;
+    font: inherit;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.admin-revenue-calendar-nav-button:hover,
+.admin-revenue-calendar-nav-button:focus-visible {
+    background: #f1f5f9;
+}
+
+.admin-revenue-calendar-title {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: #111827;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.admin-revenue-calendar-title select {
+    min-width: 0;
+    height: 32px;
+    padding: 0 6px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #111827;
+    font: inherit;
+    cursor: pointer;
+}
+
+.admin-revenue-calendar-title select:hover,
+.admin-revenue-calendar-title select:focus {
+    border-color: #cbd5e1;
+    outline: 0;
+}
+
+.admin-revenue-calendar-weekdays,
+.admin-revenue-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.admin-revenue-calendar-weekdays {
+    margin-top: 12px;
+}
+
+.admin-revenue-calendar-weekdays span {
+    height: 28px;
+    display: grid;
+    place-items: center;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.admin-revenue-calendar-day {
+    width: 100%;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #111827;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.admin-revenue-calendar-day:hover,
+.admin-revenue-calendar-day:focus-visible {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.admin-revenue-calendar-day.outside-month {
+    color: #cbd5e1;
+}
+
+.admin-revenue-calendar-day.today {
+    box-shadow: inset 0 0 0 1px #93c5fd;
+}
+
+.admin-revenue-calendar-day.selected {
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.admin-revenue-calendar-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.admin-revenue-calendar-footer button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #2563eb;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-revenue-calendar-footer button:hover,
+.admin-revenue-calendar-footer button:focus-visible {
+    color: #1d4ed8;
+    text-decoration: underline;
 }
 
 .admin-revenue-apply-button {
@@ -3611,6 +4027,7 @@
 }
 
 @media (max-width: 560px) {
+
     .admin-revenue-dashboard,
     .admin-revenue-filter-panel {
         padding: 20px;
@@ -3937,7 +4354,8 @@
 .admin-category-col-actions {
     text-align: center;
     width: 140px;
-    min-width: 130px; /* Thêm dòng này để bảo vệ 3 nút luôn đủ chỗ đứng trên một hàng */
+    min-width: 130px;
+    /* Thêm dòng này để bảo vệ 3 nút luôn đủ chỗ đứng trên một hàng */
 }
 
 .admin-category-cell-id {
@@ -3977,8 +4395,10 @@
     /* Thêm các dòng dưới đây */
     display: flex;
     align-items: center;
-    justify-content: center; /* Căn giữa ô, nếu muốn căn trái thì đổi thành flex-start */
-    gap: 8px; /* Tạo khoảng cách đều 8px giữa các nút */
+    justify-content: center;
+    /* Căn giữa ô, nếu muốn căn trái thì đổi thành flex-start */
+    gap: 8px;
+    /* Tạo khoảng cách đều 8px giữa các nút */
 }
 
 /* Category Info */
@@ -4076,7 +4496,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0; /* Tuyệt đối không cho nút bị bóp méo khi thu nhỏ màn hình */
+    flex-shrink: 0;
+    /* Tuyệt đối không cho nút bị bóp méo khi thu nhỏ màn hình */
     transition: all 0.15s ease;
 }
 
@@ -6379,8 +6800,8 @@ ADMIN DISHES PAGE STYLES
     border-radius: 22px;
     border: 1px solid rgba(226, 232, 240, 0.95);
     background:
-            radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.10), transparent 24rem),
-            linear-gradient(180deg, #ffffff, #f8fafc);
+        radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.10), transparent 24rem),
+        linear-gradient(180deg, #ffffff, #f8fafc);
     box-shadow: 0 22px 55px rgba(15, 23, 42, 0.08);
 }
 
@@ -6405,8 +6826,8 @@ ADMIN DISHES PAGE STYLES
     border-radius: 16px;
     background: #ffffff;
     box-shadow:
-            0 10px 28px rgba(15, 23, 42, 0.07),
-            inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        0 10px 28px rgba(15, 23, 42, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .weekly-overview-kpi-grid {
@@ -6428,30 +6849,30 @@ ADMIN DISHES PAGE STYLES
     border-radius: 18px;
     border: 1px solid #e2e8f0;
     background:
-            radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.08), transparent 9rem),
-            #ffffff;
+        radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.08), transparent 9rem),
+        #ffffff;
     box-shadow:
-            0 16px 38px rgba(15, 23, 42, 0.07),
-            inset 0 1px 0 rgba(255, 255, 255, 0.75);
+        0 16px 38px rgba(15, 23, 42, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75);
     transition:
-            transform 0.18s ease,
-            border-color 0.18s ease,
-            box-shadow 0.18s ease;
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
 .weekly-overview-kpi-card:hover {
     transform: translateY(-3px);
     border-color: #bfdbfe;
     box-shadow:
-            0 22px 54px rgba(15, 23, 42, 0.11),
-            inset 0 1px 0 rgba(255, 255, 255, 0.75);
+        0 22px 54px rgba(15, 23, 42, 0.11),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .weekly-overview-kpi-card.featured {
     border-color: #fed7aa;
     background:
-            radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.14), transparent 9rem),
-            linear-gradient(180deg, #fff7ed, #ffffff);
+        radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.14), transparent 9rem),
+        linear-gradient(180deg, #fff7ed, #ffffff);
 }
 
 .weekly-overview-kpi-top {
@@ -6502,7 +6923,7 @@ ADMIN DISHES PAGE STYLES
     gap: 8px;
 }
 
-.weekly-overview-kpi-content > span {
+.weekly-overview-kpi-content>span {
     min-height: 34px;
     display: flex;
     align-items: flex-end;
@@ -6570,21 +6991,26 @@ ADMIN DISHES PAGE STYLES
     height: 48px;
     overflow: hidden;
     border-radius: 8px;
-    flex-shrink: 0; /* tránh bị bóp méo khi flex container co lại */
+    flex-shrink: 0;
+    /* tránh bị bóp méo khi flex container co lại */
 }
+
 .admin-dish-image-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* ảnh sẽ crop vừa khung, không méo */
+    object-fit: cover;
+    /* ảnh sẽ crop vừa khung, không méo */
 }
 
 /* 2. Ảnh trong modal xem chi tiết (VIEW) */
 .admin-dish-view-image {
     width: 100%;
-    height: 240px; /* hoặc bất kỳ chiều cao cố định nào bạn muốn */
+    height: 240px;
+    /* hoặc bất kỳ chiều cao cố định nào bạn muốn */
     overflow: hidden;
     border-radius: 12px;
 }
+
 .admin-dish-view-image img {
     width: 100%;
     height: 100%;
@@ -6600,8 +7026,10 @@ ADMIN DISHES PAGE STYLES
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f3f4f6; /* màu nền khi chưa có ảnh */
+    background: #f3f4f6;
+    /* màu nền khi chưa có ảnh */
 }
+
 .admin-dish-image-preview img {
     width: 100%;
     height: 100%;
@@ -6615,8 +7043,539 @@ ADMIN DISHES PAGE STYLES
     overflow: hidden;
     border-radius: 12px;
 }
+
 .admin-dish-preview-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+/* =========================================================
+   ADMIN PAYMENT DETAIL
+========================================================= */
+
+
+/* =========================================================
+   1. NỀN TỔNG THỂ
+========================================================= */
+
+.admin-invoice-detail-page {
+    width: 100%;
+    min-height: 100vh;
+
+    background: #ffffff;
+
+    color: #0f172a;
+
+    box-sizing: border-box;
+}
+
+
+/* Dải gradient phía trên */
+.admin-invoice-detail-gradient {
+    width: 100%;
+    height: 5px;
+
+    background: linear-gradient(90deg,
+            #4f46e5 0%,
+            #6366f1 25%,
+            #8b5cf6 48%,
+            #f97316 78%,
+            #fb923c 100%);
+}
+
+
+/* Khu vực nền xám chứa hóa đơn */
+.admin-invoice-detail-content {
+    width: 100%;
+    min-height: calc(100vh - 5px);
+
+    padding: 20px;
+
+    background: #f4f6f9;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   2. CARD CHUNG
+========================================================= */
+
+.admin-invoice-detail-card {
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.03),
+        0 4px 14px rgba(15, 23, 42, 0.04);
+
+    box-sizing: border-box;
+}
+
+
+/* Card phía trên */
+.admin-invoice-main-card {
+    overflow: hidden;
+
+    margin-bottom: 18px;
+}
+
+
+/* =========================================================
+   3. HEADER HÓA ĐƠN
+========================================================= */
+
+.admin-invoice-detail-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    padding: 20px 20px 18px 20px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #f1f5f9;
+}
+
+
+/* Nút quay lại */
+.admin-invoice-detail-back-button {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    padding: 0;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    color: #1e293b;
+
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.admin-invoice-detail-back-button:hover {
+    background: #f8fafc;
+
+    border-color: #cbd5e1;
+
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+
+    transform: translateX(-1px);
+}
+
+
+.admin-invoice-detail-back-button:active {
+    transform: scale(0.96);
+}
+
+
+/* Khối title */
+.admin-invoice-detail-heading {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+
+/* Tiêu đề hóa đơn */
+.admin-invoice-detail-heading h1 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 23px;
+    font-weight: 700;
+
+    line-height: 1.3;
+
+    letter-spacing: -0.3px;
+}
+
+
+/* Thông tin bàn + giờ + ngày */
+.admin-invoice-detail-heading p {
+    margin: 5px 0 0 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+    font-weight: 400;
+
+    line-height: 1.5;
+}
+
+
+.admin-invoice-info-dot {
+    display: inline-block;
+
+    margin: 0 7px;
+
+    color: #cbd5e1;
+}
+
+
+/* =========================================================
+   4. BẢNG DANH SÁCH MÓN ĂN
+========================================================= */
+
+.admin-invoice-detail-table {
+    width: 100%;
+
+    background: #ffffff;
+}
+
+
+/* Header của bảng */
+.admin-invoice-detail-table-head {
+    display: grid;
+
+    grid-template-columns:
+        minmax(300px, 2fr) 100px minmax(150px, 1fr) minmax(170px, 1fr);
+
+    align-items: center;
+
+    min-height: 46px;
+
+    padding: 0 20px;
+
+    background: #eef2f6;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    box-sizing: border-box;
+}
+
+
+.admin-invoice-detail-table-head span {
+    color: #475569;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.35px;
+}
+
+
+/* Căn cột */
+.admin-invoice-detail-table-head span:nth-child(2) {
+    text-align: center;
+}
+
+
+.admin-invoice-detail-table-head span:nth-child(3),
+.admin-invoice-detail-table-head span:nth-child(4) {
+    text-align: right;
+}
+
+
+/* Dòng món ăn */
+.admin-invoice-detail-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(300px, 2fr) 100px minmax(150px, 1fr) minmax(170px, 1fr);
+
+    align-items: center;
+
+    min-height: 55px;
+
+    padding: 0 20px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    box-sizing: border-box;
+
+    transition: background-color 0.15s ease;
+}
+
+
+.admin-invoice-detail-row:last-child {
+    border-bottom: none;
+}
+
+
+.admin-invoice-detail-row:hover {
+    background: #fafcff;
+}
+
+
+/* Chữ chung của dòng */
+.admin-invoice-detail-row span {
+    color: #1e293b;
+
+    font-size: 14px;
+}
+
+
+/* Tên món */
+.admin-invoice-dish-name {
+    font-weight: 600;
+}
+
+
+/* Số lượng */
+.admin-invoice-qty {
+    text-align: center;
+
+    font-weight: 500;
+}
+
+
+/* Đơn giá */
+.admin-invoice-price {
+    text-align: right;
+
+    font-weight: 500;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Thành tiền từng món */
+.admin-invoice-line-total {
+    text-align: right;
+
+    color: #0f172a !important;
+
+    font-weight: 700 !important;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Empty */
+.admin-invoice-detail-empty {
+    padding: 45px 20px;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    text-align: center;
+
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   5. CARD TỔNG KẾT THANH TOÁN
+========================================================= */
+
+.admin-invoice-summary-wrapper {
+    padding: 0;
+
+    overflow: hidden;
+}
+
+
+.admin-invoice-summary-card {
+    width: 100%;
+
+    padding: 18px 20px 22px 20px;
+
+    background: #ffffff;
+
+    box-sizing: border-box;
+}
+
+
+/* Từng dòng summary */
+.admin-invoice-summary-row {
+    width: 100%;
+
+    min-height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    font-size: 14px;
+}
+
+
+/* Label trái */
+.admin-invoice-summary-label {
+    color: #334155;
+
+    font-weight: 500;
+}
+
+
+/* Giá trị phải */
+.admin-invoice-summary-value {
+    color: #0f172a;
+
+    font-weight: 500;
+
+    text-align: right;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Đường phân cách */
+.admin-invoice-summary-divider {
+    width: 100%;
+    height: 1px;
+
+    margin: 8px 0 7px 0;
+
+    background: #e2e8f0;
+}
+
+
+/* =========================================================
+   6. DÒNG THÀNH TIỀN
+========================================================= */
+
+.admin-invoice-summary-row-total {
+    min-height: 50px;
+
+    margin-bottom: 4px;
+}
+
+
+/* Label THÀNH TIỀN */
+.admin-invoice-total-label {
+    color: #dc2626;
+
+    font-size: 16px;
+    font-weight: 800;
+
+    letter-spacing: 0.15px;
+}
+
+
+/* Giá trị THÀNH TIỀN */
+.admin-invoice-summary-highlight {
+    color: #dc2626;
+
+    font-size: 22px;
+    font-weight: 800;
+
+    text-align: right;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================================================
+   7. ERROR STATE
+========================================================= */
+
+.admin-invoice-detail-state {
+    padding: 40px;
+
+    text-align: center;
+}
+
+
+.admin-invoice-detail-state h2 {
+    margin: 0 0 8px 0;
+
+    color: #0f172a;
+}
+
+
+.admin-invoice-detail-state p {
+    margin: 0;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   8. RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .admin-invoice-detail-content {
+        padding: 14px;
+    }
+
+
+    .admin-invoice-detail-table {
+        overflow-x: auto;
+    }
+
+
+    .admin-invoice-detail-table-head,
+    .admin-invoice-detail-row {
+        min-width: 760px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .admin-invoice-detail-content {
+        padding: 10px;
+    }
+
+
+    .admin-invoice-detail-card {
+        border-radius: 12px;
+    }
+
+
+    .admin-invoice-detail-header {
+        padding: 16px;
+    }
+
+
+    .admin-invoice-detail-heading h1 {
+        font-size: 19px;
+    }
+
+
+    .admin-invoice-detail-heading p {
+        font-size: 12px;
+    }
+
+
+    .admin-invoice-summary-card {
+        padding: 16px;
+    }
+
+
+    .admin-invoice-total-label {
+        font-size: 15px;
+    }
+
+
+    .admin-invoice-summary-highlight {
+        font-size: 19px;
+    }
 }

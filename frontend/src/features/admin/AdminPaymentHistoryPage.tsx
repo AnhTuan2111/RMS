@@ -1,6 +1,7 @@
 import {
     useCallback,
     useEffect,
+    useRef,
     useState,
     type CSSProperties,
 } from 'react'
@@ -22,6 +23,7 @@ import {
 } from '@/shared/components/ui'
 
 const PAYMENT_HISTORY_PAGE_SIZE = 10
+const PAYMENT_HISTORY_FILTER_DELAY_MS = 350
 
 function formatCurrency(value: number) {
     return `${new Intl.NumberFormat('vi-VN').format(value)}đ`
@@ -116,6 +118,7 @@ function PaymentMethodBadge({
 
 export default function AdminPaymentHistoryPage() {
     const navigate = useNavigate()
+    const hasLoadedHistoryRef = useRef(false)
 
     const [payments, setPayments] =
         useState<AdminPaymentHistoryItem[]>([])
@@ -127,8 +130,8 @@ export default function AdminPaymentHistoryPage() {
     const [error, setError] = useState<string | null>(null)
 
     const [tableFilter, setTableFilter] = useState('')
-    const [customerFilter, setCustomerFilter] = useState('')
     const [methodFilter, setMethodFilter] = useState('ALL')
+    const [keywordInput, setKeywordInput] = useState('')
     const [keywordFilter, setKeywordFilter] = useState('')
 
 
@@ -141,7 +144,6 @@ export default function AdminPaymentHistoryPage() {
         ) => {
             const filters = {
                 tableNumber: tableFilter.trim() || undefined,
-                customerKeyword: customerFilter.trim() || undefined,
                 paymentMethod:
                     methodFilter === 'ALL'
                         ? undefined
@@ -184,6 +186,7 @@ export default function AdminPaymentHistoryPage() {
                 setTotalItems(data.totalItems)
                 setTotalPages(data.totalPages)
                 setError(null)
+                hasLoadedHistoryRef.current = true
 
                 if (effectivePage !== targetPage) {
                     setPage(effectivePage)
@@ -205,7 +208,6 @@ export default function AdminPaymentHistoryPage() {
         },
         [
             tableFilter,
-            customerFilter,
             methodFilter,
             keywordFilter,
         ],
@@ -213,11 +215,25 @@ export default function AdminPaymentHistoryPage() {
 
     useEffect(() => {
         const controller = new AbortController()
+        const shouldShowFullLoading = !hasLoadedHistoryRef.current
 
-        void loadPaymentHistory(page, true, controller.signal)
+        void loadPaymentHistory(
+            page,
+            shouldShowFullLoading,
+            controller.signal,
+        )
 
         return () => controller.abort()
     }, [loadPaymentHistory, page])
+
+    useEffect(() => {
+        const timeoutId = window.setTimeout(() => {
+            setKeywordFilter(keywordInput)
+            setPage(1)
+        }, PAYMENT_HISTORY_FILTER_DELAY_MS)
+
+        return () => window.clearTimeout(timeoutId)
+    }, [keywordInput])
 
     function handleFilterChange() {
         setPage(1)
@@ -225,8 +241,8 @@ export default function AdminPaymentHistoryPage() {
 
     function clearFilters() {
         setTableFilter('')
-        setCustomerFilter('')
         setMethodFilter('ALL')
+        setKeywordInput('')
         setKeywordFilter('')
         setPage(1)
     }
@@ -240,13 +256,6 @@ export default function AdminPaymentHistoryPage() {
         )
 
         setPage(safeNextPage)
-
-        loadPaymentHistory(
-            safeNextPage,
-            true,
-        ).catch((requestError) => {
-            console.error(requestError)
-        })
     }
 
     if (isLoading) {
@@ -290,7 +299,7 @@ export default function AdminPaymentHistoryPage() {
         <div className="admin-payment-history-page">
             <PageCard className="admin-payment-header-card">
                 <PageHeader
-                    title="Lịch sử danh sách"
+                    title="Lịch sử hóa đơn"
                     description={`${totalItems} hóa đơn đã thanh toán được ghi nhận`}
                     actions={
                         <button
@@ -311,6 +320,8 @@ export default function AdminPaymentHistoryPage() {
                         display: 'flex',
                         gap: 10,
                         flexWrap: 'wrap',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
                     }}
                 >
                     <select
@@ -331,21 +342,6 @@ export default function AdminPaymentHistoryPage() {
                         ))}
                     </select>
 
-                    <input
-                        type="text"
-                        value={customerFilter}
-                        placeholder="Tìm theo tên/SĐT khách hàng..."
-                        style={{
-                            ...filterInputStyle,
-                            flex: 1,
-                            minWidth: 200,
-                        }}
-                        onChange={(event) => {
-                            setCustomerFilter(event.target.value)
-                            handleFilterChange()
-                        }}
-                    />
-
                     <select
                         value={methodFilter}
                         style={filterInputStyle}
@@ -361,15 +357,14 @@ export default function AdminPaymentHistoryPage() {
 
                     <input
                         type="text"
-                        value={keywordFilter}
+                        value={keywordInput}
                         placeholder="Mã hóa đơn..."
                         style={{
                             ...filterInputStyle,
                             width: 140,
                         }}
                         onChange={(event) => {
-                            setKeywordFilter(event.target.value)
-                            handleFilterChange()
+                            setKeywordInput(event.target.value)
                         }}
                     />
 

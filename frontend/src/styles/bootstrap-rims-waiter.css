@@ -57,18 +57,19 @@
     width: 0.85rem;
     height: 0.85rem;
     border-radius: 0.25rem;
+    border: 0.1rem solid #ededed;
 }
 
 .waiter-dot-available {
-    background: #4ade80;
+    background: #16a34a;
 }
 
 .waiter-dot-serving {
-    background: #fb923c;
+    background: #ea580c;
 }
 
 .waiter-dot-reserved {
-    background: #f87171;
+    background: #2563EB;
 }
 
 .waiter-table-grid {
@@ -189,11 +190,11 @@
 }
 
 .waiter-table-reserved {
-    background: #fef2f2;
+    background: #EFF6FF;
 }
 
 .waiter-table-reserved .waiter-table-status {
-    color: #dc2626;
+    color: #2563EB;
 }
 
 /* Sub screen headers */
@@ -683,4 +684,18 @@
 .waiter-detail-row strong {
     color: #0f172a;
     text-align: right;
+}
+
+.waiter-search-input {
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    margin: 0.75rem 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.waiter-search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
 }

@@ -12,6 +12,7 @@ import vn.edu.fpt.swp391.g6.rimsapi.dto.request.user.VerifyOtpRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.auth.AuthenticationResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.auth.LogoutResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.user.UserProfileResponse;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.InvalidTokenException;
 import vn.edu.fpt.swp391.g6.rimsapi.security.UserPrincipal;
 import vn.edu.fpt.swp391.g6.rimsapi.service.AuthService;
 import vn.edu.fpt.swp391.g6.rimsapi.service.UserService;
@@ -50,11 +51,20 @@ public class AuthController
     @PostMapping("/logout")
     public LogoutResponse logout(
             @AuthenticationPrincipal UserPrincipal principal,
-            @RequestHeader("Authorization") String authHeader
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody(required = false) RefreshTokenRequest refreshTokenRequest
     )
     {
-        String token = authHeader.substring(7);
-        return authService.logout(principal, token);
+        if (authHeader == null || !authHeader.startsWith("Bearer "))
+        {
+            throw new InvalidTokenException("Access token không hợp lệ");
+        }
+        String accessToken = authHeader.substring(7);
+
+        // Refresh token là optional ở tầng HTTP: FE có thể không gửi body (vd chỉ muốn xoá access token), nên phải check null tránh NullPointerException khi gọi getRefreshToken()
+        String refreshToken = (refreshTokenRequest != null) ? refreshTokenRequest.getRefreshToken() : null;
+
+        return authService.logout(principal, accessToken, refreshToken);
     }
 
     @PostMapping("/forgot-password")

@@ -1,4 +1,4 @@
-﻿import {apiClient} from './client'
+import {apiClient} from './client'
 import type {
     LoginRequest,
     LoginResponse,
@@ -7,6 +7,7 @@ import type {
 import {
     clearTokens,
     setTokens,
+    getRefreshToken
 } from '../utils/tokenStorage'
 
 export interface RegisterRequest {
@@ -142,10 +143,20 @@ export async function getCurrentUser(
     return currentUser
 }
 
-export function logout() {
-    clearTokens()
-    localStorage.removeItem('currentUser')
-    localStorage.removeItem('selectedActor')
+export async function logout(): Promise<void> {
+    const refreshToken = getRefreshToken()
+
+    try {
+        await apiClient.post('/auth/logout', {
+            refreshToken,
+        })
+    } catch (error) {
+        console.error('[AUTH_LOGOUT_API_ERROR]', error)
+    } finally {
+        clearTokens()
+        localStorage.removeItem('currentUser')
+        localStorage.removeItem('selectedActor')
+    }
 }
 
 export async function forgotPassword(

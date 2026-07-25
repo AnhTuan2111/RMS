@@ -181,7 +181,7 @@ export default function AdminDishesPage() {
             });
             setActiveModal('NONE');
             await loadAllData(undefined, true, true);
-            alert("Thêm món ăn thành công! 🎉");
+            alert("Thêm món ăn thành công!");
         } catch (err: unknown) {
             const errMsg = getRequestErrorMessage(
                 err,
@@ -745,7 +745,7 @@ export default function AdminDishesPage() {
                                     }}
                                     className="admin-dish-btn-primary"
                                 >
-                                    📝 Chỉnh sửa
+                                    Chỉnh sửa
                                 </button>
                                 <button
                                     onClick={() => {

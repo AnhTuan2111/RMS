@@ -179,7 +179,7 @@ function formatWeekRangeLabel(week: WeekOption) {
 }
 
 function formatRevenueCurrency(value?: number | null) {
-    return `${new Intl.NumberFormat('vi-VN').format(value ?? 0)} đ`
+    return `${new Intl.NumberFormat('vi-VN').format(value ?? 0)} ₫`
 }
 
 function formatNumber(value?: number | null) {
@@ -194,7 +194,7 @@ function formatDecimal(value?: number | null) {
 }
 
 function formatRevenueAxis(value: number) {
-    return `${formatNumber(value)} đ`
+    return `${formatNumber(value)} ₫`
 }
 
 function getDishInitial(dishName: string) {
@@ -415,8 +415,18 @@ function MoneyIcon() {
             aria-hidden="true"
             viewBox="0 0 24 24"
         >
-            <path d="M12 2v20"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"/>
+            <rect
+                height="12"
+                rx="2"
+                width="20"
+                x="2"
+                y="6"
+            />
+            <circle
+                cx="12"
+                cy="12"
+                r="3"
+            />
         </svg>
     )
 }
@@ -721,7 +731,7 @@ function WeeklyRevenueOverviewDashboard({
             <section className="weekly-overview-kpi-grid">
                 <WeeklyOverviewKpiCard
                     icon={<MoneyIcon/>}
-                    marker="$"
+                    marker="₫"
                     title="Doanh thu tuần"
                     tone="orange"
                     value={formatRevenueCurrency(revenue)}

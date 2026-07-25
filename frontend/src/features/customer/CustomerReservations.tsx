@@ -518,7 +518,7 @@ export default function CustomerReservations() {
         <div className="customer-reservations-page">
             <div className="customer-reservations-header">
                 <h1 className="customer-reservations-title">
-                    📋 Đặt bàn
+                    Đặt bàn
                 </h1>
 
                 <p>
@@ -566,7 +566,7 @@ export default function CustomerReservations() {
 
             {activeTab === 'book' && (
                 <div className="customer-reservation-card">
-                    <h2>📝 Đặt bàn mới</h2>
+                    <h2>Đặt bàn mới</h2>
 
                     <p className="customer-reservation-sub">
                         Mỗi khách hàng chỉ được đặt{' '}

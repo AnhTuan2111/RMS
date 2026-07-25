@@ -18,6 +18,7 @@ type RetriableRequestConfig =
 
 const AUTH_REFRESH_PATH = '/auth/refresh'
 const AUTH_LOGIN_PATH = '/auth/login'
+const AUTH_LOGOUT_PATH = '/auth/logout'
 
 export const apiClient = axios.create({
     baseURL: '/rims',
@@ -27,13 +28,11 @@ export const apiClient = axios.create({
 })
 
 function isAuthEndpoint(url?: string) {
-    if (!url) {
-        return false
-    }
-
+    if (!url) return false
     return (
         url.includes(AUTH_LOGIN_PATH)
         || url.includes(AUTH_REFRESH_PATH)
+        || url.includes(AUTH_LOGOUT_PATH)
     )
 }
 

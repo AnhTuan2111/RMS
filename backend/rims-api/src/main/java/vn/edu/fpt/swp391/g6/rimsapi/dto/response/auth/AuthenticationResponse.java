@@ -22,4 +22,5 @@ public class AuthenticationResponse
     private String phone;
     private String email;
     private RoleType role;
+    private Integer rewardPoints;
 }

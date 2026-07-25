@@ -17,13 +17,25 @@ import {
     ErrorState,
     LoadingState,
 } from '@/shared/components/feedback'
-import {PageCard} from '@/shared/components/ui'
 
 function formatCurrency(value: number) {
     return `${new Intl.NumberFormat('vi-VN').format(value)}đ`
 }
 
-function formatDateTime(value: string) {
+function formatTime(value: string) {
+    const date = new Date(value)
+
+    if (Number.isNaN(date.getTime())) {
+        return value
+    }
+
+    return new Intl.DateTimeFormat('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(date)
+}
+
+function formatDate(value: string) {
     const date = new Date(value)
 
     if (Number.isNaN(date.getTime())) {
@@ -34,27 +46,30 @@ function formatDateTime(value: string) {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
     }).format(date)
 }
 
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
+function formatTableName(tableNumber: string) {
+    if (!tableNumber) {
+        return 'Mang về'
     }
 
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
+    if (tableNumber.toLowerCase().startsWith('bàn')) {
+        return tableNumber
     }
 
-    return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
-    )
+    return tableNumber
+}
+
+function formatPaymentMethod(method: string) {
+    switch (method) {
+        case 'CASH':
+            return 'Tiền mặt'
+        case 'QRCODE':
+            return 'VNPay / QR Code'
+        default:
+            return method
+    }
 }
 
 export default function AdminPaymentDetailPage() {
@@ -76,8 +91,6 @@ export default function AdminPaymentDetailPage() {
     const [error, setError] =
         useState<string | null>(null)
 
-
-    // Đếm số lần gọi, chỉ request mới nhất mới được phép set state
     const requestIdRef = useRef(0)
 
     const loadPaymentDetail = useCallback(
@@ -102,7 +115,6 @@ export default function AdminPaymentDetailPage() {
                         parsedInvoiceId,
                     )
 
-                // Nếu đã có request mới hơn chạy sau, bỏ qua kết quả cũ này
                 if (requestId !== requestIdRef.current) {
                     return
                 }
@@ -141,20 +153,20 @@ export default function AdminPaymentDetailPage() {
             return
         }
 
-        const controller = new AbortController()
+        void loadPaymentDetail(true)
 
-        void loadPaymentDetail(true, controller.signal)
-
-        return () => controller.abort()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [hasValidInvoiceId, loadPaymentDetail])
 
     if (!hasValidInvoiceId) {
         return (
-            <PageCard className="admin-payment-detail-state">
-                <h2>Không thể tải dữ liệu</h2>
-
-                <p>Mã hóa đơn không hợp lệ.</p>
-            </PageCard>
+            <div className="admin-invoice-detail-page">
+                <div className="admin-invoice-detail-gradient"/>
+                <div className="admin-invoice-detail-card admin-invoice-detail-state">
+                    <h2>Không thể tải dữ liệu</h2>
+                    <p>Mã hóa đơn không hợp lệ.</p>
+                </div>
+            </div>
         )
     }
 
@@ -185,30 +197,39 @@ export default function AdminPaymentDetailPage() {
     }
 
     return (
-        <div className="admin-payment-detail-page">
-            <PageCard className="admin-payment-detail-header">
-                <button
-                    aria-label="Quay lại lịch sử hóa đơn"
-                    className="admin-payment-detail-back-button"
-                    type="button"
-                    onClick={() => navigate(-1)}
-                >
-                    ‹
-                </button>
+        <div className="admin-invoice-detail-page">
+            {/* Gradient bar trên cùng */}
+            <div className="admin-invoice-detail-gradient"/>
 
-                <div>
-                    <h2>Đơn hàng ORD-{payment.orderId}</h2>
+            {/* ═══ KHỐI 1: Thông tin hóa đơn + Bảng món ăn ═══ */}
+            <div className="admin-invoice-detail-card">
+                {/* Header: Nút quay lại + Tiêu đề + Phụ đề */}
+                <div className="admin-invoice-detail-header">
+                    <button
+                        aria-label="Quay lại lịch sử hóa đơn"
+                        className="admin-invoice-detail-back-button"
+                        type="button"
+                        onClick={() => navigate(-1)}
+                    >
+                        ‹
+                    </button>
 
-                    <p>
-                        Tạo lúc{' '}
-                        {formatDateTime(payment.invoiceDate)}
-                    </p>
+                    <div>
+                        <h1>Hóa đơn ORD-{payment.orderId}</h1>
+
+                        <p>
+                            Bàn: {formatTableName(payment.tableNumber)}
+                            {' · '}
+                            Giờ: {formatTime(payment.invoiceDate)}
+                            {' '}
+                            {formatDate(payment.invoiceDate)}
+                        </p>
+                    </div>
                 </div>
-            </PageCard>
 
-            <section className="admin-payment-detail-card">
-                <div className="admin-payment-detail-table">
-                    <div className="admin-payment-detail-table-head">
+                {/* Bảng danh sách món ăn */}
+                <div className="admin-invoice-detail-table">
+                    <div className="admin-invoice-detail-table-head">
                         <span>MÓN ĂN</span>
                         <span>SL</span>
                         <span>ĐƠN GIÁ</span>
@@ -216,41 +237,78 @@ export default function AdminPaymentDetailPage() {
                     </div>
 
                     {payment.items.length === 0 ? (
-                        <div className="admin-payment-detail-empty">
+                        <div className="admin-invoice-detail-empty">
                             Hóa đơn này chưa có món ăn.
                         </div>
                     ) : (
                         payment.items.map((item, index) => (
                             <div
-                                className="admin-payment-detail-row"
+                                className="admin-invoice-detail-row"
                                 key={`${item.dishName}-${index}`}
                             >
-                                <span className="admin-payment-dish-name">
+                                <span className="admin-invoice-dish-name">
                                     {item.dishName}
                                 </span>
 
-                                <span>{item.quantity}</span>
+                                <span className="admin-invoice-qty">
+                                    {item.quantity}
+                                </span>
 
-                                <span>
+                                <span className="admin-invoice-price">
                                     {formatCurrency(item.unitPrice)}
                                 </span>
 
-                                <span className="admin-payment-line-total">
+                                <span className="admin-invoice-line-total">
                                     {formatCurrency(item.amount)}
                                 </span>
                             </div>
                         ))
                     )}
+                </div>
+            </div>
 
-                    <div className="admin-payment-detail-footer">
-                        <span>Tổng cộng</span>
+            {/* ═══ KHỐI 2: Tổng kết thanh toán ═══ */}
+            <div className="admin-invoice-detail-card">
+                <div className="admin-invoice-summary-card">
+                    {/* Tạm tính */}
+                    <div className="admin-invoice-summary-row">
+                        <span>Tạm tính</span>
+                        <span>{formatCurrency(payment.totalBeforeVat)}</span>
+                    </div>
 
-                        <strong>
+                    {/* VAT */}
+                    <div className="admin-invoice-summary-row">
+                        <span>VAT (10%)</span>
+                        <span>{formatCurrency(payment.vatAmount)}</span>
+                    </div>
+
+                    {/* THÀNH TIỀN - highlight đỏ */}
+                    <div className="admin-invoice-summary-row admin-invoice-summary-row-total">
+                        <span>THÀNH TIỀN</span>
+                        <span className="admin-invoice-summary-highlight">
                             {formatCurrency(payment.finalAmount)}
-                        </strong>
+                        </span>
+                    </div>
+
+                    {/* Phương thức */}
+                    <div className="admin-invoice-summary-row">
+                        <span>Phương thức</span>
+                        <span>{formatPaymentMethod(payment.paymentMethod)}</span>
+                    </div>
+
+                    {/* Khách trả */}
+                    <div className="admin-invoice-summary-row">
+                        <span>Khách trả</span>
+                        <span>{formatCurrency(payment.amountPaid)}</span>
+                    </div>
+
+                    {/* Tiền thừa */}
+                    <div className="admin-invoice-summary-row">
+                        <span>Tiền thừa</span>
+                        <span>{formatCurrency(payment.excessAmount)}</span>
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     )
 }

@@ -37,15 +37,16 @@ export interface AdminPaymentDetail {
     orderId: number
     tableNumber: string
     paymentMethod: string
+    totalBeforeVat: number
+    vatAmount: number
     finalAmount: number
+    amountPaid: number
+    excessAmount: number
     invoiceDate: string
     items: AdminPaymentDetailItem[]
 }
 
 // ── Revenue ───────────────────────────────────────────────────────────────────
-
-export type BestSellingPeriod = 'WEEK' | 'MONTH' | 'YEAR'
-export type OrderShiftPeriod = 'WEEK' | 'YEAR'
 
 export interface RevenueReportResponse {
     revenue: number
@@ -210,7 +211,7 @@ export interface DishSummary {
     categoryName: string
     price: number
     imageUrl: string
-    status: 'AVAILABLE' | 'PAUSED'
+    status: 'AVAILABLE' | 'PAUSED' | 'HIDDEN'
 }
 
 export interface CategoryStat {

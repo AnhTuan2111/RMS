@@ -1,4 +1,9 @@
-import {useEffect, useState} from 'react'
+import {
+    useEffect,
+    useRef,
+    useState,
+    type KeyboardEvent,
+} from 'react'
 import {useAdminSocket} from '@/realtime/useAdminSocket'
 import {
     adminApi,
@@ -77,6 +82,15 @@ const shiftCatalog = [
         color: '#f97316',
     },
 ]
+
+const vietnameseWeekdayLabels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
+
+const vietnameseMonthLabels = Array.from(
+    {
+        length: 12,
+    },
+    (_, index) => `Tháng ${index + 1}`,
+)
 
 
 function formatDateForApi(date: Date) {
@@ -214,8 +228,46 @@ function formatDisplayDate(date: string) {
     return `${day}/${month}/${year}`
 }
 
+function getCalendarMonthDate(date: Date) {
+    return new Date(date.getFullYear(), date.getMonth(), 1)
+}
+
+function getCalendarDays(viewDate: Date) {
+    const monthStart = getCalendarMonthDate(viewDate)
+    const mondayOffset = (monthStart.getDay() + 6) % 7
+    const gridStart = addDays(monthStart, -mondayOffset)
+
+    return Array.from(
+        {
+            length: 42,
+        },
+        (_, index) => addDays(gridStart, index),
+    )
+}
+
+function isSameCalendarDate(firstDate: Date, secondDate: Date) {
+    return (
+        firstDate.getFullYear() === secondDate.getFullYear()
+        && firstDate.getMonth() === secondDate.getMonth()
+        && firstDate.getDate() === secondDate.getDate()
+    )
+}
+
+function getCalendarYearOptions(viewYear: number) {
+    const currentYear = new Date().getFullYear()
+    const startYear = Math.min(currentYear - 5, viewYear - 5)
+    const endYear = Math.max(currentYear + 5, viewYear + 5)
+
+    return Array.from(
+        {
+            length: endYear - startYear + 1,
+        },
+        (_, index) => startYear + index,
+    )
+}
+
 function formatRevenueCurrency(value?: number | null) {
-    return `${new Intl.NumberFormat('vi-VN').format(value ?? 0)} đ`
+    return `${new Intl.NumberFormat('vi-VN').format(value ?? 0)} ₫`
 }
 
 function formatNumber(value?: number | null) {
@@ -272,7 +324,7 @@ function formatManualDateInput(value: string) {
     return [day, month, year].filter(Boolean).join('/')
 }
 
-function parseManualDateForApi(value: string) {
+function parseVietnameseDate(value: string) {
     const match = value.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
 
     if (!match) {
@@ -293,7 +345,13 @@ function parseManualDateForApi(value: string) {
         return null
     }
 
-    return `${yearText}-${monthText}-${dayText}`
+    return parsedDate
+}
+
+function parseManualDateForApi(value: string) {
+    const parsedDate = parseVietnameseDate(value)
+
+    return parsedDate ? formatDateForApi(parsedDate) : null
 }
 
 function getApiErrorMessage(error: unknown, fallback: string) {
@@ -404,13 +462,13 @@ function StatIcon({
     )
 }
 
-function DollarIcon() {
+function DongIcon() {
     return (
         <span
             aria-hidden="true"
             className="admin-revenue-card-icon"
         >
-            $
+            ₫
         </span>
     )
 }
@@ -527,8 +585,7 @@ function StatisticsReportSelector({
             >
                 <StatIcon className="icon-category-bestsellers">DM</StatIcon>
                 <div className="rims-stat-card-body">
-                    <h3>Top món theo danh mục</h3>
-                    <p>Lọc món bán chạy theo danh mục</p>
+                    <h3>Lọc món bán chạy theo danh mục</h3>
                 </div>
                 <span className="rims-stat-card-action">›</span>
             </button>
@@ -583,7 +640,7 @@ function RevenueCard({
         <article className={`admin-revenue-card ${className}`.trim()}>
             <div className="admin-revenue-card-header">
                 <span>{title}</span>
-                <DollarIcon/>
+                <DongIcon/>
             </div>
 
             <strong>{formatRevenueCurrency(amount)}</strong>
@@ -602,29 +659,272 @@ function RevenueDateInput({
     value: string
     onChange: (value: string) => void
 }) {
+    const fieldRef = useRef<HTMLDivElement | null>(null)
+    const selectedDate = parseVietnameseDate(value)
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+    const [calendarDate, setCalendarDate] = useState(() =>
+        getCalendarMonthDate(selectedDate ?? new Date()),
+    )
+    const calendarDays = getCalendarDays(calendarDate)
+    const calendarYearOptions = getCalendarYearOptions(
+        calendarDate.getFullYear(),
+    )
+
+    useEffect(() => {
+        if (!isCalendarOpen) {
+            return undefined
+        }
+
+        const handlePointerDown = (event: MouseEvent) => {
+            if (fieldRef.current?.contains(event.target as Node)) {
+                return
+            }
+
+            setIsCalendarOpen(false)
+        }
+
+        document.addEventListener('mousedown', handlePointerDown)
+
+        return () =>
+            document.removeEventListener('mousedown', handlePointerDown)
+    }, [isCalendarOpen])
+
+    function openCalendar() {
+        const parsedDate = parseVietnameseDate(value)
+
+        if (parsedDate) {
+            setCalendarDate(getCalendarMonthDate(parsedDate))
+        }
+
+        setIsCalendarOpen(true)
+    }
+
+    function handleManualChange(inputValue: string) {
+        const formattedValue = formatManualDateInput(inputValue)
+        const parsedDate = parseVietnameseDate(formattedValue)
+
+        onChange(formattedValue)
+
+        if (parsedDate) {
+            setCalendarDate(getCalendarMonthDate(parsedDate))
+        }
+    }
+
+    function handleDateSelect(date: Date) {
+        onChange(formatDisplayDate(formatDateForApi(date)))
+        setCalendarDate(getCalendarMonthDate(date))
+        setIsCalendarOpen(false)
+    }
+
+    function handleMonthChange(month: number) {
+        setCalendarDate(
+            (currentDate) =>
+                new Date(currentDate.getFullYear(), month, 1),
+        )
+    }
+
+    function handleYearChange(year: number) {
+        setCalendarDate(
+            (currentDate) =>
+                new Date(year, currentDate.getMonth(), 1),
+        )
+    }
+
+    function handleCalendarKeyDown(event: KeyboardEvent) {
+        if (event.key === 'Escape') {
+            setIsCalendarOpen(false)
+        }
+    }
+
     return (
-        <label
+        <div
             className="admin-revenue-date-field"
-            htmlFor={id}
+            ref={fieldRef}
         >
-            <span>{label}</span>
+            <label htmlFor={id}>{label}</label>
 
             <span className="admin-revenue-date-input-shell">
-                <CalendarIcon/>
                 <input
                     aria-label={`${label} dạng ngày/tháng/năm`}
                     id={id}
                     inputMode="numeric"
                     maxLength={10}
-                    placeholder="Chọn ngày"
+                    placeholder="dd/mm/yyyy"
                     type="text"
                     value={value}
-                    onChange={(event) =>
-                        onChange(formatManualDateInput(event.target.value))
-                    }
+                    onChange={(event) => handleManualChange(event.target.value)}
+                    onFocus={openCalendar}
+                    onKeyDown={handleCalendarKeyDown}
                 />
+
+                <button
+                    aria-label={`Mở lịch ${label}`}
+                    className="admin-revenue-calendar-trigger"
+                    type="button"
+                    onClick={openCalendar}
+                >
+                    <CalendarIcon/>
+                </button>
             </span>
-        </label>
+
+            {isCalendarOpen && (
+                <div
+                    aria-label={`Lịch chọn ${label}`}
+                    className="admin-revenue-date-picker"
+                    role="dialog"
+                    onKeyDown={handleCalendarKeyDown}
+                >
+                    <div className="admin-revenue-calendar-nav">
+                        <button
+                            aria-label="Chuyển đến tháng trước"
+                            className="admin-revenue-calendar-nav-button"
+                            type="button"
+                            onClick={() =>
+                                setCalendarDate(
+                                    (currentDate) =>
+                                        new Date(
+                                            currentDate.getFullYear(),
+                                            currentDate.getMonth() - 1,
+                                            1,
+                                        ),
+                                )
+                            }
+                        >
+                            &lsaquo;
+                        </button>
+
+                        <div className="admin-revenue-calendar-title">
+                            <select
+                                aria-label="Chọn tháng"
+                                value={calendarDate.getMonth()}
+                                onChange={(event) =>
+                                    handleMonthChange(
+                                        Number(event.target.value),
+                                    )
+                                }
+                            >
+                                {vietnameseMonthLabels.map(
+                                    (monthLabel, monthIndex) => (
+                                        <option
+                                            key={monthLabel}
+                                            value={monthIndex}
+                                        >
+                                            {monthLabel}
+                                        </option>
+                                    ),
+                                )}
+                            </select>
+
+                            <span>năm</span>
+
+                            <select
+                                aria-label="Chọn năm"
+                                value={calendarDate.getFullYear()}
+                                onChange={(event) =>
+                                    handleYearChange(
+                                        Number(event.target.value),
+                                    )
+                                }
+                            >
+                                {calendarYearOptions.map((year) => (
+                                    <option
+                                        key={year}
+                                        value={year}
+                                    >
+                                        {year}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <button
+                            aria-label="Chuyển đến tháng tiếp theo"
+                            className="admin-revenue-calendar-nav-button"
+                            type="button"
+                            onClick={() =>
+                                setCalendarDate(
+                                    (currentDate) =>
+                                        new Date(
+                                            currentDate.getFullYear(),
+                                            currentDate.getMonth() + 1,
+                                            1,
+                                        ),
+                                )
+                            }
+                        >
+                            &rsaquo;
+                        </button>
+                    </div>
+
+                    <div
+                        aria-hidden="true"
+                        className="admin-revenue-calendar-weekdays"
+                    >
+                        {vietnameseWeekdayLabels.map((weekdayLabel) => (
+                            <span key={weekdayLabel}>{weekdayLabel}</span>
+                        ))}
+                    </div>
+
+                    <div className="admin-revenue-calendar-grid">
+                        {calendarDays.map((date) => {
+                            const dateValue = formatDateForApi(date)
+                            const displayDate = formatDisplayDate(dateValue)
+                            const isCurrentMonth =
+                                date.getFullYear()
+                                === calendarDate.getFullYear()
+                                && date.getMonth()
+                                === calendarDate.getMonth()
+                            const isSelected =
+                                selectedDate
+                                && isSameCalendarDate(date, selectedDate)
+                            const isToday = isSameCalendarDate(
+                                date,
+                                new Date(),
+                            )
+                            const className = [
+                                'admin-revenue-calendar-day',
+                                isCurrentMonth ? '' : 'outside-month',
+                                isSelected ? 'selected' : '',
+                                isToday ? 'today' : '',
+                            ]
+                                .filter(Boolean)
+                                .join(' ')
+
+                            return (
+                                <button
+                                    aria-label={`Chọn ngày ${displayDate}`}
+                                    className={className}
+                                    key={dateValue}
+                                    type="button"
+                                    onClick={() => handleDateSelect(date)}
+                                >
+                                    {date.getDate()}
+                                </button>
+                            )
+                        })}
+                    </div>
+
+                    <div className="admin-revenue-calendar-footer">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                onChange('')
+                                setIsCalendarOpen(false)
+                            }}
+                        >
+                            Xóa
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => handleDateSelect(new Date())}
+                        >
+                            Hôm nay
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
     )
 }
 
@@ -948,34 +1248,6 @@ function BestSellersReport({
                 </div>
 
                 <div className="order-shift-filter-area">
-                    {categories && selectedCategoryId && onCategoryChange && (
-                        <label className="admin-bestseller-category-filter">
-                            <span>Danh mục</span>
-                            <select
-                                disabled={isLoading || categories.length === 0}
-                                value={selectedCategoryId}
-                                onChange={(event) =>
-                                    onCategoryChange(event.target.value)
-                                }
-                            >
-                                {categories.length === 0 ? (
-                                    <option value="ALL">
-                                        Chưa có danh mục
-                                    </option>
-                                ) : (
-                                    categories.map((category) => (
-                                        <option
-                                            key={category.id}
-                                            value={String(category.id)}
-                                        >
-                                            {category.name}
-                                        </option>
-                                    ))
-                                )}
-                            </select>
-                        </label>
-                    )}
-
                     <PresetButtonGroup
                         activePreset={preset}
                         isLoading={isLoading}
@@ -989,6 +1261,36 @@ function BestSellersReport({
                     />
                 </div>
             </header>
+
+            {categories && selectedCategoryId && onCategoryChange && (
+                <div className="admin-bestseller-category-filter-row">
+                    <label className="admin-bestseller-category-filter">
+                        <span>Danh mục</span>
+                        <select
+                            disabled={isLoading || categories.length === 0}
+                            value={selectedCategoryId}
+                            onChange={(event) =>
+                                onCategoryChange(event.target.value)
+                            }
+                        >
+                            {categories.length === 0 ? (
+                                <option value="ALL">
+                                    Chưa có danh mục
+                                </option>
+                            ) : (
+                                categories.map((category) => (
+                                    <option
+                                        key={category.id}
+                                        value={String(category.id)}
+                                    >
+                                        {category.name}
+                                    </option>
+                                ))
+                            )}
+                        </select>
+                    </label>
+                </div>
+            )}
 
             {error && (
                 <p className="revenue-comparison-error">

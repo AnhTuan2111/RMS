@@ -230,6 +230,9 @@ export default function WaiterUpdateOrderPage() {
     const [activeCategory, setActiveCategory] =
         useState('Tất cả')
 
+    const [searchQuery, setSearchQuery] =
+        useState('')
+
     const [acknowledgingItemId, setAcknowledgingItemId] =
         useState<number | null>(null)
 
@@ -390,14 +393,24 @@ export default function WaiterUpdateOrderPage() {
     const visibleMenu =
         useMemo(
             () =>
-                menu.filter(
-                    (dish) =>
+                menu.filter((dish) => {
+                    const matchesCategory =
                         activeCategory === 'Tất cả'
-                        || dish.categoryName === activeCategory,
-                ),
+                        || dish.categoryName === activeCategory
+
+                    const matchesSearch =
+                        dish.name
+                            .toLowerCase()
+                            .includes(
+                                searchQuery.trim().toLowerCase(),
+                            )
+
+                    return matchesCategory && matchesSearch
+                }),
             [
                 menu,
                 activeCategory,
+                searchQuery,
             ],
         )
 
@@ -764,6 +777,14 @@ export default function WaiterUpdateOrderPage() {
                         Lưu Cập Nhật
                     </button>
                 </div>
+
+                <input
+                    type="text"
+                    placeholder="Tìm kiếm món ăn..."
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    className="waiter-search-input"
+                />
 
                 <div className="waiter-category-nav">
                     {categories.map((category) => (

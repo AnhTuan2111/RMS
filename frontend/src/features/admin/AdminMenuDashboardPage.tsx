@@ -459,7 +459,7 @@ export default function AdminMenuDashboardPage() {
                         <div className="admin-menu-scroll-container admin-menu-warning-scroll">
                             {allPausedDishesList.length === 0 ? (
                                 <div className="admin-menu-empty-warning">
-                                    🎉 Tuyệt vời! Hiện tại không có món ăn nào bị gián đoạn kinh doanh.
+                                    Tuyệt vời! Hiện tại không có món ăn nào bị gián đoạn kinh doanh.
                                 </div>
                             ) : (
                                 allPausedDishesList.map((dish) => (

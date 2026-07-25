@@ -444,7 +444,7 @@ export default function OrderPanel({
                             </p>
 
                             <div style={phoneHintStyle}>
-                                📱 SĐT dùng để đăng ký:{' '}
+                                SĐT dùng để đăng ký:{' '}
                                 <strong>{phoneSearch}</strong>
                             </div>
 

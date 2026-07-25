@@ -11,23 +11,24 @@
     display: grid;
     place-items: center;
     padding: 1.5rem;
-    background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 35%),
-    radial-gradient(circle at bottom right, rgba(249, 115, 22, 0.16), transparent 35%),
-    #0f172a;
+    background: radial-gradient(circle at top left, rgba(122, 16, 48, 0.22), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(212, 175, 55, 0.14), transparent 35%),
+    #14090b;
 }
 
 .login-card {
     width: min(460px, 100%);
     padding: 2.2rem;
     border-radius: 24px;
-    background: #ffffff;
-    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    background: #fbf3e3;
+    border: 1px solid #ead9b3;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
 }
 
 .login-back-link {
     display: inline-block;
     margin-bottom: 1.5rem;
-    color: #2563eb;
+    color: #7a1030;
     text-decoration: none;
     font-weight: 800;
 }
@@ -38,13 +39,13 @@
 
 .login-header h1 {
     margin: 0 0 0.5rem;
-    color: #0f172a;
+    color: #241512;
     font-size: 2rem;
 }
 
 .login-header p {
     margin: 0 0 1.5rem;
-    color: #64748b;
+    color: #5c4a3a;
     line-height: 1.6;
 }
 
@@ -52,38 +53,38 @@
     display: grid;
     gap: 0.5rem;
     margin-bottom: 1rem;
-    color: #334155;
+    color: #241512;
     font-weight: 700;
 }
 
 .auth-field input {
     width: 100%;
     padding: 0.85rem 1rem;
-    border: 1px solid #cbd5e1;
+    border: 1px solid #d9c39a;
     border-radius: 12px;
     background: #ffffff;
-    color: #0f172a;
+    color: #241512;
 }
 
 .auth-field input:focus {
-    outline: 2px solid #3b82f6;
-    border-color: #3b82f6;
+    outline: 2px solid #d4af37;
+    border-color: #d4af37;
 }
 
 .auth-submit {
     width: 100%;
     margin-top: 0.5rem;
     padding: 0.95rem 1rem;
-    border: none;
+    border: 1px solid #d4af37;
     border-radius: 12px;
-    background: #2563eb;
-    color: #ffffff;
+    background: #7a1030;
+    color: #f5ecd8;
     font-size: 1rem;
     font-weight: 900;
 }
 
 .auth-submit:hover {
-    background: #1d4ed8;
+    background: #9a1a3f;
 }
 
 .auth-submit:disabled {
@@ -105,19 +106,19 @@
     margin-top: 1.25rem;
     padding: 1rem;
     border-radius: 14px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: #fff8ea;
+    border: 1px solid #ead9b3;
 }
 
 .login-demo p {
     margin: 0 0 0.5rem;
     font-weight: 900;
-    color: #0f172a;
+    color: #241512;
 }
 
 .login-demo span {
     display: block;
-    color: #475569;
+    color: #5c4a3a;
     font-size: 0.9rem;
     line-height: 1.5;
 }
@@ -135,6 +136,5 @@
     place-items: center;
     min-height: 100vh;
     padding: 1.5rem;
-    background: #0f172a;
+    background: #14090b;
 }
-

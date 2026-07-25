@@ -23,7 +23,15 @@ public class InvoiceDetailResponse
 
     private String paymentMethod;
 
+    private BigDecimal totalBeforeVat;
+
+    private BigDecimal vatAmount;
+
     private BigDecimal finalAmount;
+
+    private BigDecimal amountPaid;
+
+    private BigDecimal excessAmount;
 
     private LocalDateTime invoiceDate;
 

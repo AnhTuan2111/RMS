@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { NavLink } from 'react-router-dom'
 import { ROLE_LABELS, roleMenus } from '@/app/config/roleMenus'
 import { useActor } from '@/app/providers/ActorContext'
+import { RoleType } from '@/shared/types/auth'
 
 function getMenuIcon(path: string) {
     if (path.includes('dashboard')) return '▦'
@@ -60,10 +61,16 @@ export function Sidebar() {
     return (
         <aside className="app-sidebar rims-sidebar">
             <div className="rims-sidebar-brand">
-                <div className="rims-sidebar-logo">R</div>
+                <div className="rims-sidebar-logo">
+                    {actor === RoleType.CUSTOMER ? '满' : 'R'}
+                </div>
                 <div>
-                    <h2>RIMS</h2>
-                    <p>Vận hành nhà hàng</p>
+                    <h2>{actor === RoleType.CUSTOMER ? 'MÃN VỊ LÂU' : 'RIMS'}</h2>
+                    <p>
+                        {actor === RoleType.CUSTOMER
+                            ? 'Ẩm thực Trung Hoa cao cấp'
+                            : 'Vận hành nhà hàng'}
+                    </p>
                 </div>
             </div>
 
@@ -76,7 +83,6 @@ export function Sidebar() {
             </div>
 
             <nav className="rims-sidebar-nav">
-                <p className="rims-sidebar-title">CHỨC NĂNG</p>
 
                 {menus.map((item) => (
                     <Fragment key={item.path}>

@@ -197,44 +197,28 @@ public class AdminController
 
     @GetMapping("/revenue/best-selling")
     public BestSellingReportResponse getBestSellingReport(
-            @RequestParam(defaultValue = "WEEK") String period,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
 
             @RequestParam(required = false) Integer categoryId)
     {
-        if (fromDate != null && toDate != null)
-        {
-            return adminService.getBestSellingReport(
-                    fromDate,
-                    toDate,
-                    categoryId);
-        }
         return adminService.getBestSellingReport(
-                period,
+                fromDate,
+                toDate,
                 categoryId);
     }
 
     @GetMapping("/revenue/order-shifts")
     public OrderShiftReportResponse getOrderShiftReport(
-            @RequestParam(defaultValue = "WEEK") String period,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate)
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate)
     {
-        if (fromDate != null && toDate != null)
-        {
-            return adminService
-                    .getOrderShiftReport(
-                            fromDate,
-                            toDate);
-        }
-
         return adminService
-                .getOrderShiftReport(period);
+                .getOrderShiftReport(
+                        fromDate,
+                        toDate);
     }
 
     @GetMapping("/category/all")

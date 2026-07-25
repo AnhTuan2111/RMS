@@ -56,13 +56,39 @@ public class AuthServiceImpl implements AuthService
     }
 
     @Override
+    @Transactional
     public AuthenticationResponse refresh(RefreshTokenRequest request)
     {
-        JWTClaimsSet claims = jwtService.parseAndValidate(request.getRefreshToken());
+        String rawRefreshToken = request.getRefreshToken();
+        JWTClaimsSet claims = jwtService.parseAndValidate(rawRefreshToken);
 
         if (!jwtService.isRefreshToken(claims))
         {
             throw new InvalidTokenException("Refresh token không hợp lệ");
+        }
+
+        String oldJti = jwtService.extractJti(claims);
+        LocalDateTime oldExpiry = jwtService.extractExpiry(rawRefreshToken);
+
+        // Chặn refresh token cũ bị dùng lại (reuse detection):
+        // nếu jti này đã nằm trong bảng revoked -> token đã được dùng để rotate trước đó
+        // (hoặc đã bị logout) -> từ chối ngay, không cấp token mới
+        if (oldJti == null || oldExpiry == null)
+        {
+            throw new InvalidTokenException("Refresh token không hợp lệ");
+        }
+
+        // Revoke token cũ NGAY LẬP TỨC, trước khi cấp token mới.
+        // Nhờ "jti" là @Id (khoá chính) của RevokedToken, nếu có 2 request refresh
+        // cùng dùng 1 token chạy song song, chỉ 1 request insert thành công,
+        // request còn lại sẽ nhận DataIntegrityViolationException -> coi như bị từ chối.
+        try
+        {
+            revokedTokenRepository.save(new RevokedToken(oldJti, LocalDateTime.now(), oldExpiry));
+        }
+        catch (org.springframework.dao.DataIntegrityViolationException ex)
+        {
+            throw new InvalidTokenException("Refresh token đã được sử dụng hoặc đã bị thu hồi");
         }
 
         Integer userId = jwtService.extractUserId(claims);
@@ -87,18 +113,58 @@ public class AuthServiceImpl implements AuthService
     }
 
     @Override
-    public LogoutResponse logout(UserPrincipal principal, String rawAccessToken)
+    @Transactional
+    public LogoutResponse logout(UserPrincipal principal, String rawAccessToken, String rawRefreshToken)
     {
-        String jti = jwtService.extractJti(rawAccessToken);
-        java.time.LocalDateTime exp = jwtService.extractExpiry(rawAccessToken);
-        if (jti != null && exp != null)
+        // Thu hồi access token hiện tại
+        revokeToken(rawAccessToken);
+
+        if (rawRefreshToken != null && !rawRefreshToken.isBlank())
         {
-            revokedTokenRepository.save(new RevokedToken(jti, LocalDateTime.now(), exp));
+            try
+            {
+                JWTClaimsSet refreshClaims = jwtService.parseAndValidate(rawRefreshToken);
+                Integer refreshOwnerId = jwtService.extractUserId(refreshClaims);
+
+                // Chỉ revoke nếu refresh token thực sự thuộc về chính user đang logout
+                // Tránh 1 user dùng access token hợp lệ của mình để revoke refresh token của người khác
+                if (principal != null && refreshOwnerId != null && refreshOwnerId.equals(principal.getId()))
+                {
+                    revokeToken(rawRefreshToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                return LogoutResponse.builder()
+                        .message("Đăng xuất thất bại do " + ex.getMessage()).build();
+            }
         }
 
         return LogoutResponse.builder()
                 .message("Đăng xuất thành công")
                 .build();
+    }
+
+    /**
+     * Hàm dùng chung để revoke 1 token (access hoặc refresh) bằng cách lưu jti + hạn hết
+     * của nó vào bảng revoked_tokens. Bỏ qua an toàn nếu token không có jti/expiry hợp lệ
+     * (vd token đã hết hạn từ trước, đã bị format sai...) thay vì ném lỗi làm fail cả request logout.
+     */
+    private void revokeToken(String rawToken)
+    {
+        try
+        {
+            String jti = jwtService.extractJti(rawToken);
+            LocalDateTime expiry = jwtService.extractExpiry(rawToken);
+            if (jti != null && expiry != null && !revokedTokenRepository.existsByJti(jti))
+            {
+                revokedTokenRepository.save(new RevokedToken(jti, LocalDateTime.now(), expiry));
+            }
+        }
+        catch (Exception ex)
+        {
+            // Token không hợp lệ / đã hết hạn thì coi như không cần revoke nữa, không chặn luồng logout
+        }
     }
 
     private AuthenticationResponse buildAuthenticationResponse(User user)
@@ -122,6 +188,7 @@ public class AuthServiceImpl implements AuthService
                 .phone(user.getPhone())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .rewardPoints(user.getRewardPoints())
                 .build();
     }
 
@@ -134,6 +201,7 @@ public class AuthServiceImpl implements AuthService
                 .phone(user.getPhone())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .rewardPoints(user.getRewardPoints())
                 .build();
     }
 
