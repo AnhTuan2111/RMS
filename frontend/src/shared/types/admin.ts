@@ -48,9 +48,6 @@ export interface AdminPaymentDetail {
 
 // ── Revenue ───────────────────────────────────────────────────────────────────
 
-export type BestSellingPeriod = 'WEEK' | 'MONTH' | 'YEAR'
-export type OrderShiftPeriod = 'WEEK' | 'YEAR'
-
 export interface RevenueReportResponse {
     revenue: number
     period: string

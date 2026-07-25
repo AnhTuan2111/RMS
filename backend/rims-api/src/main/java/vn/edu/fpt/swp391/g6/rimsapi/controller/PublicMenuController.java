@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.report.PublicBestSellingDishResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.service.AdminService;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @RestController
@@ -19,7 +22,10 @@ public class PublicMenuController
     @GetMapping("/best-selling")
     public List<PublicBestSellingDishResponse> getPublicBestSelling()
     {
-        return adminService.getBestSellingReport("WEEK", null)
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        return adminService.getBestSellingReport(startOfWeek, today, null)
                 .getItems()
                 .stream()
                 .limit(5)

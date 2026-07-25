@@ -71,11 +71,7 @@ public interface AdminService
 
     WeeklyRevenueChartResponse getDailyRevenue(LocalDate fromDate, LocalDate toDate);
 
-    BestSellingReportResponse getBestSellingReport(String period, Integer categoryId);
-
     BestSellingReportResponse getBestSellingReport(LocalDate fromDate, LocalDate toDate, Integer categoryId);
-
-    OrderShiftReportResponse getOrderShiftReport(String period);
 
     OrderShiftReportResponse getOrderShiftReport(LocalDate fromDate, LocalDate toDate);
 

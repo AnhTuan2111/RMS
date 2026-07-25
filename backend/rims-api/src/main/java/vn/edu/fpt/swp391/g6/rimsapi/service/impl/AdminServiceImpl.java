@@ -756,70 +756,6 @@ public class AdminServiceImpl implements AdminService
     }
 
     @Override
-    public BestSellingReportResponse getBestSellingReport(String period, Integer categoryId)
-    {
-        LocalDate today = LocalDate.now();
-        String normalizedPeriod = period == null ? "WEEK" : period.toUpperCase(Locale.ROOT);
-        LocalDate fromDate;
-        LocalDate toDate;
-        String dataRangeNote;
-
-        switch (normalizedPeriod)
-        {
-            case "WEEK" ->
-            {
-                fromDate = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-                toDate = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-                dataRangeNote = "Tuần hiện tại đến hôm nay";
-            }
-
-            case "MONTH" ->
-            {
-                fromDate = today.withDayOfMonth(1);
-                toDate = today.withDayOfMonth(today.lengthOfMonth());
-                dataRangeNote = "Tháng hiện tại đến hôm nay";
-            }
-
-            case "YEAR" ->
-            {
-                fromDate = today.withDayOfYear(1);
-                toDate = today.withDayOfYear(today.lengthOfYear());
-                dataRangeNote = "Năm hiện tại đến hôm nay";
-            }
-
-            default -> throw new RuntimeException("Khoảng thời gian món bán chạy không hợp lệ. Chỉ hỗ trợ tuần, tháng hoặc năm");
-        }
-
-        if (toDate.isAfter(today))
-        {
-            toDate = today;
-        }
-
-        LocalDateTime start = fromDate.atStartOfDay();
-        LocalDateTime end = toDate.atTime(23, 59, 59);
-        Pageable top10 = PageRequest.of(0, 10);
-
-        List<BestSellingDishProjection> result = invoiceRepository.getBestSellingDishes(start, end, categoryId, top10);
-
-        List<BestSellingDishItemResponse> items = new ArrayList<>();
-
-        int rank = 1;
-
-        for (BestSellingDishProjection row : result)
-        {
-            items.add(new BestSellingDishItemResponse(
-                    rank++,
-                    row.getDishName(),
-                    row.getImageUrl(),
-                    row.getTotalQuantity(),
-                    row.getTotalRevenue())
-            );
-        }
-
-        return new BestSellingReportResponse(fromDate, toDate, dataRangeNote, items);
-    }
-
-    @Override
     public BestSellingReportResponse getBestSellingReport(LocalDate fromDate, LocalDate toDate, Integer categoryId)
     {
         LocalDate today = LocalDate.now();
@@ -858,23 +794,6 @@ public class AdminServiceImpl implements AdminService
         }
 
         return new BestSellingReportResponse(fromDate, toDate, "Khoảng thời gian đã chọn", items);
-    }
-
-    @Override
-    public OrderShiftReportResponse getOrderShiftReport(String period)
-    {
-        LocalDate today = LocalDate.now();
-        String normalizedPeriod = period == null ? "WEEK" : period.toUpperCase(Locale.ROOT);
-        LocalDate fromDate;
-
-        switch (normalizedPeriod)
-        {
-            case "WEEK" -> fromDate = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-            case "YEAR" -> fromDate = today.withDayOfYear(1);
-            default -> throw new RuntimeException("Khoảng thời gian thống kê theo ca không hợp lệ. Chỉ hỗ trợ tuần hoặc năm");
-        }
-
-        return getOrderShiftReport(fromDate, today);
     }
 
     @Override

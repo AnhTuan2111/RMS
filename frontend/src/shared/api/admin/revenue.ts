@@ -7,12 +7,10 @@
 import {apiClient} from '../client'
 import type {
     BestSellingDishItem,
-    BestSellingPeriod,
     BestSellingReportResponse,
     DailyRevenueItem,
     HighestOrderShift,
     OrderShiftItem,
-    OrderShiftPeriod,
     OrderShiftReportResponse,
     RevenueReportResponse,
     WeeklyRevenueChartResponse,
@@ -21,12 +19,10 @@ import type {
 // Re-export types so callers can import from this file alone
 export type {
     BestSellingDishItem,
-    BestSellingPeriod,
     BestSellingReportResponse,
     DailyRevenueItem,
     HighestOrderShift,
     OrderShiftItem,
-    OrderShiftPeriod,
     OrderShiftReportResponse,
     RevenueReportResponse,
     WeeklyRevenueChartResponse,
@@ -75,17 +71,6 @@ export const revenueApi = {
             signal,
         }),
 
-    /** Best-selling dishes by standard period */
-    getBestSellingReport: (
-        period: BestSellingPeriod = 'WEEK',
-        categoryId?: number | null,
-        signal?: AbortSignal,
-    ) =>
-        apiClient.get<BestSellingReportResponse>('/admin/revenue/best-selling', {
-            params: {period, ...(categoryId ? {categoryId} : {})},
-            signal,
-        }),
-
     /** Best-selling dishes for a custom date range */
     getBestSellingReportBetween: (
         fromDate: string,
@@ -95,16 +80,6 @@ export const revenueApi = {
     ) =>
         apiClient.get<BestSellingReportResponse>('/admin/revenue/best-selling', {
             params: {fromDate, toDate, ...(categoryId ? {categoryId} : {})},
-            signal,
-        }),
-
-    /** Order-shift analytics by standard period */
-    getOrderShiftReport: (
-        period: OrderShiftPeriod = 'WEEK',
-        signal?: AbortSignal,
-    ) =>
-        apiClient.get<OrderShiftReportResponse>('/admin/revenue/order-shifts', {
-            params: {period},
             signal,
         }),
 
