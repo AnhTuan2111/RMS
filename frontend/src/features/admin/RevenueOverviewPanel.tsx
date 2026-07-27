@@ -834,7 +834,7 @@ function WeeklyRevenueOverviewDashboard({
                 </article>
 
                 <article className="weekly-overview-panel weekly-shift-panel">
-                    <h3>Đơn hàng theo ca</h3>
+                    <h3>Tỉ trọng đơn theo ca</h3>
 
                     <div className="weekly-shift-content">
                         <div
@@ -865,6 +865,10 @@ function WeeklyRevenueOverviewDashboard({
                                         <strong>{row.displayName}</strong>
                                         <span>
                                             {formatNumber(row.orderCount)} đơn
+                                            {' '}
+                                            (
+                                            {formatDecimal(row.percentage)}%
+                                            )
                                         </span>
                                     </div>
                                 </div>
