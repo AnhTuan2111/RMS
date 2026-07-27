@@ -382,7 +382,6 @@ export default function AdminPaymentHistoryPage() {
                 <div className="admin-payment-table">
                     <div className="admin-payment-table-header">
                         <span>Mã hóa đơn</span>
-                        <span>Mã đơn hàng</span>
                         <span>Bàn</span>
                         <span>Phương thức</span>
                         <span>Số tiền</span>
@@ -409,10 +408,6 @@ export default function AdminPaymentHistoryPage() {
                             >
                                 <span className="admin-payment-id">
                                     {payment.invoiceId}
-                                </span>
-
-                                <span>
-                                    {payment.orderId}
                                 </span>
 
                                 <span>

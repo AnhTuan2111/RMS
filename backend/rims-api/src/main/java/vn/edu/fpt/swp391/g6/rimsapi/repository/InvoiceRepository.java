@@ -98,7 +98,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long>
     );
 
 
-    //Get invoice history, có filter theo bàn / phương thức / mã HĐ-đơn / tên-SĐT khách hàng.
+    //Get invoice history, có filter theo bàn / phương thức / mã HĐ / tên-SĐT khách hàng.
     @Query(
             value = """
                     SELECT
@@ -115,7 +115,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long>
                     LEFT JOIN User u ON u.id = o.pendingCustomerId
                     WHERE (:tableNumber IS NULL OR LOWER(t.tableNumber) LIKE LOWER(CONCAT('%', :tableNumber, '%')))
                       AND (:paymentMethod IS NULL OR p.paymentMethod = :paymentMethod)
-                      AND (:keyword IS NULL OR CAST(i.id AS string) LIKE CONCAT('%', :keyword, '%') OR CAST(o.id AS string) LIKE CONCAT('%', :keyword, '%'))
+                      AND (:keyword IS NULL OR CAST(i.id AS string) LIKE CONCAT('%', :keyword, '%'))
                       AND (:customerKeyword IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :customerKeyword, '%')) OR u.phone LIKE CONCAT('%', :customerKeyword, '%'))
                     ORDER BY i.invoiceDate DESC
                     """,
@@ -128,7 +128,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long>
                     LEFT JOIN User u ON u.id = o.pendingCustomerId
                     WHERE (:tableNumber IS NULL OR LOWER(t.tableNumber) LIKE LOWER(CONCAT('%', :tableNumber, '%')))
                       AND (:paymentMethod IS NULL OR p.paymentMethod = :paymentMethod)
-                      AND (:keyword IS NULL OR CAST(i.id AS string) LIKE CONCAT('%', :keyword, '%') OR CAST(o.id AS string) LIKE CONCAT('%', :keyword, '%'))
+                      AND (:keyword IS NULL OR CAST(i.id AS string) LIKE CONCAT('%', :keyword, '%'))
                       AND (:customerKeyword IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :customerKeyword, '%')) OR u.phone LIKE CONCAT('%', :customerKeyword, '%'))
                     """
     )
