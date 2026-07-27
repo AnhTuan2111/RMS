@@ -22,6 +22,7 @@ public class CreateCustomerRequest
     @Pattern(regexp = "^\\p{L}+( \\p{L}+)*$", message = "Họ tên chỉ được chứa chữ cái và khoảng trắng")
     private String fullName;
 
+    @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không đúng định dạng")
     @Size(max = 50, message = "Email không được vượt quá 50 ký tự")
     private String email;

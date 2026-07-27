@@ -601,6 +601,7 @@ export default function AdminDishesPage() {
                                         type="text"
                                         required
                                         placeholder="Ví dụ: Phở Bò Tái Lăn"
+                                        maxLength={50}
                                         value={formData.name}
                                         onChange={e => setFormData({...formData, name: e.target.value})}
                                         className="admin-dish-input-field"
@@ -638,6 +639,7 @@ export default function AdminDishesPage() {
                                     <textarea
                                         rows={4}
                                         placeholder="Mô tả tóm tắt hương vị, các thành phần nguyên liệu đặc biệt..."
+                                        maxLength={100}
                                         value={formData.description}
                                         onChange={e => setFormData({...formData, description: e.target.value})}
                                         className="admin-dish-textarea-field"
@@ -779,6 +781,7 @@ export default function AdminDishesPage() {
                                         <label className="admin-dish-input-label">TÊN MÓN ĂN</label>
                                         <input
                                             type="text"
+                                            maxLength={50}
                                             value={formData.name}
                                             onChange={e => setFormData({...formData, name: e.target.value})}
                                             className="admin-dish-input-field"
@@ -836,6 +839,7 @@ export default function AdminDishesPage() {
                                     <label className="admin-dish-input-label">MÔ TẢ CHI TIẾT</label>
                                     <textarea
                                         rows={4}
+                                        maxLength={100}
                                         value={formData.description}
                                         onChange={e => setFormData({...formData, description: e.target.value})}
                                         className="admin-dish-textarea-field"

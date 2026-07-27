@@ -749,6 +749,7 @@ export default function AdminCategoryPage() {
                                 type="text"
                                 required
                                 placeholder="Ví dụ: Hải Sản, Món Nướng, Đồ Tráng Miệng..."
+                                maxLength={50}
                                 value={formData.name}
                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                                 className="admin-category-input-field"
@@ -761,7 +762,7 @@ export default function AdminCategoryPage() {
                                 <span className="admin-category-char-count">{formData.description.length}/100</span>
                             </div>
                             <textarea
-                                maxLength={255}
+                                maxLength={100}
                                 rows={4}
                                 placeholder="Nhập tóm tắt thông tin mô tả về nhóm món ăn này..."
                                 value={formData.description}
