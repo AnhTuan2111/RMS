@@ -86,7 +86,7 @@ public class CustomerServiceImpl implements CustomerService
         LocalDateTime end = request.getReservationTime().plusMinutes(ReservationConflictValidator.TABLE_TURNAROUND_MINUTES);
 
         List<Reservation> existingReservations = reservationRepository
-                .findByTableIdAndReservationTimeBetween(request.getTableId(), start, end);
+                .findByTableIdAndReservationTimeBetweenAndStatusIn(request.getTableId(), start, end, List.of(ReservationStatus.QUEUED, ReservationStatus.WAITING));
 
         LocalDateTime servingOrderCreatedAt = null;
         if (table.getStatus() == TableStatus.SERVING)

@@ -699,13 +699,16 @@ public class CashierServiceImpl implements CashierService {
         if (order.getTable() == null) return;
 
         RestaurantTable table = order.getTable();
-        boolean hasUpcomingReservation = reservationRepository
-                .findFirstByTableAndStatusInAndReservationTimeAfterOrderByReservationTimeAsc(
-                        table,
-                        List.of(ReservationStatus.WAITING, ReservationStatus.QUEUED),
-                        LocalDateTime.now()
-                ).isPresent();
-        table.setStatus(hasUpcomingReservation ? TableStatus.RESERVED : TableStatus.AVAILABLE);
+        // Chỉ giữ bàn (RESERVED) khi có reservation đang ở đúng khung giờ WAITING
+        // (đúng theo định nghĩa TableStatus.RESERVED: "đồng bộ khi reservation tương ứng đang trong trạng thái WAITING").
+        // KHÔNG xét QUEUED ở đây: một reservation QUEUED có thể còn cách rất xa giờ đặt (vài tiếng sau),
+        // việc chuyển QUEUED -> WAITING (và set bàn RESERVED) đã được xử lý riêng bởi job
+        // autoUpdateTableStatusToReserved() khi gần tới giờ đặt (trước 30 phút). Nếu đưa QUEUED vào đây,
+        // bàn sẽ bị khóa RESERVED ngay sau khi thanh toán dù giờ đặt kế tiếp còn rất xa -> đây chính là bug.
+        boolean hasWaitingReservation = reservationRepository
+                .findFirstByTableIdAndStatus(table.getId(), ReservationStatus.WAITING)
+                .isPresent();
+        table.setStatus(hasWaitingReservation ? TableStatus.RESERVED : TableStatus.AVAILABLE);
         tableRepository.save(table);
         webSocketBroadcaster.broadcastAfterCommit("/topic/tables", "TABLE_UPDATED");
     }

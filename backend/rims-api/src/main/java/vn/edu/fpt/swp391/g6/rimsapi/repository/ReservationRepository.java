@@ -30,13 +30,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>
 
     Optional<Reservation> findFirstByTableIdAndStatus(int tableId, ReservationStatus status);
 
-    Optional<Reservation> findFirstByTableAndStatusInAndReservationTimeAfterOrderByReservationTimeAsc(
-            RestaurantTable table,
-            List<ReservationStatus> statuses,
-            LocalDateTime after
-    );
-
-
     // Lấy các reservation QUEUED sắp tới trong vòng 30 phút (để chuyển sang WAITING)
     // WHERE status = QUEUED AND reservation_time BETWEEN :from AND :to
     List<Reservation> findByStatusAndReservationTimeBetween(

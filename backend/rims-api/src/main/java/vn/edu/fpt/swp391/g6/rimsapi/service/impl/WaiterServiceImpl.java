@@ -56,7 +56,7 @@ public class WaiterServiceImpl implements WaiterService
         List<RestaurantTable> tables = restaurantTableRepository.findAll();
 
         //tự động lọc ra các Reservation đang ở trạng thái QUEUED(chỉ lọc trong 1 ngày tới)
-        List<Reservation> queuedReservations = reservationRepository.findByStatusAndReservationTimeBetween(ReservationStatus.QUEUED, LocalDateTime.now(), LocalDateTime.now().plusDays(1));
+        List<Reservation> queuedReservations = reservationRepository.findByStatusAndReservationTimeBetween(ReservationStatus.QUEUED, LocalDateTime.now(), LocalDate.now().atStartOfDay().plusDays(1));
 
         Map<Integer, Reservation> nextReservations = new HashMap<>();
         for (Reservation res : queuedReservations)
@@ -410,7 +410,7 @@ public class WaiterServiceImpl implements WaiterService
         LocalDateTime start = request.getReservationTime().minusMinutes(ReservationConflictValidator.TABLE_TURNAROUND_MINUTES);
         LocalDateTime end = request.getReservationTime().plusMinutes(ReservationConflictValidator.TABLE_TURNAROUND_MINUTES);
 
-        List<Reservation> existingReservations = reservationRepository.findByTableIdAndReservationTimeBetween(request.getTableId(), start, end);
+        List<Reservation> existingReservations = reservationRepository.findByTableIdAndReservationTimeBetweenAndStatusIn(request.getTableId(), start, end, List.of(ReservationStatus.QUEUED, ReservationStatus.WAITING));
 
         LocalDateTime servingOrderCreatedAt = null;
         if (table.getStatus() == TableStatus.SERVING)
@@ -523,8 +523,8 @@ public class WaiterServiceImpl implements WaiterService
         LocalDateTime start = request.getReservationTime().minusMinutes(ReservationConflictValidator.TABLE_TURNAROUND_MINUTES);
         LocalDateTime end = request.getReservationTime().plusMinutes(ReservationConflictValidator.TABLE_TURNAROUND_MINUTES);
 
-        List<Reservation> existingReservations = reservationRepository.findByTableIdAndReservationTimeBetween(
-                request.getTableId(), start, end);
+        List<Reservation> existingReservations = reservationRepository.findByTableIdAndReservationTimeBetweenAndStatusIn(
+                request.getTableId(), start, end, List.of(ReservationStatus.WAITING,  ReservationStatus.QUEUED));
 
         LocalDateTime servingOrderCreatedAt = null;
         if (table.getStatus() == TableStatus.SERVING)
