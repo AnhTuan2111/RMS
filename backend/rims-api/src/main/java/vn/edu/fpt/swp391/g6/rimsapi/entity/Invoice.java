@@ -52,7 +52,7 @@ public class Invoice {
 
     private Integer pointsEarnedOnInvoice;
 
-    // Hàm mới: Tính doanh thu thực tế bằng cách trừ thẳng tiền VAT
+    //Tính doanh thu thực tế bằng cách trừ thẳng tiền VAT
     public void calculateAndSetRevenue(BigDecimal vatAmount) {
         if (this.finalAmount != null && vatAmount != null) {
             this.restaurantRevenueAmount = this.finalAmount.subtract(vatAmount);

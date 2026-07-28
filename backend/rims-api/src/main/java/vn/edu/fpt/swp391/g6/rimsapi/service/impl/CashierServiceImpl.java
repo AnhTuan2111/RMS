@@ -48,6 +48,7 @@ public class CashierServiceImpl implements CashierService {
     private final WebSocketBroadcaster webSocketBroadcaster;
     private final PasswordEncoder passwordEncoder;
 
+    // Dashboard sơ đồ bàn cho Cashier: bàn nào đang có order SERVING/LOCKED -> hiển thị "đang phục vụ", còn lại "trống"
     @Override
     @Transactional(readOnly = true)
     public List<TableDashboardResponse> getTablesDashboard()
@@ -77,6 +78,7 @@ public class CashierServiceImpl implements CashierService {
                 .toList();
     }
 
+    // Xem chi tiết đơn để chuẩn bị thanh toán: chỉ tính món COMPLETED, tự tính VAT 10%. Đây là API "xem trước", không đổi trạng thái.
     @Override
     @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetail(Long orderId)
@@ -117,6 +119,9 @@ public class CashierServiceImpl implements CashierService {
                 .build();
     }
 
+    // BƯỚC 1/2 của thanh toán: "chốt" đơn trước khi xử lý tiền thật.
+    // LƯU Ý QUAN TRỌNG: hàm này KHÔNG dùng pessimistic lock (chỉ completeCashPayment mới lock thật) -> có race condition
+    // nhỏ nếu 2 request gọi processPayment gần như đồng thời cho cùng 1 order.
     @Override
     @Transactional
     public PaymentResponse processPayment(Long orderId, PaymentRequest request)
@@ -124,6 +129,7 @@ public class CashierServiceImpl implements CashierService {
         Order order = orderRepository.findOrderWithDetailsById(orderId) // ĐỔI: cần load kèm orderItems
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
+        // Idempotent: nếu đã LOCKED sẵn (Cashier bấm lại/F5) thì trả về luôn, không làm gì thêm
         if (order.getStatus() == OrderStatus.LOCKED)
         {
             return PaymentResponse.builder()
@@ -152,7 +158,8 @@ public class CashierServiceImpl implements CashierService {
             throw new IllegalArgumentException("Không thể thanh toán, còn món chưa hoàn thành: " + preparingNames); // ĐỔI: RuntimeException -> IllegalArgumentException để trả đúng mã 400
         }
 
-        // MỚI: nếu không còn PREPARING nhưng cũng không có món nào COMPLETED -> toàn bộ đã bị hủy
+        // QUAN TRỌNG - CASE ĐẶC BIỆT: không còn PREPARING nhưng cũng không có món nào COMPLETED
+        // -> nghĩa là 100% món đã bị CANCELLED -> tự đóng đơn, KHÔNG tạo Invoice, giải phóng bàn luôn
         boolean hasCompletedItem = items.stream()
                 .anyMatch(item -> item.getStatus() == OrderItemStatus.COMPLETED);
 
@@ -169,6 +176,7 @@ public class CashierServiceImpl implements CashierService {
                     .build();
         }
 
+        // Còn lại: có ít nhất 1 món COMPLETED -> khóa đơn, chờ completeCashPayment/createVNPayPaymentUrl xử lý tiếp
         order.setStatus(OrderStatus.LOCKED);
         order.setLockedAt(LocalDateTime.now());
         orderRepository.save(order);
@@ -179,6 +187,9 @@ public class CashierServiceImpl implements CashierService {
                 .build();
     }
 
+    // BƯỚC 2/2 (nhánh tiền mặt): xử lý tiền thật, dùng pessimistic lock vì đây là nơi ghi dữ liệu quan trọng nhất.
+    // LƯU Ý: có 2 lần tính discount điểm - lần 1 (preview) chỉ để validate sớm "khách đưa đủ tiền chưa",
+    // lần 2 (applyLoyaltyPoints) mới là tính + trừ điểm thật. Sửa rule tính điểm phải sửa khớp cả 2 chỗ.
     @Override
     @Transactional
     public PaymentResponse completeCashPayment(Long orderId, PaymentRequest request) {
@@ -209,7 +220,7 @@ public class CashierServiceImpl implements CashierService {
         }
 
         Invoice invoice = new Invoice();
-        finalAmount = applyLoyaltyPoints(invoice, customerId, pointsUsed, finalAmount);
+        finalAmount = applyLoyaltyPoints(invoice, customerId, pointsUsed, finalAmount); // tính + trừ/cộng điểm THẬT ở đây
 
         BigDecimal excessAmount = amountPaid.subtract(finalAmount);
 
@@ -246,6 +257,7 @@ public class CashierServiceImpl implements CashierService {
                 .build();
     }
 
+    // Cashier bấm "Hủy" giữa chừng thanh toán: trả đơn LOCKED -> SERVING, dọn sạch dữ liệu tạm (pending fields, lockedAt)
     @Override
     @Transactional
     public PaymentResponse unlockOrder(Long orderId)
@@ -273,6 +285,8 @@ public class CashierServiceImpl implements CashierService {
                 .build();
     }
 
+    // Callback VNPay báo THẤT BẠI/hủy: chỉ mở khóa đơn, KHÔNG tạo Invoice, KHÔNG đụng điểm khách
+    // (vì ở bước tạo URL, điểm mới chỉ bị trừ "tạm" trên số tiền hiển thị, chưa từng trừ thật vào customer.rewardPoints)
     @Override
     @Transactional
     public void processVnPayFailed(String vnpTxnRef)
@@ -292,6 +306,9 @@ public class CashierServiceImpl implements CashierService {
         }
     }
 
+    // BƯỚC 2 (nhánh VNPay - phần 1): tính tiền, trừ TẠM điểm (chỉ để ra số tiền hiển thị/gửi VNPay), sinh URL redirect + chữ ký HMAC-SHA512.
+    // QUAN TRỌNG: lưu customerId/pointsUsed vào chính Order (pendingCustomerId/pendingPointsUsed) vì callback VNPay
+    // là 1 request độc lập, không có session/context cũ - phải "nhớ" lựa chọn của khách bằng cách lưu vào DB.
     @Override
     @Transactional
     public VNPayResponse createVNPayPaymentUrl(Long orderId, Integer customerId, Integer pointsUsed)
@@ -367,6 +384,7 @@ public class CashierServiceImpl implements CashierService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         vnp_Params.put("vnp_CreateDate", now.format(formatter));
 
+        // Sort tham số theo key (bắt buộc theo chuẩn VNPay) rồi build 2 chuỗi song song: hashData (để ký) và query (để redirect)
         Map<String, String> sortedParams = new TreeMap<>(vnp_Params);
         StringBuilder hashData = new StringBuilder();
         StringBuilder query = new StringBuilder();
@@ -411,6 +429,9 @@ public class CashierServiceImpl implements CashierService {
         return new VNPayResponse(paymentUrl, "Sinh link thanh toán VNPay thành công!", true);
     }
 
+    // BƯỚC 2 (nhánh VNPay - phần 2): callback khi VNPay báo THÀNH CÔNG.
+    // Đây mới là nơi tạo Invoice thật + trừ/cộng điểm thật, dùng lại đúng applyLoyaltyPoints() như nhánh tiền mặt
+    // để đảm bảo 2 kênh thanh toán tính điểm giống hệt nhau. Có lock (findOrderForUpdateWithItems) vì đây là bước ghi tiền thật.
     @Override
     @Transactional
     public Long processVnPaySuccess(String vnpTxnRef)
@@ -421,6 +442,7 @@ public class CashierServiceImpl implements CashierService {
         Order order = orderRepository.findOrderForUpdateWithItems(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng từ VNPay"));
 
+        // Chặn xử lý trùng nếu VNPay gọi callback nhiều hơn 1 lần cho cùng giao dịch
         if (order.getStatus() == OrderStatus.COMPLETED)
         {
             throw new RuntimeException("Đơn hàng này đã được thanh toán rồi!");
@@ -467,6 +489,7 @@ public class CashierServiceImpl implements CashierService {
         return invoice.getId();
     }
 
+    // Tra cứu khách hàng theo SĐT - chỉ trả về nếu đúng role CUSTOMER (tránh nhầm tài khoản nhân viên có cùng SĐT)
     @Override
     @Transactional(readOnly = true)
     public User searchCustomerByPhone(String phone) {
@@ -477,6 +500,7 @@ public class CashierServiceImpl implements CashierService {
         return null;
     }
 
+    // Tạo nhanh tài khoản khách vãng lai ngay tại quầy: username = phone, mật khẩu mặc định "123456" (đã mã hóa BCrypt)
     @Override
     @Transactional
     public User createCustomerFast(String fullName, String phone, String email) {
@@ -504,6 +528,10 @@ public class CashierServiceImpl implements CashierService {
     }
 
 
+    // Danh sách hóa đơn HÔM NAY cho Cashier, có filter theo bàn/từ khóa khách/phương thức/mã HĐ.
+    // LƯU Ý HIỆU NĂNG: khác với InvoiceRepository.getInvoiceHistory() (lọc + phân trang ở DB),
+    // hàm này load TOÀN BỘ invoice trong ngày rồi lọc/phân trang bằng Java Stream + subList().
+    // Nếu số hóa đơn/ngày tăng nhiều, đây là chỗ cần tối ưu lại (chuyển filter xuống SQL).
     @Override
     @Transactional(readOnly = true)
     public PagedInvoiceResponse getTodayInvoices(String tableNumber, String keyword, String paymentMethod, String invoiceCode, int page, int size)
@@ -558,6 +586,7 @@ public class CashierServiceImpl implements CashierService {
                 .build();
     }
 
+    // Xem lại chi tiết 1 hóa đơn đã thanh toán (màn hình tra cứu/in lại) - chỉ tính món COMPLETED, khớp logic PDF
     @Override
     @Transactional(readOnly = true)
     public CashierInvoiceDetailResponse getInvoiceDetailForCashier(Long invoiceId)
@@ -612,6 +641,8 @@ public class CashierServiceImpl implements CashierService {
                 .build();
     }
 
+    // JOB TỰ ĐỘNG (1 giờ/lần): dọn rác các Order "toàn bộ món bị hủy" từ hôm qua trở về trước
+    // (nhánh đặc biệt ở processPayment tạo ra các Order COMPLETED nhưng không có Invoice)
     @Scheduled(fixedRate = 3600000) // 1 giờ/lần — không cấp thiết như 2 job kia
     @Transactional
     public void cleanupStaleCancelledOrders()
@@ -627,6 +658,9 @@ public class CashierServiceImpl implements CashierService {
         }
     }
 
+    // JOB TỰ ĐỘNG (5 phút/lần): tự phát hiện đơn LOCKED bị "kẹt" quá 15 phút (Cashier đóng tab/mất mạng giữa chừng)
+    // và tự mở khóa về SERVING. LƯU Ý: không phân biệt đang chờ tiền mặt hay đang chờ VNPay redirect -> nếu khách
+    // đang thao tác VNPay chậm quá 15 phút, đơn có thể bị auto-unlock trong lúc khách vẫn ở trang VNPay (edge case chấp nhận được).
     @Scheduled(fixedRate = 300000) // 5 phút/lần — đủ nhanh để không kẹt bàn lâu, không quá tải DB
     @Transactional
     public void autoUnlockStaleOrders()
@@ -646,6 +680,9 @@ public class CashierServiceImpl implements CashierService {
         }
     }
 
+    // HÀM DÙNG CHUNG: công thức tính tiền chuẩn (chỉ cộng các món COMPLETED) - dùng ở nhiều nơi (completeCashPayment,
+    // createVNPayPaymentUrl, processVnPaySuccess). Đổi công thức tính tiền thì sửa ở đây trước, nhưng nhớ kiểm tra
+    // thêm các chỗ viết logic tương tự thủ công ở getOrderDetail/getInvoiceDetailForCashier.
     private BigDecimal calculateActualTotal(Order order) {
         if (order.getOrderItems() == null) return BigDecimal.ZERO;
 
@@ -656,6 +693,9 @@ public class CashierServiceImpl implements CashierService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    // HÀM LÕI hệ thống điểm thưởng - dùng chung cho cả CASH và QRCODE:
+    // 1) set customer vào invoice, 2) nếu dùng điểm: check đủ điểm -> check không vượt 50% hóa đơn -> trừ điểm -> trừ tiền,
+    // 3) LUÔN cộng điểm mới = 1% giá trị hóa đơn SAU KHI đã trừ điểm dùng (làm tròn xuống theo mỗi 1.000đ).
     private BigDecimal applyLoyaltyPoints(Invoice invoice, Integer customerId, Integer pointsUsed, BigDecimal finalAmount)
     {
         if (customerId == null) return finalAmount;
@@ -694,6 +734,8 @@ public class CashierServiceImpl implements CashierService {
         return finalAmount;
     }
 
+    // Giải phóng bàn sau khi đóng đơn: chỉ giữ RESERVED nếu có reservation đang ở đúng trạng thái WAITING.
+    // KHÔNG xét QUEUED ở đây (xem comment gốc bên dưới) - đây là bug đã từng gặp và được note lại cẩn thận.
     private void releaseTableAfterOrderClose(Order order)
     {
         if (order.getTable() == null) return;
