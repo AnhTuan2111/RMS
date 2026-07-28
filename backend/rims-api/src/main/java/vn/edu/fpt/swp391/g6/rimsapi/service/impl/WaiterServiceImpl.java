@@ -261,6 +261,12 @@ public class WaiterServiceImpl implements WaiterService
                     if (itemRequest.getQuantity() == 0)
                     {
                         order.removeOrderItem(existedItem);
+                        if (order.getOrderItems().isEmpty())
+                        {
+                            RestaurantTable table = order.getTable();
+                            table.setStatus(TableStatus.AVAILABLE);
+                            restaurantTableRepository.save(table);
+                        }
                     } else
                     {
                         existedItem.setQuantity(itemRequest.getQuantity());
