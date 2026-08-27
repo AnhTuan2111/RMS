@@ -1,14 +1,15 @@
 package vn.edu.fpt.swp391.g6.rimsapi.config;
 
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import java.nio.charset.StandardCharsets;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 
+import jakarta.servlet.http.HttpServletRequest;
+
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Getter
@@ -37,7 +38,8 @@ public class VNPayConfig
     {
         try
         {
-            if (key == null || data == null) return "";
+            if (key == null || data == null)
+                return "";
 
             final Mac hmac512 = Mac.getInstance("HmacSHA512");
             SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA512");

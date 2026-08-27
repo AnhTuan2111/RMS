@@ -2,7 +2,6 @@ package vn.edu.fpt.swp391.g6.rimsapi.dto.response.auth;
 
 import lombok.*;
 
-
 @Getter
 @Builder
 @ToString

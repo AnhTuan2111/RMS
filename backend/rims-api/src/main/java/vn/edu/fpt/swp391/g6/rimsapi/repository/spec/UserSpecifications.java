@@ -1,12 +1,14 @@
 package vn.edu.fpt.swp391.g6.rimsapi.repository.spec;
 
-import jakarta.persistence.criteria.Predicate;
-import org.springframework.data.jpa.domain.Specification;
-import vn.edu.fpt.swp391.g6.rimsapi.entity.User;
-import vn.edu.fpt.swp391.g6.rimsapi.enums.RoleType;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.criteria.Predicate;
+
+import org.springframework.data.jpa.domain.Specification;
+
+import vn.edu.fpt.swp391.g6.rimsapi.entity.User;
+import vn.edu.fpt.swp391.g6.rimsapi.enums.RoleType;
 
 /**
  * Xây dựng các Specification để lọc User (staff / customer) phục vụ
@@ -49,8 +51,7 @@ public final class UserSpecifications
                 cb.like(cb.lower(root.get("fullName")), like),
                 cb.like(cb.lower(root.get("username")), like),
                 cb.like(cb.lower(cb.coalesce(root.get("email"), "")), like),
-                cb.like(root.get("phone"), like)
-        );
+                cb.like(root.get("phone"), like));
     }
 
     /**
@@ -87,8 +88,7 @@ public final class UserSpecifications
 
     private static Specification<User> combine(List<Specification<User>> specs)
     {
-        return (root, query, cb) ->
-        {
+        return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             for (Specification<User> spec : specs)
             {

@@ -6,10 +6,7 @@
  */
 
 /** Status of a restaurant table */
-export type TableStatus =
-    | 'AVAILABLE'
-    | 'SERVING'
-    | 'RESERVED'
+export type TableStatus = 'AVAILABLE' | 'SERVING' | 'RESERVED'
 
 /** Full table detail response (waiter + admin view) */
 export interface TableDetailResponse {

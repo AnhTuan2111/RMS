@@ -1,11 +1,10 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.common;
 
-import lombok.Builder;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder

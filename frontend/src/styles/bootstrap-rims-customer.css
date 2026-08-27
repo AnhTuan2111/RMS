@@ -129,7 +129,9 @@
     border-radius: 10px;
     font-size: 14px;
     background: #f8fafc;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
     outline: none;
     font-family: inherit;
     width: 100%;

@@ -1,22 +1,8 @@
-import {
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-} from 'react'
-import {
-    useNavigate,
-    useParams,
-} from 'react-router-dom'
+import {useCallback, useEffect, useRef, useState} from 'react'
+import {useNavigate, useParams} from 'react-router-dom'
 
-import {
-    adminApi,
-    type AdminPaymentDetail,
-} from '@/shared/api/admin'
-import {
-    ErrorState,
-    LoadingState,
-} from '@/shared/components/feedback'
+import {adminApi, type AdminPaymentDetail} from '@/shared/api/admin'
+import {ErrorState, LoadingState} from '@/shared/components/feedback'
 
 function formatCurrency(value: number) {
     return `${new Intl.NumberFormat('vi-VN').format(value)}đ`
@@ -78,18 +64,13 @@ export default function AdminPaymentDetailPage() {
 
     const parsedInvoiceId = Number(invoiceId)
 
-    const hasValidInvoiceId =
-        Boolean(invoiceId)
-        && Number.isFinite(parsedInvoiceId)
+    const hasValidInvoiceId = Boolean(invoiceId) && Number.isFinite(parsedInvoiceId)
 
-    const [payment, setPayment] =
-        useState<AdminPaymentDetail | null>(null)
+    const [payment, setPayment] = useState<AdminPaymentDetail | null>(null)
 
-    const [isLoading, setIsLoading] =
-        useState(true)
+    const [isLoading, setIsLoading] = useState(true)
 
-    const [error, setError] =
-        useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null)
 
     const requestIdRef = useRef(0)
 
@@ -110,10 +91,7 @@ export default function AdminPaymentDetailPage() {
 
                 setError(null)
 
-                const {data} =
-                    await adminApi.getPaymentDetail(
-                        parsedInvoiceId,
-                    )
+                const {data} = await adminApi.getPaymentDetail(parsedInvoiceId)
 
                 if (requestId !== requestIdRef.current) {
                     return
@@ -125,27 +103,16 @@ export default function AdminPaymentDetailPage() {
                     return
                 }
 
-                console.error(
-                    '[ADMIN_PAYMENT_DETAIL_FETCH_ERROR]',
-                    requestError,
-                )
+                console.error('[ADMIN_PAYMENT_DETAIL_FETCH_ERROR]', requestError)
 
-                setError(
-                    'Không thể tải chi tiết hóa đơn.',
-                )
+                setError('Không thể tải chi tiết hóa đơn.')
             } finally {
-                if (
-                    requestId === requestIdRef.current
-                    && showFullLoading
-                ) {
+                if (requestId === requestIdRef.current && showFullLoading) {
                     setIsLoading(false)
                 }
             }
         },
-        [
-            hasValidInvoiceId,
-            parsedInvoiceId,
-        ],
+        [hasValidInvoiceId, parsedInvoiceId],
     )
 
     useEffect(() => {
@@ -165,7 +132,7 @@ export default function AdminPaymentDetailPage() {
     if (!hasValidInvoiceId) {
         return (
             <div className="admin-invoice-detail-page">
-                <div className="admin-invoice-detail-gradient"/>
+                <div className="admin-invoice-detail-gradient" />
                 <div className="admin-invoice-detail-content">
                     <div className="admin-invoice-detail-card admin-invoice-detail-state">
                         <h2>Không thể tải dữ liệu</h2>
@@ -189,14 +156,11 @@ export default function AdminPaymentDetailPage() {
         return (
             <ErrorState
                 title="Không thể tải dữ liệu"
-                message={
-                    error ?? 'Không tìm thấy hóa đơn.'
-                }
+                message={error ?? 'Không tìm thấy hóa đơn.'}
                 onRetry={() => {
-                    loadPaymentDetail(true)
-                        .catch((requestError) => {
-                            console.error(requestError)
-                        })
+                    loadPaymentDetail(true).catch((requestError) => {
+                        console.error(requestError)
+                    })
                 }}
             />
         )
@@ -204,7 +168,7 @@ export default function AdminPaymentDetailPage() {
 
     return (
         <div className="admin-invoice-detail-page">
-            <div className="admin-invoice-detail-gradient"/>
+            <div className="admin-invoice-detail-gradient" />
 
             <div className="admin-invoice-detail-content">
                 <div className="admin-invoice-detail-card admin-invoice-main-card">
@@ -223,11 +187,8 @@ export default function AdminPaymentDetailPage() {
 
                             <p>
                                 Bàn: {formatTableName(payment.tableNumber)}
-                                <span className="admin-invoice-info-dot">
-                                    •
-                                </span>
-                                Giờ: {formatTime(payment.invoiceDate)}
-                                {' '}
+                                <span className="admin-invoice-info-dot">•</span>
+                                Giờ: {formatTime(payment.invoiceDate)}{' '}
                                 {formatDate(payment.invoiceDate)}
                             </p>
                         </div>
@@ -275,29 +236,23 @@ export default function AdminPaymentDetailPage() {
                 <div className="admin-invoice-detail-card admin-invoice-summary-wrapper">
                     <div className="admin-invoice-summary-card">
                         <div className="admin-invoice-summary-row">
-                            <span className="admin-invoice-summary-label">
-                                Tạm tính
-                            </span>
+                            <span className="admin-invoice-summary-label">Tạm tính</span>
                             <span className="admin-invoice-summary-value">
                                 {formatCurrency(payment.totalBeforeVat)}
                             </span>
                         </div>
 
                         <div className="admin-invoice-summary-row">
-                            <span className="admin-invoice-summary-label">
-                                VAT (10%)
-                            </span>
+                            <span className="admin-invoice-summary-label">VAT (10%)</span>
                             <span className="admin-invoice-summary-value">
                                 {formatCurrency(payment.vatAmount)}
                             </span>
                         </div>
 
-                        <div className="admin-invoice-summary-divider"/>
+                        <div className="admin-invoice-summary-divider" />
 
                         <div className="admin-invoice-summary-row admin-invoice-summary-row-total">
-                            <span className="admin-invoice-total-label">
-                                THÀNH TIỀN
-                            </span>
+                            <span className="admin-invoice-total-label">THÀNH TIỀN</span>
                             <span className="admin-invoice-summary-highlight">
                                 {formatCurrency(payment.finalAmount)}
                             </span>
@@ -313,18 +268,14 @@ export default function AdminPaymentDetailPage() {
                         </div>
 
                         <div className="admin-invoice-summary-row">
-                            <span className="admin-invoice-summary-label">
-                                Khách trả
-                            </span>
+                            <span className="admin-invoice-summary-label">Khách trả</span>
                             <span className="admin-invoice-summary-value">
                                 {formatCurrency(payment.amountPaid)}
                             </span>
                         </div>
 
                         <div className="admin-invoice-summary-row">
-                            <span className="admin-invoice-summary-label">
-                                Tiền thừa
-                            </span>
+                            <span className="admin-invoice-summary-label">Tiền thừa</span>
                             <span className="admin-invoice-summary-value">
                                 {formatCurrency(payment.excessAmount)}
                             </span>

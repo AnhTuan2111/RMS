@@ -1,10 +1,9 @@
 package vn.edu.fpt.swp391.g6.rimsapi.repository.projection;
 
-import vn.edu.fpt.swp391.g6.rimsapi.enums.PaymentMethod;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import vn.edu.fpt.swp391.g6.rimsapi.enums.PaymentMethod;
 
 public interface InvoiceHistoryProjection
 {
@@ -21,4 +20,3 @@ public interface InvoiceHistoryProjection
 
     LocalDateTime getPaymentDate();
 }
-

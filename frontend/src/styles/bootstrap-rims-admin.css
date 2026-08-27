@@ -78,8 +78,10 @@
 .admin-payment-table-row {
     min-width: 860px;
     display: grid;
-    grid-template-columns:
-        minmax(140px, 0.95fr) minmax(140px, 0.85fr) minmax(160px, 1fr) minmax(150px, 0.95fr) minmax(210px, 1.25fr) 34px;
+    grid-template-columns: minmax(140px, 0.95fr) minmax(140px, 0.85fr) minmax(160px, 1fr) minmax(150px, 0.95fr) minmax(
+            210px,
+            1.25fr
+        ) 34px;
     align-items: center;
     gap: 14px;
     padding: 16px 18px;
@@ -725,8 +727,6 @@
     background: #f1f5f9;
 }
 
-
-
 /* ==============================
    RIMS STATISTICS STYLES
    ============================== */
@@ -761,7 +761,9 @@
     text-align: left;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.03),
+        0 2px 4px -1px rgba(0, 0, 0, 0.03);
     outline: none;
     font-family: inherit;
     width: 100%;
@@ -1034,7 +1036,7 @@
     margin: 0;
 }
 
-.revenue-comparison-date-field>span {
+.revenue-comparison-date-field > span {
     color: #475569;
     font-size: 13px;
     font-weight: 850;
@@ -1784,7 +1786,7 @@
     gap: 1rem;
 }
 
-.admin-bestseller-dashboard-panel .order-shift-dashboard-header>div:first-child {
+.admin-bestseller-dashboard-panel .order-shift-dashboard-header > div:first-child {
     min-width: 260px;
     flex: 1 1 320px;
 }
@@ -2097,7 +2099,7 @@
     font-size: 14px;
 }
 
-.reservation-summary-card+.reservation-summary-card {
+.reservation-summary-card + .reservation-summary-card {
     border-left: 1px solid #e5e7eb;
 }
 
@@ -2523,7 +2525,7 @@
     gap: 6px;
 }
 
-.weekly-overview-kpi-content>span {
+.weekly-overview-kpi-content > span {
     color: #64748b;
     font-size: 13px;
     font-weight: 850;
@@ -2681,7 +2683,7 @@
     background: #fef2f2;
 }
 
-.weekly-comparison-card>span {
+.weekly-comparison-card > span {
     color: #64748b;
     font-size: 13px;
     font-weight: 850;
@@ -2971,7 +2973,6 @@
 }
 
 @media (max-width: 560px) {
-
     .weekly-overview-dashboard,
     .weekly-overview-panel {
         padding: 18px;
@@ -3674,8 +3675,8 @@
     gap: 8px;
 }
 
-.admin-revenue-date-field>label,
-.admin-revenue-date-field>span:first-child {
+.admin-revenue-date-field > label,
+.admin-revenue-date-field > span:first-child {
     color: #0b0f19;
     font-size: 13px;
     font-weight: 650;
@@ -4027,7 +4028,6 @@
 }
 
 @media (max-width: 560px) {
-
     .admin-revenue-dashboard,
     .admin-revenue-filter-panel {
         padding: 20px;
@@ -4057,7 +4057,7 @@
 
 /* Main Container */
 .admin-category-page {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     color: #334155;
 }
 
@@ -4170,7 +4170,9 @@
     background-color: #ffffff;
     padding: 24px;
     border-radius: 16px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02), 0 1px 2px rgba(15, 23, 42, 0.04);
+    box-shadow:
+        0 1px 3px rgba(15, 23, 42, 0.02),
+        0 1px 2px rgba(15, 23, 42, 0.04);
     border: 1px solid #e2e8f0;
     box-sizing: border-box;
 }
@@ -4854,7 +4856,9 @@
     background: #ffffff;
     padding: 28px;
     border-radius: 16px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02), 0 1px 2px rgba(15, 23, 42, 0.04);
+    box-shadow:
+        0 1px 3px rgba(15, 23, 42, 0.02),
+        0 1px 2px rgba(15, 23, 42, 0.04);
     border: 1px solid #e2e8f0;
 }
 
@@ -5133,7 +5137,7 @@ ADMIN DISHES PAGE STYLES
 
 /* Page Container */
 .admin-dish-page {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     padding: 32px;
     background-color: #f8fafc;
     min-height: 100vh;
@@ -5277,7 +5281,9 @@ ADMIN DISHES PAGE STYLES
     background-color: #ffffff;
     padding: 20px;
     border-radius: 16px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02), 0 1px 2px rgba(15, 23, 42, 0.04);
+    box-shadow:
+        0 1px 3px rgba(15, 23, 42, 0.02),
+        0 1px 2px rgba(15, 23, 42, 0.04);
     border: 1px solid #e2e8f0;
     box-sizing: border-box;
 }
@@ -6188,7 +6194,7 @@ ADMIN DISHES PAGE STYLES
 
 /* Page Container */
 .admin-menu-page {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     padding: 32px;
     background-color: #f8fafc;
     min-height: 100vh;
@@ -6800,7 +6806,7 @@ ADMIN DISHES PAGE STYLES
     border-radius: 22px;
     border: 1px solid rgba(226, 232, 240, 0.95);
     background:
-        radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.10), transparent 24rem),
+        radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.1), transparent 24rem),
         linear-gradient(180deg, #ffffff, #f8fafc);
     box-shadow: 0 22px 55px rgba(15, 23, 42, 0.08);
 }
@@ -6848,9 +6854,7 @@ ADMIN DISHES PAGE STYLES
     justify-content: stretch;
     border-radius: 18px;
     border: 1px solid #e2e8f0;
-    background:
-        radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.08), transparent 9rem),
-        #ffffff;
+    background: radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.08), transparent 9rem), #ffffff;
     box-shadow:
         0 16px 38px rgba(15, 23, 42, 0.07),
         inset 0 1px 0 rgba(255, 255, 255, 0.75);
@@ -6923,7 +6927,7 @@ ADMIN DISHES PAGE STYLES
     gap: 8px;
 }
 
-.weekly-overview-kpi-content>span {
+.weekly-overview-kpi-content > span {
     min-height: 34px;
     display: flex;
     align-items: flex-end;
@@ -7054,7 +7058,6 @@ ADMIN DISHES PAGE STYLES
    ADMIN PAYMENT DETAIL
 ========================================================= */
 
-
 /* =========================================================
    1. NỀN TỔNG THỂ
 ========================================================= */
@@ -7070,20 +7073,13 @@ ADMIN DISHES PAGE STYLES
     box-sizing: border-box;
 }
 
-
 /* Dải gradient phía trên */
 .admin-invoice-detail-gradient {
     width: 100%;
     height: 5px;
 
-    background: linear-gradient(90deg,
-            #4f46e5 0%,
-            #6366f1 25%,
-            #8b5cf6 48%,
-            #f97316 78%,
-            #fb923c 100%);
+    background: linear-gradient(90deg, #4f46e5 0%, #6366f1 25%, #8b5cf6 48%, #f97316 78%, #fb923c 100%);
 }
-
 
 /* Khu vực nền xám chứa hóa đơn */
 .admin-invoice-detail-content {
@@ -7098,7 +7094,6 @@ ADMIN DISHES PAGE STYLES
 
     box-sizing: border-box;
 }
-
 
 /* =========================================================
    2. CARD CHUNG
@@ -7119,14 +7114,12 @@ ADMIN DISHES PAGE STYLES
     box-sizing: border-box;
 }
 
-
 /* Card phía trên */
 .admin-invoice-main-card {
     overflow: hidden;
 
     margin-bottom: 18px;
 }
-
 
 /* =========================================================
    3. HEADER HÓA ĐƠN
@@ -7143,7 +7136,6 @@ ADMIN DISHES PAGE STYLES
 
     border-bottom: 1px solid #f1f5f9;
 }
-
 
 /* Nút quay lại */
 .admin-invoice-detail-back-button {
@@ -7178,7 +7170,6 @@ ADMIN DISHES PAGE STYLES
         transform 0.2s ease;
 }
 
-
 .admin-invoice-detail-back-button:hover {
     background: #f8fafc;
 
@@ -7189,11 +7180,9 @@ ADMIN DISHES PAGE STYLES
     transform: translateX(-1px);
 }
 
-
 .admin-invoice-detail-back-button:active {
     transform: scale(0.96);
 }
-
 
 /* Khối title */
 .admin-invoice-detail-heading {
@@ -7202,7 +7191,6 @@ ADMIN DISHES PAGE STYLES
 
     min-width: 0;
 }
-
 
 /* Tiêu đề hóa đơn */
 .admin-invoice-detail-heading h1 {
@@ -7218,7 +7206,6 @@ ADMIN DISHES PAGE STYLES
     letter-spacing: -0.5px;
 }
 
-
 /* Thông tin bàn + giờ + ngày */
 .admin-invoice-detail-heading p {
     margin: 6px 0 0 0;
@@ -7231,7 +7218,6 @@ ADMIN DISHES PAGE STYLES
     line-height: 1.5;
 }
 
-
 .admin-invoice-info-dot {
     display: inline-block;
 
@@ -7239,7 +7225,6 @@ ADMIN DISHES PAGE STYLES
 
     color: #cbd5e1;
 }
-
 
 /* =========================================================
    4. BẢNG DANH SÁCH MÓN ĂN
@@ -7251,13 +7236,11 @@ ADMIN DISHES PAGE STYLES
     background: #ffffff;
 }
 
-
 /* Header của bảng */
 .admin-invoice-detail-table-head {
     display: grid;
 
-    grid-template-columns:
-        minmax(300px, 2fr) 100px minmax(150px, 1fr) minmax(170px, 1fr);
+    grid-template-columns: minmax(300px, 2fr) 100px minmax(150px, 1fr) minmax(170px, 1fr);
 
     align-items: center;
 
@@ -7272,7 +7255,6 @@ ADMIN DISHES PAGE STYLES
     box-sizing: border-box;
 }
 
-
 .admin-invoice-detail-table-head span {
     color: #475569;
 
@@ -7284,25 +7266,21 @@ ADMIN DISHES PAGE STYLES
     letter-spacing: 0.35px;
 }
 
-
 /* Căn cột */
 .admin-invoice-detail-table-head span:nth-child(2) {
     text-align: center;
 }
-
 
 .admin-invoice-detail-table-head span:nth-child(3),
 .admin-invoice-detail-table-head span:nth-child(4) {
     text-align: right;
 }
 
-
 /* Dòng món ăn */
 .admin-invoice-detail-row {
     display: grid;
 
-    grid-template-columns:
-        minmax(300px, 2fr) 100px minmax(150px, 1fr) minmax(170px, 1fr);
+    grid-template-columns: minmax(300px, 2fr) 100px minmax(150px, 1fr) minmax(170px, 1fr);
 
     align-items: center;
 
@@ -7319,16 +7297,13 @@ ADMIN DISHES PAGE STYLES
     transition: background-color 0.15s ease;
 }
 
-
 .admin-invoice-detail-row:last-child {
     border-bottom: none;
 }
 
-
 .admin-invoice-detail-row:hover {
     background: #fafcff;
 }
-
 
 /* Chữ chung của dòng */
 .admin-invoice-detail-row span {
@@ -7337,12 +7312,10 @@ ADMIN DISHES PAGE STYLES
     font-size: 18px;
 }
 
-
 /* Tên món */
 .admin-invoice-dish-name {
     font-weight: 500;
 }
-
 
 /* Số lượng */
 .admin-invoice-qty {
@@ -7352,7 +7325,6 @@ ADMIN DISHES PAGE STYLES
     font-variant-numeric: tabular-nums;
 }
 
-
 /* Đơn giá */
 .admin-invoice-price {
     text-align: right;
@@ -7361,7 +7333,6 @@ ADMIN DISHES PAGE STYLES
 
     font-variant-numeric: tabular-nums;
 }
-
 
 /* Thành tiền từng món */
 .admin-invoice-line-total {
@@ -7373,7 +7344,6 @@ ADMIN DISHES PAGE STYLES
 
     font-variant-numeric: tabular-nums;
 }
-
 
 /* Empty */
 .admin-invoice-detail-empty {
@@ -7388,7 +7358,6 @@ ADMIN DISHES PAGE STYLES
     background: #ffffff;
 }
 
-
 /* =========================================================
    5. CARD TỔNG KẾT THANH TOÁN
 ========================================================= */
@@ -7399,7 +7368,6 @@ ADMIN DISHES PAGE STYLES
     overflow: hidden;
 }
 
-
 .admin-invoice-summary-card {
     width: 100%;
 
@@ -7409,7 +7377,6 @@ ADMIN DISHES PAGE STYLES
 
     box-sizing: border-box;
 }
-
 
 /* Từng dòng summary */
 .admin-invoice-summary-row {
@@ -7426,14 +7393,12 @@ ADMIN DISHES PAGE STYLES
     font-size: 17px;
 }
 
-
 /* Label trái */
 .admin-invoice-summary-label {
     color: #334155;
 
     font-weight: 500;
 }
-
 
 /* Giá trị phải */
 .admin-invoice-summary-value {
@@ -7446,7 +7411,6 @@ ADMIN DISHES PAGE STYLES
     font-variant-numeric: tabular-nums;
 }
 
-
 /* Đường phân cách */
 .admin-invoice-summary-divider {
     width: 100%;
@@ -7456,7 +7420,6 @@ ADMIN DISHES PAGE STYLES
 
     background: #e2e8f0;
 }
-
 
 /* =========================================================
    6. DÒNG THÀNH TIỀN
@@ -7468,7 +7431,6 @@ ADMIN DISHES PAGE STYLES
     margin-bottom: 2px;
 }
 
-
 /* Label THÀNH TIỀN */
 .admin-invoice-total-label {
     color: #dc2626;
@@ -7478,7 +7440,6 @@ ADMIN DISHES PAGE STYLES
 
     letter-spacing: 0.15px;
 }
-
 
 /* Giá trị THÀNH TIỀN */
 .admin-invoice-summary-highlight {
@@ -7492,7 +7453,6 @@ ADMIN DISHES PAGE STYLES
     font-variant-numeric: tabular-nums;
 }
 
-
 /* =========================================================
    7. ERROR STATE
 ========================================================= */
@@ -7503,13 +7463,11 @@ ADMIN DISHES PAGE STYLES
     text-align: center;
 }
 
-
 .admin-invoice-detail-state h2 {
     margin: 0 0 8px 0;
 
     color: #0f172a;
 }
-
 
 .admin-invoice-detail-state p {
     margin: 0;
@@ -7517,22 +7475,18 @@ ADMIN DISHES PAGE STYLES
     color: #64748b;
 }
 
-
 /* =========================================================
    8. RESPONSIVE
 ========================================================= */
 
 @media (max-width: 900px) {
-
     .admin-invoice-detail-content {
         padding: 14px;
     }
 
-
     .admin-invoice-detail-table {
         overflow-x: auto;
     }
-
 
     .admin-invoice-detail-table-head,
     .admin-invoice-detail-row {
@@ -7540,43 +7494,34 @@ ADMIN DISHES PAGE STYLES
     }
 }
 
-
 @media (max-width: 600px) {
-
     .admin-invoice-detail-content {
         padding: 10px;
     }
-
 
     .admin-invoice-detail-card {
         border-radius: 12px;
     }
 
-
     .admin-invoice-detail-header {
         padding: 16px;
     }
-
 
     .admin-invoice-detail-heading h1 {
         font-size: 22px;
     }
 
-
     .admin-invoice-detail-heading p {
         font-size: 14px;
     }
-
 
     .admin-invoice-summary-card {
         padding: 16px;
     }
 
-
     .admin-invoice-total-label {
         font-size: 16px;
     }
-
 
     .admin-invoice-summary-highlight {
         font-size: 24px;

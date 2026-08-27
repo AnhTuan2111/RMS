@@ -2,7 +2,6 @@ package vn.edu.fpt.swp391.g6.rimsapi.dto.response.kitchen;
 
 import lombok.*;
 
-
 @Getter
 @Setter
 @Builder
@@ -21,4 +20,3 @@ public class ChefDashboardResponse
     // Số món đang tạm hết
     private long unavailableDishCount;
 }
-

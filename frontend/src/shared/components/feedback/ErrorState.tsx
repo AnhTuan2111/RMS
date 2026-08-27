@@ -10,21 +10,18 @@ type ErrorStateProps = {
 }
 
 export function ErrorState({
-                               title = 'Không thể tải dữ liệu',
-                               message,
-                               description,
-                               onRetry,
-                               retryLabel = 'Thử lại',
-                               action,
-                           }: ErrorStateProps) {
-    const displayMessage =
-        message ?? description ?? 'Đã có lỗi xảy ra. Vui lòng thử lại.'
+    title = 'Không thể tải dữ liệu',
+    message,
+    description,
+    onRetry,
+    retryLabel = 'Thử lại',
+    action,
+}: ErrorStateProps) {
+    const displayMessage = message ?? description ?? 'Đã có lỗi xảy ra. Vui lòng thử lại.'
 
     return (
         <div className="rims-feedback-state rims-feedback-error">
-            <div className="rims-feedback-icon error">
-                !
-            </div>
+            <div className="rims-feedback-icon error">!</div>
 
             <div>
                 <h3>{title}</h3>

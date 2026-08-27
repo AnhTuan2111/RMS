@@ -1,5 +1,7 @@
 package vn.edu.fpt.swp391.g6.rimsapi.service.impl;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,20 +25,19 @@ import vn.edu.fpt.swp391.g6.rimsapi.dto.response.order.CancelledOrderResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.order.GroupedKitchenItemResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.order.GroupedKitchenOrderResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.Dish;
+import vn.edu.fpt.swp391.g6.rimsapi.entity.Order;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.OrderItem;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.OrderItemStatus;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.DishRepository;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.OrderItemRepository;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.OrderRepository;
-import vn.edu.fpt.swp391.g6.rimsapi.entity.Order;
-import java.math.BigDecimal;
 import vn.edu.fpt.swp391.g6.rimsapi.service.ChefService;
-import java.time.LocalDate;
 import vn.edu.fpt.swp391.g6.rimsapi.util.WebSocketBroadcaster;
 
 @Service
 @RequiredArgsConstructor
-public class ChefServiceImpl implements ChefService {
+public class ChefServiceImpl implements ChefService
+{
 
     private final OrderItemRepository orderItemRepository;
     private final DishRepository dishRepository;
@@ -43,11 +45,11 @@ public class ChefServiceImpl implements ChefService {
     private final WebSocketBroadcaster webSocketBroadcaster;
 
     @Override
-    public List<KitchenOrderResponse> getKitchenOrders() {
+    public List<KitchenOrderResponse> getKitchenOrders()
+    {
         return orderItemRepository
                 .findByStatusOrderByCreatedAtAsc(
-                        OrderItemStatus.PREPARING
-                )
+                        OrderItemStatus.PREPARING)
                 .stream()
                 .map(this::toKitchenOrderResponse)
                 .toList();
@@ -55,61 +57,50 @@ public class ChefServiceImpl implements ChefService {
 
     @Override
     public DishDetailResponse getDishDetail(
-            Long orderItemId
-    ) {
+            Long orderItemId)
+    {
         OrderItem item = findOrderItem(orderItemId);
 
-        if (item.getStatus() != OrderItemStatus.PREPARING) {
+        if (item.getStatus() != OrderItemStatus.PREPARING)
+        {
             throw new IllegalStateException(
-                    "Chỉ có thể xem chi tiết món đang chuẩn bị"
-            );
+                    "Chỉ có thể xem chi tiết món đang chuẩn bị");
         }
 
-        DishDetailResponse response =
-                new DishDetailResponse();
+        DishDetailResponse response = new DishDetailResponse();
 
         response.setOrderItemId(item.getId());
 
         response.setTableNumber(
                 item.getOrder()
                         .getTable()
-                        .getTableNumber()
-        );
+                        .getTableNumber());
 
         response.setDishName(
-                item.getDishNameSnapshot()
-        );
+                item.getDishNameSnapshot());
 
         response.setDescription(
-                item.getDish().getDescription()
-        );
+                item.getDish().getDescription());
         response.setQuantity(
-                item.getQuantity()
-        );
+                item.getQuantity());
 
         response.setNote(
-                item.getNote()
-        );
+                item.getNote());
 
         response.setStatus(
-                item.getStatus()
-        );
+                item.getStatus());
 
         response.setCreatedAt(
-                item.getCreatedAt()
-        );
+                item.getCreatedAt());
 
         response.setChefInternalNote(
-                item.getChefInternalNote()
-        );
+                item.getChefInternalNote());
 
         response.setChefInternalNoteCreatedAt(
-                item.getChefInternalNoteCreatedAt()
-        );
+                item.getChefInternalNoteCreatedAt());
 
         response.setChefInternalNoteAcknowledgedAt(
-                item.getChefInternalNoteAcknowledgedAt()
-        );
+                item.getChefInternalNoteAcknowledgedAt());
 
         return response;
     }
@@ -118,20 +109,20 @@ public class ChefServiceImpl implements ChefService {
     @Transactional
     public void updateDishStatus(
             Long orderItemId,
-            OrderItemStatus status
-    ) {
+            OrderItemStatus status)
+    {
         OrderItem item = findOrderItem(orderItemId);
 
-        if (item.getStatus() != OrderItemStatus.PREPARING) {
+        if (item.getStatus() != OrderItemStatus.PREPARING)
+        {
             throw new IllegalStateException(
-                    "Món đã được hoàn thành hoặc đã hủy"
-            );
+                    "Món đã được hoàn thành hoặc đã hủy");
         }
 
-        if (status == null) {
+        if (status == null)
+        {
             throw new IllegalArgumentException(
-                    "Trạng thái món không được để trống"
-            );
+                    "Trạng thái món không được để trống");
         }
 
         item.setStatus(status);
@@ -141,32 +132,27 @@ public class ChefServiceImpl implements ChefService {
     }
 
     @Override
-    public List<DishListResponse> getDishList() {
+    public List<DishListResponse> getDishList()
+    {
         return dishRepository.findByIsHiddenFalse()
                 .stream()
                 .map(dish -> {
-                    DishListResponse response =
-                            new DishListResponse();
+                    DishListResponse response = new DishListResponse();
 
                     response.setDishId(
-                            dish.getId()
-                    );
+                            dish.getId());
 
                     response.setDishName(
-                            dish.getName()
-                    );
+                            dish.getName());
 
                     response.setCategory(
-                            dish.getCategory().getName()
-                    );
+                            dish.getCategory().getName());
 
                     response.setPrice(
-                            dish.getPrice()
-                    );
+                            dish.getPrice());
 
                     response.setAvailable(
-                            dish.isAvailable()
-                    );
+                            dish.isAvailable());
 
                     return response;
                 })
@@ -177,20 +163,18 @@ public class ChefServiceImpl implements ChefService {
     @Transactional
     public void updateMenuStatus(
             Integer dishId,
-            Boolean available
-    ) {
+            Boolean available)
+    {
         Dish dish = dishRepository
                 .findById(dishId)
                 .orElseThrow(
                         () -> new RuntimeException(
-                                "Không tìm thấy món ăn"
-                        )
-                );
+                                "Không tìm thấy món ăn"));
 
-        if (available == null) {
+        if (available == null)
+        {
             throw new IllegalArgumentException(
-                    "Trạng thái phục vụ không được để trống"
-            );
+                    "Trạng thái phục vụ không được để trống");
         }
 
         dish.setAvailable(available);
@@ -199,11 +183,11 @@ public class ChefServiceImpl implements ChefService {
          * Khi đặt món thành hết:
          * hủy tất cả OrderItem của món đó đang PREPARING.
          */
-        if (!available) {
+        if (!available)
+        {
             cancelAllPreparingItemsOfDish(
                     dish,
-                    "Món đã được Chef đánh dấu hết trong thực đơn"
-            );
+                    "Món đã được Chef đánh dấu hết trong thực đơn");
         }
 
         dishRepository.save(dish);
@@ -212,35 +196,28 @@ public class ChefServiceImpl implements ChefService {
     }
 
     @Override
-    public ChefDashboardResponse getDashboard() {
+    public ChefDashboardResponse getDashboard()
+    {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
 
-        long preparingCount =
-                orderItemRepository.countByStatus(
-                        OrderItemStatus.PREPARING
-                );
+        long preparingCount = orderItemRepository.countByStatus(
+                OrderItemStatus.PREPARING);
 
-        long completedCount =
-                orderItemRepository.countByStatusAndCreatedAtBetween(
-                        OrderItemStatus.COMPLETED, startOfDay, endOfDay
-                );
+        long completedCount = orderItemRepository.countByStatusAndCreatedAtBetween(
+                OrderItemStatus.COMPLETED, startOfDay, endOfDay);
 
-        long cancelledCount =
-                orderItemRepository.countByStatusAndCreatedAtBetween(
-                        OrderItemStatus.CANCELLED, startOfDay, endOfDay
-                );
+        long cancelledCount = orderItemRepository.countByStatusAndCreatedAtBetween(
+                OrderItemStatus.CANCELLED, startOfDay, endOfDay);
 
-        long unavailableDishCount =
-                dishRepository.countByIsAvailableFalse();
+        long unavailableDishCount = dishRepository.countByIsAvailableFalse();
 
         return ChefDashboardResponse.builder()
                 .preparingCount(preparingCount)
                 .completedCount(completedCount)
                 .cancelledCount(cancelledCount)
                 .unavailableDishCount(
-                        unavailableDishCount
-                )
+                        unavailableDishCount)
                 .build();
     }
 
@@ -257,7 +234,7 @@ public class ChefServiceImpl implements ChefService {
 
         String normalizedReason = reason == null ? "" : reason.trim();
 
-         // Hủy trong chi tiết món: chỉ hủy đúng OrderItem được chọn.
+        // Hủy trong chi tiết món: chỉ hủy đúng OrderItem được chọn.
         selectedItem.setStatus(OrderItemStatus.CANCELLED);
         selectedItem.setCancelReason(normalizedReason);
         selectedItem.setCancelRequestedAt(LocalDateTime.now());
@@ -268,21 +245,22 @@ public class ChefServiceImpl implements ChefService {
     }
 
     @Override
-    public List<KitchenOrderResponse> getCompletedOrders() {
+    public List<KitchenOrderResponse> getCompletedOrders()
+    {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
 
         return orderItemRepository
                 .findByStatusAndCreatedAtBetweenOrderByCreatedAtAsc(
-                        OrderItemStatus.COMPLETED, startOfDay, endOfDay
-                )
+                        OrderItemStatus.COMPLETED, startOfDay, endOfDay)
                 .stream()
                 .map(this::toKitchenOrderResponse)
                 .toList();
     }
 
     @Override
-    public List<CancelledOrderResponse> getCancelledOrders() {
+    public List<CancelledOrderResponse> getCancelledOrders()
+    {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // MỚI
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1); // MỚI
 
@@ -307,39 +285,38 @@ public class ChefServiceImpl implements ChefService {
     @Transactional
     public DishDetailResponse updateChefInternalNote(
             Long orderItemId,
-            String note
-    ) {
+            String note)
+    {
         OrderItem item = findOrderItem(orderItemId);
 
-        if (item.getStatus() != OrderItemStatus.PREPARING) {
+        if (item.getStatus() != OrderItemStatus.PREPARING)
+        {
             throw new IllegalStateException(
-                    "Chỉ có thể thêm ghi chú cho món đang chuẩn bị"
-            );
+                    "Chỉ có thể thêm ghi chú cho món đang chuẩn bị");
         }
 
-        String normalizedNote =
-                note == null
-                        ? ""
-                        : note.trim();
+        String normalizedNote = note == null
+                ? ""
+                : note.trim();
 
-        if (normalizedNote.length() > 500) {
+        if (normalizedNote.length() > 500)
+        {
             throw new IllegalArgumentException(
-                    "Ghi chú nội bộ không được vượt quá 500 ký tự"
-            );
+                    "Ghi chú nội bộ không được vượt quá 500 ký tự");
         }
 
-        if (normalizedNote.isBlank()) {
+        if (normalizedNote.isBlank())
+        {
             item.setChefInternalNote(null);
             item.setChefInternalNoteCreatedAt(null);
             item.setChefInternalNoteAcknowledgedAt(null);
-        } else {
+        } else
+        {
             item.setChefInternalNote(
-                    normalizedNote
-            );
+                    normalizedNote);
 
             item.setChefInternalNoteCreatedAt(
-                    LocalDateTime.now()
-            );
+                    LocalDateTime.now());
 
             item.setChefInternalNoteAcknowledgedAt(null);
         }
@@ -351,80 +328,60 @@ public class ChefServiceImpl implements ChefService {
     }
 
     @Override
-    public List<GroupedKitchenOrderResponse>
-    getGroupedKitchenOrders() {
-        List<OrderItem> preparingItems =
-                orderItemRepository
-                        .findByStatusOrderByCreatedAtAsc(
-                                OrderItemStatus.PREPARING
-                        );
+    public List<GroupedKitchenOrderResponse> getGroupedKitchenOrders()
+    {
+        List<OrderItem> preparingItems = orderItemRepository
+                .findByStatusOrderByCreatedAtAsc(
+                        OrderItemStatus.PREPARING);
 
-        Map<String, GroupedKitchenOrderResponse>
-                groupMap = new LinkedHashMap<>();
+        Map<String, GroupedKitchenOrderResponse> groupMap = new LinkedHashMap<>();
 
-        for (OrderItem item : preparingItems) {
-            String normalizedNote =
-                    normalizeKitchenNote(
-                            item.getNote()
-                    );
+        for (OrderItem item : preparingItems)
+        {
+            String normalizedNote = normalizeKitchenNote(
+                    item.getNote());
 
-            String groupKey =
-                    buildKitchenGroupKey(item);
+            String groupKey = buildKitchenGroupKey(item);
 
-            GroupedKitchenOrderResponse group =
-                    groupMap.computeIfAbsent(
+            GroupedKitchenOrderResponse group = groupMap.computeIfAbsent(
+                    groupKey,
+                    ignored -> createKitchenGroup(
+                            item,
                             groupKey,
-                            ignored -> createKitchenGroup(
-                                    item,
-                                    groupKey,
-                                    normalizedNote
-                            )
-                    );
+                            normalizedNote));
 
-            GroupedKitchenItemResponse itemResponse =
-                    new GroupedKitchenItemResponse();
+            GroupedKitchenItemResponse itemResponse = new GroupedKitchenItemResponse();
 
             itemResponse.setOrderItemId(
-                    item.getId()
-            );
+                    item.getId());
 
             itemResponse.setOrderId(
-                    item.getOrder().getId()
-            );
+                    item.getOrder().getId());
 
             itemResponse.setTableNumber(
                     item.getOrder()
                             .getTable()
-                            .getTableNumber()
-            );
+                            .getTableNumber());
 
             itemResponse.setQuantity(
-                    item.getQuantity()
-            );
+                    item.getQuantity());
 
             itemResponse.setCreatedAt(
-                    item.getCreatedAt()
-            );
+                    item.getCreatedAt());
 
             group.getItems().add(itemResponse);
 
             group.setTotalQuantity(
                     group.getTotalQuantity()
-                            + item.getQuantity()
-            );
+                            + item.getQuantity());
 
-            if (
-                    group.getEarliestCreatedAt() == null
-                            || (
-                            item.getCreatedAt() != null
-                                    && item.getCreatedAt().isBefore(
-                                    group.getEarliestCreatedAt()
-                            )
-                    )
-            ) {
+            if (group.getEarliestCreatedAt() == null
+                    || (item.getCreatedAt() != null
+                            && item.getCreatedAt().isBefore(
+                                    group.getEarliestCreatedAt())))
+            {
                 group.setEarliestCreatedAt(
-                        item.getCreatedAt()
-                );
+                        item.getCreatedAt());
             }
         }
 
@@ -433,93 +390,74 @@ public class ChefServiceImpl implements ChefService {
                 .sorted(
                         Comparator
                                 .comparing(
-                                        GroupedKitchenOrderResponse
-                                                ::getEarliestCreatedAt,
+                                        GroupedKitchenOrderResponse::getEarliestCreatedAt,
                                         Comparator.nullsLast(
-                                                Comparator.naturalOrder()
-                                        )
-                                )
+                                                Comparator.naturalOrder()))
                                 .thenComparing(
-                                        group ->
-                                                group.isHasNote()
-                                                        ? 0
-                                                        : 1
-                                )
+                                        group -> group.isHasNote()
+                                                ? 0
+                                                : 1)
                                 .thenComparing(
-                                        GroupedKitchenOrderResponse
-                                                ::getTotalQuantity,
-                                        Comparator.reverseOrder()
-                                )
+                                        GroupedKitchenOrderResponse::getTotalQuantity,
+                                        Comparator.reverseOrder())
                                 .thenComparing(
-                                        GroupedKitchenOrderResponse
-                                                ::getDishName,
-                                        String.CASE_INSENSITIVE_ORDER
-                                )
-                )
+                                        GroupedKitchenOrderResponse::getDishName,
+                                        String.CASE_INSENSITIVE_ORDER))
                 .toList();
     }
 
     @Override
     @Transactional
     public void completeGroupedKitchenOrders(
-            List<Long> orderItemIds
-    ) {
-        if (
-                orderItemIds == null
-                        || orderItemIds.isEmpty()
-        ) {
+            List<Long> orderItemIds)
+    {
+        if (orderItemIds == null
+                || orderItemIds.isEmpty())
+        {
             throw new IllegalArgumentException(
-                    "Danh sách orderItemId không được để trống"
-            );
+                    "Danh sách orderItemId không được để trống");
         }
 
-        List<Long> uniqueIds =
-                orderItemIds.stream()
-                        .distinct()
-                        .toList();
+        List<Long> uniqueIds = orderItemIds.stream()
+                .distinct()
+                .toList();
 
-        List<OrderItem> items =
-                new ArrayList<>();
+        List<OrderItem> items = new ArrayList<>();
 
         orderItemRepository
                 .findAllById(uniqueIds)
                 .forEach(items::add);
 
-        if (items.size() != uniqueIds.size()) {
+        if (items.size() != uniqueIds.size())
+        {
             throw new IllegalArgumentException(
-                    "Có OrderItem không tồn tại"
-            );
+                    "Có OrderItem không tồn tại");
         }
 
-        boolean containsInvalidStatus =
-                items.stream()
-                        .anyMatch(
-                                item ->
-                                        item.getStatus()
-                                                != OrderItemStatus.PREPARING
-                        );
+        boolean containsInvalidStatus = items.stream()
+                .anyMatch(
+                        item -> item.getStatus() != OrderItemStatus.PREPARING);
 
-        if (containsInvalidStatus) {
+        if (containsInvalidStatus)
+        {
             throw new IllegalStateException(
-                    "Tất cả món trong nhóm phải đang ở trạng thái PREPARING"
-            );
+                    "Tất cả món trong nhóm phải đang ở trạng thái PREPARING");
         }
 
-        Set<String> groupKeys =
-                items.stream()
-                        .map(this::buildKitchenGroupKey)
-                        .collect(Collectors.toSet());
+        Set<String> groupKeys = items.stream()
+                .map(this::buildKitchenGroupKey)
+                .collect(Collectors.toSet());
 
-        if (groupKeys.size() != 1) {
+        if (groupKeys.size() != 1)
+        {
             throw new IllegalArgumentException(
-                    "Các OrderItem không thuộc cùng một nhóm nấu"
-            );
+                    "Các OrderItem không thuộc cùng một nhóm nấu");
         }
 
-        for (OrderItem item : items) {
+        for (OrderItem item : items)
+        {
             item.setStatus(
-                    OrderItemStatus.COMPLETED
-            );
+                    OrderItemStatus.COMPLETED);
         }
 
         orderItemRepository.saveAll(items);
@@ -528,52 +466,47 @@ public class ChefServiceImpl implements ChefService {
 
     private void cancelAllPreparingItemsOfDish(
             Dish dish,
-            String reason
-    ) {
-        LocalDateTime cancelledAt =
-                LocalDateTime.now();
+            String reason)
+    {
+        LocalDateTime cancelledAt = LocalDateTime.now();
 
-        List<OrderItem> preparingItemsOfDish =
-                orderItemRepository
-                        .findByStatusOrderByCreatedAtAsc(
-                                OrderItemStatus.PREPARING
-                        )
-                        .stream()
-                        .filter(item ->
-                                item.getDish() != null
-                                        && Objects.equals(
-                                        item.getDish().getId(),
-                                        dish.getId()
-                                )
-                        )
-                        .toList();
+        List<OrderItem> preparingItemsOfDish = orderItemRepository
+                .findByStatusOrderByCreatedAtAsc(
+                        OrderItemStatus.PREPARING)
+                .stream()
+                .filter(item -> item.getDish() != null
+                        && Objects.equals(
+                                item.getDish().getId(),
+                                dish.getId()))
+                .toList();
 
-        for (OrderItem item : preparingItemsOfDish) {
+        for (OrderItem item : preparingItemsOfDish)
+        {
             item.setStatus(
-                    OrderItemStatus.CANCELLED
-            );
+                    OrderItemStatus.CANCELLED);
 
             item.setCancelReason(reason);
 
             item.setCancelRequestedAt(
-                    cancelledAt
-            );
+                    cancelledAt);
         }
 
-        if (!preparingItemsOfDish.isEmpty()) {
+        if (!preparingItemsOfDish.isEmpty())
+        {
             orderItemRepository.saveAll(
-                    preparingItemsOfDish
-            );
+                    preparingItemsOfDish);
             Set<Order> affectedOrders = preparingItemsOfDish.stream()
                     .map(OrderItem::getOrder)
                     .collect(Collectors.toSet());
-            for (Order order : affectedOrders) {
+            for (Order order : affectedOrders)
+            {
                 recalculateOrderTotal(order);
             }
         }
     }
 
-    private void recalculateOrderTotal(Order order) {
+    private void recalculateOrderTotal(Order order)
+    {
         BigDecimal total = order.getOrderItems().stream()
                 .filter(item -> item.getStatus() != OrderItemStatus.CANCELLED)
                 .map(OrderItem::getSubTotal)
@@ -584,103 +517,85 @@ public class ChefServiceImpl implements ChefService {
     }
 
     private OrderItem findOrderItem(
-            Long orderItemId
-    ) {
+            Long orderItemId)
+    {
         return orderItemRepository
                 .findById(orderItemId)
                 .orElseThrow(
                         () -> new RuntimeException(
-                                "Không tìm thấy món trong đơn hàng"
-                        )
-                );
+                                "Không tìm thấy món trong đơn hàng"));
     }
 
     private KitchenOrderResponse toKitchenOrderResponse(
-            OrderItem item
-    ) {
-        KitchenOrderResponse response =
-                new KitchenOrderResponse();
+            OrderItem item)
+    {
+        KitchenOrderResponse response = new KitchenOrderResponse();
 
         response.setOrderItemId(
-                item.getId()
-        );
+                item.getId());
 
         response.setOrderId(
-                item.getOrder().getId()
-        );
+                item.getOrder().getId());
 
         response.setTableNumber(
                 item.getOrder()
                         .getTable()
-                        .getTableNumber()
-        );
+                        .getTableNumber());
 
         response.setDishName(
-                item.getDishNameSnapshot()
-        );
+                item.getDishNameSnapshot());
 
         response.setQuantity(
-                item.getQuantity()
-        );
+                item.getQuantity());
 
         response.setStatus(
-                item.getStatus()
-        );
+                item.getStatus());
 
         response.setCreatedAt(
-                item.getCreatedAt()
-        );
+                item.getCreatedAt());
 
         return response;
     }
 
-    private GroupedKitchenOrderResponse
-    createKitchenGroup(
+    private GroupedKitchenOrderResponse createKitchenGroup(
             OrderItem item,
             String groupKey,
-            String normalizedNote
-    ) {
-        GroupedKitchenOrderResponse group =
-                new GroupedKitchenOrderResponse();
+            String normalizedNote)
+    {
+        GroupedKitchenOrderResponse group = new GroupedKitchenOrderResponse();
 
         group.setGroupKey(groupKey);
 
         group.setDishId(
-                item.getDish().getId()
-        );
+                item.getDish().getId());
 
         group.setDishName(
-                item.getDishNameSnapshot()
-        );
+                item.getDishNameSnapshot());
 
         group.setHasNote(
-                !normalizedNote.isBlank()
-        );
+                !normalizedNote.isBlank());
 
         group.setNote(
                 normalizedNote.isBlank()
                         ? null
-                        : normalizedNote
-        );
+                        : normalizedNote);
 
         group.setTotalQuantity(0);
 
         group.setEarliestCreatedAt(
-                item.getCreatedAt()
-        );
+                item.getCreatedAt());
 
         return group;
     }
 
     private String buildKitchenGroupKey(
-            OrderItem item
-    ) {
-        String normalizedNote =
-                normalizeKitchenNote(
-                        item.getNote()
-                );
+            OrderItem item)
+    {
+        String normalizedNote = normalizeKitchenNote(
+                item.getNote());
 
-        if (normalizedNote.isBlank()) {
+        if (normalizedNote.isBlank())
+        {
             return "DISH_"
                     + item.getDish().getId();
         }
@@ -689,8 +604,8 @@ public class ChefServiceImpl implements ChefService {
     }
 
     private String normalizeKitchenNote(
-            String note
-    ) {
+            String note)
+    {
         return note == null
                 ? ""
                 : note.trim();

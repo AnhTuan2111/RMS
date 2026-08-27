@@ -1,11 +1,11 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.report;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Getter
 @Builder

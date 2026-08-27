@@ -1,12 +1,12 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.request.reservation;
 
+import java.time.LocalDateTime;
+
 import jakarta.validation.constraints.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-
 
 @Getter
 @AllArgsConstructor

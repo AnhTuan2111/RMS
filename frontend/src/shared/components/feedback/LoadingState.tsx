@@ -5,10 +5,10 @@ type LoadingStateProps = {
 }
 
 export function LoadingState({
-                                 title = 'Đang tải dữ liệu...',
-                                 description = 'Hệ thống đang đồng bộ thông tin mới nhất.',
-                                 size = 'md',
-                             }: LoadingStateProps) {
+    title = 'Đang tải dữ liệu...',
+    description = 'Hệ thống đang đồng bộ thông tin mới nhất.',
+    size = 'md',
+}: LoadingStateProps) {
     return (
         <div className={`rims-feedback-state rims-feedback-loading state-${size}`}>
             <div className="rims-feedback-orb">

@@ -8,8 +8,8 @@ import PaymentFailed from '../../features/cashier/PaymentFailed'
 export function renderCashierRoutes() {
     return (
         <>
-            <Route path="/cashier/payments" element={<CashierPaymentsPage/>}/>
-            <Route path="/cashier/invoices" element={<CashierInvoicesPage/>}/>
+            <Route path="/cashier/payments" element={<CashierPaymentsPage />} />
+            <Route path="/cashier/invoices" element={<CashierInvoicesPage />} />
         </>
     )
 }
@@ -17,8 +17,8 @@ export function renderCashierRoutes() {
 export function renderPaymentResultRoutes() {
     return (
         <>
-            <Route path="/payment-success" element={<PaymentSuccess/>}/>
-            <Route path="/payment-failed" element={<PaymentFailed/>}/>
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/payment-failed" element={<PaymentFailed />} />
         </>
     )
 }

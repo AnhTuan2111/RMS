@@ -1,10 +1,5 @@
-﻿import {
-    type CSSProperties,
-} from 'react'
-import {
-    useNavigate,
-    useSearchParams,
-} from 'react-router-dom'
+﻿import {type CSSProperties} from 'react'
+import {useNavigate, useSearchParams} from 'react-router-dom'
 
 import {cashierApi} from '@/shared/api/cashier'
 
@@ -20,9 +15,9 @@ function isRequestCanceled(error: unknown) {
     }
 
     return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
+        requestError.name === 'CanceledError' ||
+        requestError.code === 'ERR_CANCELED' ||
+        requestError.message === 'canceled'
     )
 }
 
@@ -38,30 +33,18 @@ export default function PaymentSuccess() {
         }
 
         try {
-            const response =
-                await cashierApi.downloadInvoicePdf(
-                    Number(invoiceId),
-                )
+            const response = await cashierApi.downloadInvoicePdf(Number(invoiceId))
 
-            const blob =
-                new Blob(
-                    [response.data as BlobPart],
-                    {
-                        type: 'application/pdf',
-                    },
-                )
+            const blob = new Blob([response.data as BlobPart], {
+                type: 'application/pdf',
+            })
 
-            const url =
-                window.URL.createObjectURL(blob)
+            const url = window.URL.createObjectURL(blob)
 
-            const link =
-                document.createElement('a')
+            const link = document.createElement('a')
 
             link.href = url
-            link.setAttribute(
-                'download',
-                `Invoice-${invoiceId}.pdf`,
-            )
+            link.setAttribute('download', `Invoice-${invoiceId}.pdf`)
 
             document.body.appendChild(link)
             link.click()
@@ -73,10 +56,7 @@ export default function PaymentSuccess() {
                 return
             }
 
-            console.error(
-                '[PAYMENT_SUCCESS_DOWNLOAD_PDF_ERROR]',
-                requestError,
-            )
+            console.error('[PAYMENT_SUCCESS_DOWNLOAD_PDF_ERROR]', requestError)
 
             alert('Không thể tải PDF! Vui lòng thử lại.')
         }
@@ -84,28 +64,19 @@ export default function PaymentSuccess() {
 
     return (
         <div style={pageStyle}>
-            <div
-                className="page-card"
-                style={cardStyle}
-            >
-                <div style={iconStyle}>
-                    ✔
-                </div>
+            <div className="page-card" style={cardStyle}>
+                <div style={iconStyle}>✔</div>
 
-                <h1 style={titleStyle}>
-                    Thanh Toán Thành Công!
-                </h1>
+                <h1 style={titleStyle}>Thanh Toán Thành Công!</h1>
 
                 <p style={descriptionStyle}>
-                    Giao dịch qua VNPay đã hoàn tất. Hóa đơn của
-                    quý khách đã được lưu lại hệ thống.
+                    Giao dịch qua VNPay đã hoàn tất. Hóa đơn của quý khách đã được lưu lại
+                    hệ thống.
                 </p>
 
                 {invoiceId && (
                     <div style={invoiceBoxStyle}>
-                        <strong>
-                            Mã hóa đơn: INV-{invoiceId}
-                        </strong>
+                        <strong>Mã hóa đơn: INV-{invoiceId}</strong>
                     </div>
                 )}
 
@@ -114,9 +85,7 @@ export default function PaymentSuccess() {
                         type="button"
                         style={downloadButtonStyle}
                         disabled={!invoiceId}
-                        onClick={() =>
-                            void handleDownloadPdf()
-                        }
+                        onClick={() => void handleDownloadPdf()}
                     >
                         📥 Tải PDF Hóa Đơn
                     </button>
@@ -124,9 +93,7 @@ export default function PaymentSuccess() {
                     <button
                         type="button"
                         style={backButtonStyle}
-                        onClick={() =>
-                            navigate('/cashier/payments')
-                        }
+                        onClick={() => navigate('/cashier/payments')}
                     >
                         Về màn hình Thu Ngân
                     </button>

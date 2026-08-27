@@ -2,10 +2,11 @@ package vn.edu.fpt.swp391.g6.rimsapi.dto.request.payment;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+
 import lombok.Getter;
 import lombok.Setter;
-import vn.edu.fpt.swp391.g6.rimsapi.enums.PaymentMethod;
 
+import vn.edu.fpt.swp391.g6.rimsapi.enums.PaymentMethod;
 
 @Getter
 @Setter

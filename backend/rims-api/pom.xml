@@ -93,6 +93,43 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
+            <!--
+                Spotless: định dạng code tự động, gắn vào phase "process-sources"
+                nên `mvn compile` sẽ tự format trước khi biên dịch.
+                Kiểm tra thủ công: mvn spotless:check | Sửa: mvn spotless:apply
+            -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.44.5</version>
+                <configuration>
+                    <java>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                        </includes>
+                        <eclipse>
+                            <file>${project.basedir}/eclipse-formatter.properties</file>
+                        </eclipse>
+                        <removeUnusedImports/>
+                        <!-- java/jakarta chuẩn -> thư viện ngoài (spring, lombok...) -> code của dự án -->
+                        <importOrder>
+                            <order>java,javax,jakarta,,vn.edu.fpt</order>
+                        </importOrder>
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

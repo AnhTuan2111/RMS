@@ -1,10 +1,4 @@
-import {
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-    type CSSProperties,
-} from 'react'
+import {useCallback, useEffect, useRef, useState, type CSSProperties} from 'react'
 import {useNavigate} from 'react-router-dom'
 
 import {
@@ -12,15 +6,8 @@ import {
     type AdminPaymentHistoryItem,
     type AdminPaymentMethod,
 } from '@/shared/api/admin'
-import {
-    EmptyState,
-    ErrorState,
-    LoadingState,
-} from '@/shared/components/feedback'
-import {
-    PageCard,
-    PageHeader,
-} from '@/shared/components/ui'
+import {EmptyState, ErrorState, LoadingState} from '@/shared/components/feedback'
+import {PageCard, PageHeader} from '@/shared/components/ui'
 
 const PAYMENT_HISTORY_PAGE_SIZE = 10
 const PAYMENT_HISTORY_FILTER_DELAY_MS = 350
@@ -65,9 +52,9 @@ function WalletIcon() {
             focusable="false"
             viewBox="0 0 24 24"
         >
-            <path d="M4.5 7.5h13a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z"/>
-            <path d="M16.5 12h4v3h-4a1.5 1.5 0 0 1 0-3z"/>
-            <path d="M5.5 7.5 15 4.8a1.8 1.8 0 0 1 2.2 1.3l.4 1.4"/>
+            <path d="M4.5 7.5h13a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z" />
+            <path d="M16.5 12h4v3h-4a1.5 1.5 0 0 1 0-3z" />
+            <path d="M5.5 7.5 15 4.8a1.8 1.8 0 0 1 2.2 1.3l.4 1.4" />
         </svg>
     )
 }
@@ -80,23 +67,19 @@ function QrIcon() {
             focusable="false"
             viewBox="0 0 24 24"
         >
-            <path d="M4 4h6v6H4z"/>
-            <path d="M14 4h6v6h-6z"/>
-            <path d="M4 14h6v6H4z"/>
-            <path d="M14 14h2.5"/>
-            <path d="M19 14h1"/>
-            <path d="M14 17h6"/>
-            <path d="M14 20h1.5"/>
-            <path d="M18 20h2"/>
+            <path d="M4 4h6v6H4z" />
+            <path d="M14 4h6v6h-6z" />
+            <path d="M4 14h6v6H4z" />
+            <path d="M14 14h2.5" />
+            <path d="M19 14h1" />
+            <path d="M14 17h6" />
+            <path d="M14 20h1.5" />
+            <path d="M18 20h2" />
         </svg>
     )
 }
 
-function PaymentMethodBadge({
-                                method,
-                            }: {
-    method: AdminPaymentMethod
-}) {
+function PaymentMethodBadge({method}: {method: AdminPaymentMethod}) {
     const isCash = method === 'CASH'
 
     return (
@@ -108,7 +91,7 @@ function PaymentMethodBadge({
             }
         >
             <span className="admin-payment-method-icon">
-                {isCash ? <WalletIcon/> : <QrIcon/>}
+                {isCash ? <WalletIcon /> : <QrIcon />}
             </span>
 
             {method}
@@ -120,8 +103,7 @@ export default function AdminPaymentHistoryPage() {
     const navigate = useNavigate()
     const hasLoadedHistoryRef = useRef(false)
 
-    const [payments, setPayments] =
-        useState<AdminPaymentHistoryItem[]>([])
+    const [payments, setPayments] = useState<AdminPaymentHistoryItem[]>([])
 
     const [page, setPage] = useState(1)
     const [totalItems, setTotalItems] = useState(0)
@@ -134,20 +116,11 @@ export default function AdminPaymentHistoryPage() {
     const [keywordInput, setKeywordInput] = useState('')
     const [keywordFilter, setKeywordFilter] = useState('')
 
-
-
     const loadPaymentHistory = useCallback(
-        async (
-            targetPage: number,
-            showFullLoading = true,
-            signal?: AbortSignal,
-        ) => {
+        async (targetPage: number, showFullLoading = true, signal?: AbortSignal) => {
             const filters = {
                 tableNumber: tableFilter.trim() || undefined,
-                paymentMethod:
-                    methodFilter === 'ALL'
-                        ? undefined
-                        : methodFilter,
+                paymentMethod: methodFilter === 'ALL' ? undefined : methodFilter,
                 keyword: keywordFilter.trim() || undefined,
             }
 
@@ -165,19 +138,15 @@ export default function AdminPaymentHistoryPage() {
                     signal,
                 )
 
-                if (
-                    data.totalPages > 0
-                    && effectivePage > data.totalPages
-                ) {
+                if (data.totalPages > 0 && effectivePage > data.totalPages) {
                     effectivePage = data.totalPages
 
-                    const retryResponse =
-                        await adminApi.getPaymentHistory(
-                            effectivePage,
-                            PAYMENT_HISTORY_PAGE_SIZE,
-                            filters,
-                            signal,
-                        )
+                    const retryResponse = await adminApi.getPaymentHistory(
+                        effectivePage,
+                        PAYMENT_HISTORY_PAGE_SIZE,
+                        filters,
+                        signal,
+                    )
 
                     data = retryResponse.data
                 }
@@ -192,36 +161,23 @@ export default function AdminPaymentHistoryPage() {
                     setPage(effectivePage)
                 }
             } catch (requestError: unknown) {
-                console.error(
-                    '[ADMIN_PAYMENT_HISTORY_FETCH_ERROR]',
-                    requestError,
-                )
+                console.error('[ADMIN_PAYMENT_HISTORY_FETCH_ERROR]', requestError)
 
-                setError(
-                    'Không thể tải lịch sử thanh toán.',
-                )
+                setError('Không thể tải lịch sử thanh toán.')
             } finally {
                 if (showFullLoading) {
                     setIsLoading(false)
                 }
             }
         },
-        [
-            tableFilter,
-            methodFilter,
-            keywordFilter,
-        ],
+        [tableFilter, methodFilter, keywordFilter],
     )
 
     useEffect(() => {
         const controller = new AbortController()
         const shouldShowFullLoading = !hasLoadedHistoryRef.current
 
-        void loadPaymentHistory(
-            page,
-            shouldShowFullLoading,
-            controller.signal,
-        )
+        void loadPaymentHistory(page, shouldShowFullLoading, controller.signal)
 
         return () => controller.abort()
     }, [loadPaymentHistory, page])
@@ -250,10 +206,7 @@ export default function AdminPaymentHistoryPage() {
     function handlePageChange(nextPage: number) {
         const safeTotalPages = Math.max(totalPages, 1)
 
-        const safeNextPage = Math.min(
-            Math.max(nextPage, 1),
-            safeTotalPages,
-        )
+        const safeNextPage = Math.min(Math.max(nextPage, 1), safeTotalPages)
 
         setPage(safeNextPage)
     }
@@ -272,10 +225,7 @@ export default function AdminPaymentHistoryPage() {
             <ErrorState
                 message={error}
                 onRetry={() => {
-                    loadPaymentHistory(
-                        page,
-                        true,
-                    ).catch((requestError) => {
+                    loadPaymentHistory(page, true).catch((requestError) => {
                         console.error(requestError)
                     })
                 }}
@@ -284,14 +234,9 @@ export default function AdminPaymentHistoryPage() {
     }
 
     const firstVisibleItem =
-        totalItems === 0
-            ? 0
-            : (page - 1) * PAYMENT_HISTORY_PAGE_SIZE + 1
+        totalItems === 0 ? 0 : (page - 1) * PAYMENT_HISTORY_PAGE_SIZE + 1
 
-    const lastVisibleItem = Math.min(
-        page * PAYMENT_HISTORY_PAGE_SIZE,
-        totalItems,
-    )
+    const lastVisibleItem = Math.min(page * PAYMENT_HISTORY_PAGE_SIZE, totalItems)
 
     const safeTotalPages = Math.max(totalPages, 1)
 
@@ -333,8 +278,9 @@ export default function AdminPaymentHistoryPage() {
                         }}
                     >
                         <option value="">Tất cả bàn</option>
-                        {Array.from({length: 12}, (_, i) =>
-                            `T${String(i + 1).padStart(2, '0')}`,
+                        {Array.from(
+                            {length: 12},
+                            (_, i) => `T${String(i + 1).padStart(2, '0')}`,
                         ).map((tableNumber) => (
                             <option key={tableNumber} value={tableNumber}>
                                 Bàn {tableNumber}
@@ -386,7 +332,7 @@ export default function AdminPaymentHistoryPage() {
                         <span>Phương thức</span>
                         <span>Số tiền</span>
                         <span>Ngày thanh toán</span>
-                        <span/>
+                        <span />
                     </div>
 
                     {payments.length === 0 ? (
@@ -401,42 +347,26 @@ export default function AdminPaymentHistoryPage() {
                                 key={payment.invoiceId}
                                 type="button"
                                 onClick={() =>
-                                    navigate(
-                                        `/admin/invoices/${payment.invoiceId}`,
-                                    )
+                                    navigate(`/admin/invoices/${payment.invoiceId}`)
                                 }
                             >
                                 <span className="admin-payment-id">
                                     {payment.invoiceId}
                                 </span>
 
-                                <span>
-                                    {formatTableName(
-                                        payment.tableNumber,
-                                    )}
-                                </span>
+                                <span>{formatTableName(payment.tableNumber)}</span>
 
                                 <span>
-                                    <PaymentMethodBadge
-                                        method={
-                                            payment.paymentMethod
-                                        }
-                                    />
+                                    <PaymentMethodBadge method={payment.paymentMethod} />
                                 </span>
 
                                 <span className="admin-payment-amount">
                                     {formatCurrency(payment.amount)}
                                 </span>
 
-                                <span>
-                                    {formatPaymentDate(
-                                        payment.paymentDate,
-                                    )}
-                                </span>
+                                <span>{formatPaymentDate(payment.paymentDate)}</span>
 
-                                <span className="admin-payment-row-arrow">
-                                    ›
-                                </span>
+                                <span className="admin-payment-row-arrow">›</span>
                             </button>
                         ))
                     )}
@@ -445,8 +375,7 @@ export default function AdminPaymentHistoryPage() {
                 {totalItems > 0 && (
                     <div className="admin-payment-pagination">
                         <div className="admin-payment-pagination-info">
-                            Hiển thị {firstVisibleItem}-
-                            {lastVisibleItem} trong tổng{' '}
+                            Hiển thị {firstVisibleItem}-{lastVisibleItem} trong tổng{' '}
                             {totalItems} hóa đơn
                         </div>
 
@@ -455,9 +384,7 @@ export default function AdminPaymentHistoryPage() {
                                 className="admin-payment-pagination-button"
                                 type="button"
                                 disabled={page === 1}
-                                onClick={() =>
-                                    handlePageChange(page - 1)
-                                }
+                                onClick={() => handlePageChange(page - 1)}
                             >
                                 Trước
                             </button>
@@ -469,13 +396,8 @@ export default function AdminPaymentHistoryPage() {
                             <button
                                 className="admin-payment-pagination-button"
                                 type="button"
-                                disabled={
-                                    totalPages === 0
-                                    || page >= totalPages
-                                }
-                                onClick={() =>
-                                    handlePageChange(page + 1)
-                                }
+                                disabled={totalPages === 0 || page >= totalPages}
+                                onClick={() => handlePageChange(page + 1)}
                             >
                                 Sau
                             </button>
@@ -485,7 +407,6 @@ export default function AdminPaymentHistoryPage() {
             </section>
         </div>
     )
-
 }
 const filterInputStyle: CSSProperties = {
     padding: '8px 12px',

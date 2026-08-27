@@ -8,9 +8,7 @@ export function AppProviders({children}: {children: ReactNode}) {
     return (
         <BrowserRouter>
             <AuthProvider>
-                <ActorProvider>
-                    {children}
-                </ActorProvider>
+                <ActorProvider>{children}</ActorProvider>
             </AuthProvider>
         </BrowserRouter>
     )

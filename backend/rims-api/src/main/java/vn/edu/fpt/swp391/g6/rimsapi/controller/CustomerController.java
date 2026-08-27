@@ -1,11 +1,17 @@
 package vn.edu.fpt.swp391.g6.rimsapi.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.reservation.CustomerCreateReservationRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.user.ChangePasswordRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.user.UpdateAccountRequest;
@@ -17,46 +23,49 @@ import vn.edu.fpt.swp391.g6.rimsapi.security.UserPrincipal;
 import vn.edu.fpt.swp391.g6.rimsapi.service.CustomerService;
 import vn.edu.fpt.swp391.g6.rimsapi.service.UserService;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
 @RestController
 @RequestMapping("/rims/customer")
 @RequiredArgsConstructor
-public class CustomerController {
+public class CustomerController
+{
 
     private final UserService userService;
     private final CustomerService customerService;
 
     // ========== Profile Management ==========
     @GetMapping("/profile")
-    public UserResponse getMyProfile(@AuthenticationPrincipal UserPrincipal principal) {
+    public UserResponse getMyProfile(@AuthenticationPrincipal UserPrincipal principal)
+    {
         return userService.getAccountDetail(principal.getId());
     }
 
     @PutMapping("/profile")
     public UserResponse updateMyProfile(
             @AuthenticationPrincipal UserPrincipal principal,
-            @RequestBody @Valid UpdateAccountRequest request) {
+            @RequestBody @Valid UpdateAccountRequest request)
+    {
         return userService.updateAccount(principal.getId(), request);
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal UserPrincipal principal,
-            @RequestBody @Valid ChangePasswordRequest request) {
+            @RequestBody @Valid ChangePasswordRequest request)
+    {
         userService.changePassword(principal, request);
         return ResponseEntity.noContent().build();
     }
 
     // ========== Table Management for Customer ==========
     @GetMapping("/tables/available")
-    public ResponseEntity<List<RestaurantTableResponse>> getAvailableTables() {
-        try {
+    public ResponseEntity<List<RestaurantTableResponse>> getAvailableTables()
+    {
+        try
+        {
             List<RestaurantTableResponse> response = customerService.getAvailableTables();
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             return ResponseEntity.ok(List.of());
         }
     }
@@ -70,7 +79,8 @@ public class CustomerController {
     @PostMapping("/reservations")
     public ResponseEntity<CustomerReservationResponse> createReservation(
             @AuthenticationPrincipal UserPrincipal principal,
-            @RequestBody @Valid CustomerCreateReservationRequest request) {
+            @RequestBody @Valid CustomerCreateReservationRequest request)
+    {
 
         request.setUserId(principal.getId());
         CustomerReservationResponse response = customerService.createReservation(request);
@@ -90,12 +100,12 @@ public class CustomerController {
     @DeleteMapping("/reservations/{reservationId}/cancel")
     public ResponseEntity<CustomerReservationResponse> cancelReservation(
             @AuthenticationPrincipal UserPrincipal principal,
-            @PathVariable Long reservationId) {
+            @PathVariable Long reservationId)
+    {
 
         CustomerReservationResponse response = customerService.cancelReservation(
                 principal.getId(),
-                reservationId
-        );
+                reservationId);
         return ResponseEntity.ok(response);
     }
 
@@ -105,7 +115,8 @@ public class CustomerController {
      */
     @GetMapping("/reservations/current")
     public ResponseEntity<List<CustomerReservationResponse>> getCurrentReservation(
-            @AuthenticationPrincipal UserPrincipal principal) {
+            @AuthenticationPrincipal UserPrincipal principal)
+    {
 
         List<CustomerReservationResponse> response = customerService.getCurrentReservationByUser(principal.getId());
         return ResponseEntity.ok(response);
@@ -118,7 +129,8 @@ public class CustomerController {
     @GetMapping("/reservations/check")
     public ResponseEntity<Boolean> checkCustomerReservation(
             @AuthenticationPrincipal UserPrincipal principal,
-            @RequestParam String date) {
+            @RequestParam String date)
+    {
 
         boolean exists = customerService.checkCustomerReservationByUser(principal.getId(), date);
         return ResponseEntity.ok(exists);
@@ -131,7 +143,8 @@ public class CustomerController {
     @GetMapping("/tables/{tableId}/blocked-slots")
     public ResponseEntity<List<TimeRangeResponse>> getBlockedTimeRanges(
             @PathVariable int tableId,
-            @RequestParam String date) {
+            @RequestParam String date)
+    {
         LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
         return ResponseEntity.ok(customerService.getBlockedTimeRanges(tableId, parsedDate));
     }

@@ -1,12 +1,12 @@
-import {useNavigate} from "react-router-dom";
+import {useNavigate} from 'react-router-dom'
 
-export function BackArrow({onClick}: { onClick?: () => void }) {
-    const navigate = useNavigate();
+export function BackArrow({onClick}: {onClick?: () => void}) {
+    const navigate = useNavigate()
     return (
         <button onClick={onClick || (() => navigate(-1))} className="waiter-back-btn">
             <svg fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
             </svg>
         </button>
-    );
+    )
 }

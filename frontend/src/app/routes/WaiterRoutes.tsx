@@ -11,13 +11,31 @@ import WaiterEditReservationPage from '../../features/waiter/WaiterEditReservati
 export function renderWaiterRoutes() {
     return (
         <>
-            <Route path="/waiter/tables" element={<WaiterTableListPage/>}/>
-            <Route path="/waiter/tables/:tableId/order/new" element={<WaiterCreateOrderPage/>}/>
-            <Route path="/waiter/tables/:tableId/order/detail" element={<WaiterOrderDetailPage/>}/>
-            <Route path="/waiter/tables/:tableId/order/edit" element={<WaiterUpdateOrderPage/>}/>
-            <Route path="/waiter/tables/:tableId/reservation" element={<WaiterReservationDetailPage/>}/>
-            <Route path="/waiter/reservations" element={<WaiterCreateReservationPage/>}/>
-            <Route path="/waiter/reservations/:resId/edit" element={<WaiterEditReservationPage/>}/>
+            <Route path="/waiter/tables" element={<WaiterTableListPage />} />
+            <Route
+                path="/waiter/tables/:tableId/order/new"
+                element={<WaiterCreateOrderPage />}
+            />
+            <Route
+                path="/waiter/tables/:tableId/order/detail"
+                element={<WaiterOrderDetailPage />}
+            />
+            <Route
+                path="/waiter/tables/:tableId/order/edit"
+                element={<WaiterUpdateOrderPage />}
+            />
+            <Route
+                path="/waiter/tables/:tableId/reservation"
+                element={<WaiterReservationDetailPage />}
+            />
+            <Route
+                path="/waiter/reservations"
+                element={<WaiterCreateReservationPage />}
+            />
+            <Route
+                path="/waiter/reservations/:resId/edit"
+                element={<WaiterEditReservationPage />}
+            />
         </>
     )
 }

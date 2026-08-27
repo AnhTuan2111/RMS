@@ -1,9 +1,8 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.payment;
 
-import lombok.*;
-
 import java.math.BigDecimal;
 
+import lombok.*;
 
 @Getter
 @Data
@@ -18,10 +17,10 @@ public class PaymentResponse
     private BigDecimal amountPaid;
     private BigDecimal excessAmount;
 
-    private BigDecimal finalAmount;      // Số tiền thực phải trả SAU KHI đã trừ điểm
-    private String customerName;         // Tên khách hàng (null nếu không gắn tài khoản)
-    private Integer pointsUsed;           // Số điểm đã dùng để giảm giá
-    private Integer pointsEarned;         // Số điểm tích lũy thêm được
-    private String paymentMethod;         // "CASH" hoặc "QRCODE"
+    private BigDecimal finalAmount; // Số tiền thực phải trả SAU KHI đã trừ điểm
+    private String customerName; // Tên khách hàng (null nếu không gắn tài khoản)
+    private Integer pointsUsed; // Số điểm đã dùng để giảm giá
+    private Integer pointsEarned; // Số điểm tích lũy thêm được
+    private String paymentMethod; // "CASH" hoặc "QRCODE"
     private boolean autoClosedNoPayment; // true khi đơn tự đóng do toàn bộ món đã bị hủy, không có gì để thanh toán
 }

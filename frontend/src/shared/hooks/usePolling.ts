@@ -1,15 +1,8 @@
-﻿import {
-    useEffect,
-    useRef,
-} from 'react'
+﻿import {useEffect, useRef} from 'react'
 
-import {
-    DEFAULT_POLL_INTERVAL_MS,
-} from '@/app/config/realtime'
+import {DEFAULT_POLL_INTERVAL_MS} from '@/app/config/realtime'
 
-export type PollingCallback = (
-    signal: AbortSignal,
-) => void | Promise<void>
+export type PollingCallback = (signal: AbortSignal) => void | Promise<void>
 
 export interface UsePollingOptions {
     /**
@@ -55,8 +48,7 @@ export function usePolling(
     const errorHandlerRef = useRef(onError)
 
     const timeoutRef = useRef<number | null>(null)
-    const abortControllerRef =
-        useRef<AbortController | null>(null)
+    const abortControllerRef = useRef<AbortController | null>(null)
 
     const isRunningRef = useRef(false)
 
@@ -92,10 +84,7 @@ export function usePolling(
                 return false
             }
 
-            if (
-                pauseWhenHidden
-                && document.visibilityState === 'hidden'
-            ) {
+            if (pauseWhenHidden && document.visibilityState === 'hidden') {
                 return false
             }
 
@@ -141,19 +130,13 @@ export function usePolling(
                  * AbortError xuất hiện khi component unmount
                  * hoặc tab bị ẩn. Đây không phải lỗi nghiệp vụ.
                  */
-                if (
-                    error instanceof DOMException
-                    && error.name === 'AbortError'
-                ) {
+                if (error instanceof DOMException && error.name === 'AbortError') {
                     return
                 }
 
                 errorHandlerRef.current?.(error)
             } finally {
-                if (
-                    abortControllerRef.current
-                    === controller
-                ) {
+                if (abortControllerRef.current === controller) {
                     abortControllerRef.current = null
                 }
 
@@ -184,10 +167,7 @@ export function usePolling(
             void runPolling()
         }
 
-        document.addEventListener(
-            'visibilitychange',
-            handleVisibilityChange,
-        )
+        document.addEventListener('visibilitychange', handleVisibilityChange)
 
         if (runImmediately) {
             void runPolling()
@@ -198,19 +178,11 @@ export function usePolling(
         return () => {
             active = false
 
-            document.removeEventListener(
-                'visibilitychange',
-                handleVisibilityChange,
-            )
+            document.removeEventListener('visibilitychange', handleVisibilityChange)
 
             clearTimer()
             abortCurrentRequest()
             isRunningRef.current = false
         }
-    }, [
-        enabled,
-        intervalMs,
-        pauseWhenHidden,
-        runImmediately,
-    ])
+    }, [enabled, intervalMs, pauseWhenHidden, runImmediately])
 }

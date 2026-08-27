@@ -1,7 +1,4 @@
-﻿import axios, {
-    type AxiosError,
-    type InternalAxiosRequestConfig,
-} from 'axios'
+﻿import axios, {type AxiosError, type InternalAxiosRequestConfig} from 'axios'
 
 import type {LoginResponse} from '@/shared/types/auth'
 import {
@@ -11,8 +8,7 @@ import {
     setTokens,
 } from '../utils/tokenStorage'
 
-type RetriableRequestConfig =
-    InternalAxiosRequestConfig & {
+type RetriableRequestConfig = InternalAxiosRequestConfig & {
     _retry?: boolean
 }
 
@@ -30,76 +26,58 @@ export const apiClient = axios.create({
 function isAuthEndpoint(url?: string) {
     if (!url) return false
     return (
-        url.includes(AUTH_LOGIN_PATH)
-        || url.includes(AUTH_REFRESH_PATH)
-        || url.includes(AUTH_LOGOUT_PATH)
+        url.includes(AUTH_LOGIN_PATH) ||
+        url.includes(AUTH_REFRESH_PATH) ||
+        url.includes(AUTH_LOGOUT_PATH)
     )
 }
 
-function setAuthorizationHeader(
-    config: InternalAxiosRequestConfig,
-    accessToken: string,
-) {
-    config.headers.Authorization =
-        `Bearer ${accessToken}`
+function setAuthorizationHeader(config: InternalAxiosRequestConfig, accessToken: string) {
+    config.headers.Authorization = `Bearer ${accessToken}`
 }
 
-apiClient.interceptors.request.use(
-    (config) => {
-        const accessToken =
-            getAccessToken()
+apiClient.interceptors.request.use((config) => {
+    const accessToken = getAccessToken()
 
-        if (accessToken) {
-            setAuthorizationHeader(
-                config,
-                accessToken,
-            )
-        }
+    if (accessToken) {
+        setAuthorizationHeader(config, accessToken)
+    }
 
-        return config
-    },
-)
+    return config
+})
 
 let refreshPromise: Promise<string> | null = null
 
 async function refreshAccessToken(): Promise<string> {
-    const storedRefreshToken =
-        getRefreshToken()
+    const storedRefreshToken = getRefreshToken()
 
     if (!storedRefreshToken) {
         throw new Error('Thiếu token làm mới phiên đăng nhập')
     }
 
-    const {data} =
-        await axios.post<LoginResponse>(
-            '/rims/auth/refresh',
-            {
-                refreshToken: storedRefreshToken,
+    const {data} = await axios.post<LoginResponse>(
+        '/rims/auth/refresh',
+        {
+            refreshToken: storedRefreshToken,
+        },
+        {
+            headers: {
+                'Content-Type': 'application/json',
             },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            },
-        )
-
-    setTokens(
-        data.accessToken,
-        data.refreshToken,
+        },
     )
+
+    setTokens(data.accessToken, data.refreshToken)
 
     return data.accessToken
 }
 
-function shouldRefreshToken(
-    error: AxiosError,
-    originalRequest?: RetriableRequestConfig,
-) {
+function shouldRefreshToken(error: AxiosError, originalRequest?: RetriableRequestConfig) {
     return (
-        error.response?.status === 401
-        && Boolean(originalRequest)
-        && !originalRequest?._retry
-        && !isAuthEndpoint(originalRequest?.url)
+        error.response?.status === 401 &&
+        Boolean(originalRequest) &&
+        !originalRequest?._retry &&
+        !isAuthEndpoint(originalRequest?.url)
     )
 }
 
@@ -107,15 +85,9 @@ apiClient.interceptors.response.use(
     (response) => response,
 
     async (error: AxiosError) => {
-        const originalRequest =
-            error.config as RetriableRequestConfig | undefined
+        const originalRequest = error.config as RetriableRequestConfig | undefined
 
-        if (
-            !shouldRefreshToken(
-                error,
-                originalRequest,
-            )
-        ) {
+        if (!shouldRefreshToken(error, originalRequest)) {
             return Promise.reject(error)
         }
 
@@ -123,8 +95,7 @@ apiClient.interceptors.response.use(
             return Promise.reject(error)
         }
 
-        const refreshToken =
-            getRefreshToken()
+        const refreshToken = getRefreshToken()
 
         if (!refreshToken) {
             clearTokens()
@@ -134,16 +105,11 @@ apiClient.interceptors.response.use(
         originalRequest._retry = true
 
         try {
-            refreshPromise ??=
-                refreshAccessToken()
+            refreshPromise ??= refreshAccessToken()
 
-            const newAccessToken =
-                await refreshPromise
+            const newAccessToken = await refreshPromise
 
-            setAuthorizationHeader(
-                originalRequest,
-                newAccessToken,
-            )
+            setAuthorizationHeader(originalRequest, newAccessToken)
 
             return apiClient(originalRequest)
         } catch (refreshError: unknown) {

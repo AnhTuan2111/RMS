@@ -1,14 +1,13 @@
 package vn.edu.fpt.swp391.g6.rimsapi.service;
 
+import java.util.List;
+
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.auth.UpdateProfileRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.user.*;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.common.PageResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.user.UserProfileResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.user.UserResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.security.UserPrincipal;
-
-import java.util.List;
-
 
 public interface UserService
 {

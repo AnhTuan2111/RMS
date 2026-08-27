@@ -1,5 +1,6 @@
 package vn.edu.fpt.swp391.g6.rimsapi.service;
 
+import java.util.List;
 
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.payment.PaymentRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.order.OrderDetailResponse;
@@ -8,11 +9,7 @@ import vn.edu.fpt.swp391.g6.rimsapi.dto.response.payment.VNPayResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.report.CashierInvoiceDetailResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.report.PagedInvoiceResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.table.TableDashboardResponse;
-import vn.edu.fpt.swp391.g6.rimsapi.entity.Invoice;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.User;
-
-import java.util.List;
-
 
 public interface CashierService
 {
@@ -47,7 +44,8 @@ public interface CashierService
     User createCustomerFast(String fullName, String phone, String email);
 
     // Danh sách hóa đơn trong ngày hôm nay, có filter theo bàn/từ khóa/phương thức/mã HĐ + phân trang thủ công
-    PagedInvoiceResponse getTodayInvoices(String tableNumber, String keyword, String paymentMethod, String invoiceCode, int page, int size);
+    PagedInvoiceResponse getTodayInvoices(String tableNumber, String keyword, String paymentMethod, String invoiceCode,
+            int page, int size);
 
     // Xem lại chi tiết 1 hóa đơn đã thanh toán (dùng cho màn hình tra cứu/in lại)
     CashierInvoiceDetailResponse getInvoiceDetailForCashier(Long invoiceId);

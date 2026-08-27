@@ -16,11 +16,11 @@ export default function DashboardLayout() {
 
     return (
         <div className={layoutClassName}>
-            <Sidebar/>
+            <Sidebar />
             <div className="app-main">
-                <DashboardTopbar onLogout={handleLogout}/>
+                <DashboardTopbar onLogout={handleLogout} />
                 <main className="app-content rims-app-content">
-                    <Outlet/>
+                    <Outlet />
                 </main>
             </div>
         </div>

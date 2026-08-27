@@ -8,29 +8,21 @@ type EmptyStateProps = {
 }
 
 export function EmptyState({
-                               title = 'Chưa có dữ liệu',
-                               description = 'Khi có dữ liệu mới, thông tin sẽ được hiển thị tại đây.',
-                               action,
-                               icon = '∅',
-                           }: EmptyStateProps) {
+    title = 'Chưa có dữ liệu',
+    description = 'Khi có dữ liệu mới, thông tin sẽ được hiển thị tại đây.',
+    action,
+    icon = '∅',
+}: EmptyStateProps) {
     return (
         <div className="rims-feedback-state rims-feedback-empty">
-            <div className="rims-feedback-icon empty">
-                {icon}
-            </div>
+            <div className="rims-feedback-icon empty">{icon}</div>
 
             <div>
                 <h3>{title}</h3>
 
-                {description && (
-                    <p>{description}</p>
-                )}
+                {description && <p>{description}</p>}
 
-                {action && (
-                    <div className="mt-3">
-                        {action}
-                    </div>
-                )}
+                {action && <div className="mt-3">{action}</div>}
             </div>
         </div>
     )

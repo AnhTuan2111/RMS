@@ -107,8 +107,12 @@
     font-weight: 750;
     line-height: 1;
     text-decoration: none;
-    transition: border-color 0.18s ease, background 0.18s ease,
-    color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    transition:
+        border-color 0.18s ease,
+        background 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
 .rims-app-content .chef-page .primary-button,
@@ -209,8 +213,10 @@
     border-radius: var(--chef-radius-md);
     background: #ffffff;
     text-decoration: none;
-    transition: transform 0.2s ease, border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .rims-app-content .chef-page .stat-card::before,
@@ -371,7 +377,9 @@
     color: var(--chef-text);
     font-size: 14px;
     outline: none;
-    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
 .rims-app-content .chef-page .chef-filter-bar input::placeholder,
@@ -414,8 +422,10 @@
     border-radius: var(--chef-radius-md);
     background: #ffffff;
     box-shadow: var(--chef-shadow-sm);
-    transition: transform 0.2s ease, border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .rims-app-content .chef-page .kitchen-order-card::before,
@@ -669,8 +679,10 @@
     background: #ffffff;
     color: #334155;
     font-size: 14px;
-    transition: border-color 0.18s ease, background 0.18s ease,
-    transform 0.18s ease;
+    transition:
+        border-color 0.18s ease,
+        background 0.18s ease,
+        transform 0.18s ease;
 }
 
 .rims-app-content .chef-page .chef-dish-table .simple-table-row:hover,
@@ -737,8 +749,10 @@
     border-radius: 14px;
     background: #ffffff;
     box-shadow: var(--chef-shadow-sm);
-    transition: transform 0.18s ease, border-color 0.18s ease,
-    box-shadow 0.18s ease;
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
 .rims-app-content .chef-page .completed-order-card:hover,
@@ -1204,8 +1218,8 @@
     font-weight: 600;
     cursor: pointer;
     transition:
-            background-color 0.2s ease,
-            border-color 0.2s ease;
+        background-color 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .internal-note-quick-actions button:hover {
@@ -1275,8 +1289,7 @@
 
 .grouped-kitchen-grid {
     display: grid;
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
 }
 
@@ -1288,10 +1301,7 @@
     border-left: 4px solid #2563eb;
     border-radius: 17px;
     background: #ffffff;
-    box-shadow: var(
-            --rims-shadow-sm,
-            0 8px 24px rgba(15, 23, 42, 0.055)
-    );
+    box-shadow: var(--rims-shadow-sm, 0 8px 24px rgba(15, 23, 42, 0.055));
 }
 
 .grouped-kitchen-card.has-note {
@@ -1493,31 +1503,18 @@
     border-radius: 26px;
 
     background:
-            radial-gradient(
-                    circle at 92% 5%,
-                    rgba(37, 99, 235, 0.13),
-                    transparent 22rem
-            ),
-            radial-gradient(
-                    circle at 8% 95%,
-                    rgba(124, 58, 237, 0.08),
-                    transparent 20rem
-            ),
-            linear-gradient(
-                    145deg,
-                    #ffffff 0%,
-                    #f8fbff 55%,
-                    #f8f7ff 100%
-            );
+        radial-gradient(circle at 92% 5%, rgba(37, 99, 235, 0.13), transparent 22rem),
+        radial-gradient(circle at 8% 95%, rgba(124, 58, 237, 0.08), transparent 20rem),
+        linear-gradient(145deg, #ffffff 0%, #f8fbff 55%, #f8f7ff 100%);
 
     box-shadow:
-            0 1px 2px rgba(15, 23, 42, 0.03),
-            0 18px 48px rgba(15, 23, 42, 0.08);
+        0 1px 2px rgba(15, 23, 42, 0.03),
+        0 18px 48px rgba(15, 23, 42, 0.08);
 }
 
 /* Hình tròn trang trí */
 .chef-page > .page-card:has(.chef-dashboard-stat-grid)::before {
-    content: "";
+    content: '';
     position: absolute;
     top: -85px;
     right: -65px;
@@ -1532,7 +1529,7 @@
 }
 
 .chef-page > .page-card:has(.chef-dashboard-stat-grid)::after {
-    content: "";
+    content: '';
     position: absolute;
     bottom: -110px;
     left: -90px;
@@ -1547,9 +1544,7 @@
 }
 
 /* Phần tiêu đề */
-.chef-page
-> .page-card:has(.chef-dashboard-stat-grid)
-> .page-header {
+.chef-page > .page-card:has(.chef-dashboard-stat-grid) > .page-header {
     position: relative;
     z-index: 1;
 
@@ -1564,9 +1559,7 @@
     border-bottom: 1px solid rgba(203, 213, 225, 0.7);
 }
 
-.chef-page
-> .page-card:has(.chef-dashboard-stat-grid)
-> .page-header h2 {
+.chef-page > .page-card:has(.chef-dashboard-stat-grid) > .page-header h2 {
     margin: 0;
 
     color: #0f172a;
@@ -1575,9 +1568,7 @@
     letter-spacing: -0.055em;
 }
 
-.chef-page
-> .page-card:has(.chef-dashboard-stat-grid)
-> .page-header p {
+.chef-page > .page-card:has(.chef-dashboard-stat-grid) > .page-header p {
     max-width: 600px;
     margin: 8px 0 0;
 
@@ -1587,9 +1578,7 @@
 }
 
 /* Nút làm mới */
-.chef-page
-> .page-card:has(.chef-dashboard-stat-grid)
-.secondary-button {
+.chef-page > .page-card:has(.chef-dashboard-stat-grid) .secondary-button {
     min-height: 44px;
     padding: 0 18px;
 
@@ -1605,19 +1594,17 @@
     cursor: pointer;
 
     box-shadow:
-            0 2px 4px rgba(15, 23, 42, 0.035),
-            0 8px 20px rgba(15, 23, 42, 0.045);
+        0 2px 4px rgba(15, 23, 42, 0.035),
+        0 8px 20px rgba(15, 23, 42, 0.045);
 
     transition:
-            transform 160ms ease,
-            border-color 160ms ease,
-            background 160ms ease,
-            box-shadow 160ms ease;
+        transform 160ms ease,
+        border-color 160ms ease,
+        background 160ms ease,
+        box-shadow 160ms ease;
 }
 
-.chef-page
-> .page-card:has(.chef-dashboard-stat-grid)
-.secondary-button:hover {
+.chef-page > .page-card:has(.chef-dashboard-stat-grid) .secondary-button:hover {
     border-color: #93c5fd;
     background: #eff6ff;
     color: #2563eb;
@@ -1625,8 +1612,8 @@
     transform: translateY(-2px);
 
     box-shadow:
-            0 4px 8px rgba(37, 99, 235, 0.08),
-            0 12px 28px rgba(37, 99, 235, 0.1);
+        0 4px 8px rgba(37, 99, 235, 0.08),
+        0 12px 28px rgba(37, 99, 235, 0.1);
 }
 
 /* Lưới thống kê */
@@ -1635,8 +1622,7 @@
     z-index: 1;
 
     display: grid;
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 18px;
 }
 
@@ -1661,18 +1647,18 @@
     text-decoration: none;
 
     box-shadow:
-            0 2px 4px rgba(15, 23, 42, 0.025),
-            0 12px 30px rgba(15, 23, 42, 0.055);
+        0 2px 4px rgba(15, 23, 42, 0.025),
+        0 12px 30px rgba(15, 23, 42, 0.055);
 
     transition:
-            transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
-            border-color 180ms ease,
-            box-shadow 180ms ease;
+        transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        border-color 180ms ease,
+        box-shadow 180ms ease;
 }
 
 /* Thanh màu phía trên */
 .chef-dashboard-stat-grid .dashboard-stat-link::before {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
@@ -1685,7 +1671,7 @@
 
 /* Hình tròn trang trí */
 .chef-dashboard-stat-grid .dashboard-stat-link::after {
-    content: "";
+    content: '';
     position: absolute;
     top: -45px;
     right: -35px;
@@ -1698,8 +1684,8 @@
     opacity: 0.075;
 
     transition:
-            transform 220ms ease,
-            opacity 220ms ease;
+        transform 220ms ease,
+        opacity 220ms ease;
 }
 
 /* Hover */
@@ -1709,23 +1695,21 @@
     border-color: rgba(37, 99, 235, 0.22);
 
     box-shadow:
-            0 8px 18px rgba(15, 23, 42, 0.07),
-            0 24px 50px rgba(15, 23, 42, 0.11);
+        0 8px 18px rgba(15, 23, 42, 0.07),
+        0 24px 50px rgba(15, 23, 42, 0.11);
 }
 
-.chef-dashboard-stat-grid
-.dashboard-stat-link:hover::after {
+.chef-dashboard-stat-grid .dashboard-stat-link:hover::after {
     transform: scale(1.12);
     opacity: 0.11;
 }
 
-.chef-dashboard-stat-grid
-.dashboard-stat-link:focus-visible {
+.chef-dashboard-stat-grid .dashboard-stat-link:focus-visible {
     outline: none;
 
     box-shadow:
-            0 0 0 4px rgba(37, 99, 235, 0.14),
-            0 24px 50px rgba(15, 23, 42, 0.11);
+        0 0 0 4px rgba(37, 99, 235, 0.14),
+        0 24px 50px rgba(15, 23, 42, 0.11);
 }
 
 /* Số lượng */
@@ -1767,66 +1751,41 @@
     font-weight: 700;
 
     transition:
-            color 160ms ease,
-            transform 160ms ease;
+        color 160ms ease,
+        transform 160ms ease;
 }
 
-.chef-dashboard-stat-grid
-.dashboard-stat-link:hover small {
+.chef-dashboard-stat-grid .dashboard-stat-link:hover small {
     color: currentColor;
     transform: translateX(3px);
 }
 
 /* Món đang chuẩn bị */
-.chef-dashboard-stat-grid
-.dashboard-stat-link:nth-child(1) {
+.chef-dashboard-stat-grid .dashboard-stat-link:nth-child(1) {
     color: #d97706;
 
-    background:
-            linear-gradient(
-                    145deg,
-                    #ffffff 0%,
-                    #fffbeb 100%
-            );
+    background: linear-gradient(145deg, #ffffff 0%, #fffbeb 100%);
 }
 
 /* Món hoàn thành */
-.chef-dashboard-stat-grid
-.dashboard-stat-link:nth-child(2) {
+.chef-dashboard-stat-grid .dashboard-stat-link:nth-child(2) {
     color: #16a34a;
 
-    background:
-            linear-gradient(
-                    145deg,
-                    #ffffff 0%,
-                    #f0fdf4 100%
-            );
+    background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%);
 }
 
 /* Món đã hủy */
-.chef-dashboard-stat-grid
-.dashboard-stat-link:nth-child(3) {
+.chef-dashboard-stat-grid .dashboard-stat-link:nth-child(3) {
     color: #dc2626;
 
-    background:
-            linear-gradient(
-                    145deg,
-                    #ffffff 0%,
-                    #fef2f2 100%
-            );
+    background: linear-gradient(145deg, #ffffff 0%, #fef2f2 100%);
 }
 
 /* Món đang tạm hết */
-.chef-dashboard-stat-grid
-.dashboard-stat-link:nth-child(4) {
+.chef-dashboard-stat-grid .dashboard-stat-link:nth-child(4) {
     color: #7c3aed;
 
-    background:
-            linear-gradient(
-                    145deg,
-                    #ffffff 0%,
-                    #f5f3ff 100%
-            );
+    background: linear-gradient(145deg, #ffffff 0%, #f5f3ff 100%);
 }
 
 /* Animation khi mở Dashboard */
@@ -1845,8 +1804,7 @@
 /* Tablet */
 @media (max-width: 1150px) {
     .chef-dashboard-stat-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -1857,16 +1815,12 @@
         border-radius: 20px;
     }
 
-    .chef-page
-    > .page-card:has(.chef-dashboard-stat-grid)
-    > .page-header {
+    .chef-page > .page-card:has(.chef-dashboard-stat-grid) > .page-header {
         align-items: stretch;
         flex-direction: column;
     }
 
-    .chef-page
-    > .page-card:has(.chef-dashboard-stat-grid)
-    .secondary-button {
+    .chef-page > .page-card:has(.chef-dashboard-stat-grid) .secondary-button {
         width: 100%;
     }
 
@@ -1881,8 +1835,7 @@
         border-radius: 18px;
     }
 
-    .chef-dashboard-stat-grid
-    .dashboard-stat-link strong {
+    .chef-dashboard-stat-grid .dashboard-stat-link strong {
         font-size: 2.8rem;
     }
 }
@@ -1920,8 +1873,7 @@
     background: #f0fdf4;
     color: #15803d;
 
-    box-shadow:
-            0 0 0 3px rgba(34, 197, 94, 0.08);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.08);
 }
 
 .sound-toggle-button.enabled:hover {
@@ -1949,37 +1901,24 @@
     border: 1px solid #93c5fd;
     border-radius: 16px;
 
-    background:
-            linear-gradient(
-                    135deg,
-                    #eff6ff,
-                    #ffffff
-            );
+    background: linear-gradient(135deg, #eff6ff, #ffffff);
 
     color: #1e3a8a;
 
-    box-shadow:
-            0 10px 28px rgba(37, 99, 235, 0.12);
+    box-shadow: 0 10px 28px rgba(37, 99, 235, 0.12);
 
-    animation:
-            new-order-notification-in
-            220ms ease-out;
+    animation: new-order-notification-in 220ms ease-out;
 }
 
 .new-order-notification::before {
-    content: "";
+    content: '';
 
     position: absolute;
     inset: 0 auto 0 0;
 
     width: 5px;
 
-    background:
-            linear-gradient(
-                    180deg,
-                    #2563eb,
-                    #60a5fa
-            );
+    background: linear-gradient(180deg, #2563eb, #60a5fa);
 }
 
 .new-order-notification-icon {
@@ -1997,9 +1936,7 @@
 
     font-size: 22px;
 
-    animation:
-            new-order-bell-ring
-            700ms ease-in-out;
+    animation: new-order-bell-ring 700ms ease-in-out;
 }
 
 .new-order-notification strong {
@@ -2077,16 +2014,15 @@
     padding: 24px;
     border: 1px solid #dbeafe;
     border-radius: 24px;
-    background:
-            linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
     box-shadow: 0 18px 40px rgb(37 99 235 / 10%);
     color: #0f172a;
     text-decoration: none;
     overflow: hidden;
     transition:
-            transform 0.18s ease,
-            box-shadow 0.18s ease,
-            border-color 0.18s ease;
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
 }
 
 .chef-dashboard-card::before {
@@ -2130,8 +2066,7 @@
 
 .chef-dashboard-card.success {
     border-color: #bbf7d0;
-    background:
-            linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
 }
 
 .chef-dashboard-card.success::before {
@@ -2144,8 +2079,7 @@
 
 .chef-dashboard-card.danger {
     border-color: #fecaca;
-    background:
-            linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
 }
 
 .chef-dashboard-card.danger::before {
@@ -2158,8 +2092,7 @@
 
 .chef-dashboard-card.warning {
     border-color: #fde68a;
-    background:
-            linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
 }
 
 .chef-dashboard-card.warning::before {
@@ -2229,8 +2162,8 @@
     border: 1px solid var(--chef-border, #e2e8f0);
     border-radius: 24px;
     background:
-            radial-gradient(circle at 96% 0%, rgba(37, 99, 235, 0.10), transparent 24rem),
-            linear-gradient(180deg, #ffffff, #f8fafc);
+        radial-gradient(circle at 96% 0%, rgba(37, 99, 235, 0.1), transparent 24rem),
+        linear-gradient(180deg, #ffffff, #f8fafc);
     box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
 }
 
@@ -2307,7 +2240,10 @@
     color: #0f172a;
     text-decoration: none !important;
     box-shadow: 0 14px 34px rgba(15, 23, 42, 0.075);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
 }
 
 .chef-page .stat-grid > *::before,
@@ -2952,7 +2888,10 @@
     line-height: 1;
     text-decoration: none !important;
     cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
 }
 
 .primary-button {

@@ -1,13 +1,14 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.order;
 
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
-public class GroupedKitchenItemResponse {
+public class GroupedKitchenItemResponse
+{
 
     private Long orderItemId;
 

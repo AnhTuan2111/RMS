@@ -1,14 +1,14 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.user;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import vn.edu.fpt.swp391.g6.rimsapi.enums.RoleType;
-
-import java.time.LocalDateTime;
-
 
 @Data
 @Builder

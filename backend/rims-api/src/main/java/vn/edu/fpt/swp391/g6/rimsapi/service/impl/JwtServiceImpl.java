@@ -1,15 +1,5 @@
 package vn.edu.fpt.swp391.g6.rimsapi.service.impl;
 
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
-import com.nimbusds.jwt.JWTClaimsSet;
-import lombok.experimental.NonFinal;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import vn.edu.fpt.swp391.g6.rimsapi.exception.InvalidTokenException;
-import vn.edu.fpt.swp391.g6.rimsapi.service.JwtService;
-
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -18,6 +8,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.UUID;
 
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import vn.edu.fpt.swp391.g6.rimsapi.exception.InvalidTokenException;
+import vn.edu.fpt.swp391.g6.rimsapi.service.JwtService;
 
 @Service
 public class JwtServiceImpl implements JwtService
@@ -174,7 +174,8 @@ public class JwtServiceImpl implements JwtService
     public LocalDateTime extractExpiry(String token)
     {
         Date exp = parseAndValidate(token).getExpirationTime();
-        if (exp == null) return null;
+        if (exp == null)
+            return null;
         return exp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 }

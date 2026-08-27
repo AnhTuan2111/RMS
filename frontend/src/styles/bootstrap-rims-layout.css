@@ -57,8 +57,6 @@
     white-space: nowrap;
 }
 
-
-
 /* ==============================
    NEW RIMS SIDEBAR
 ============================== */
@@ -75,22 +73,10 @@
     overflow: hidden;
     color: #ffffff;
 
-    background: radial-gradient(
-            circle at 10% 0%,
-            rgba(59, 130, 246, 0.38),
-            transparent 34%
-    ),
-    radial-gradient(
-            circle at 95% 85%,
-            rgba(124, 58, 237, 0.26),
-            transparent 38%
-    ),
-    linear-gradient(
-            180deg,
-            #091426 0%,
-            #0b1930 55%,
-            #07111f 100%
-    );
+    background:
+        radial-gradient(circle at 10% 0%, rgba(59, 130, 246, 0.38), transparent 34%),
+        radial-gradient(circle at 95% 85%, rgba(124, 58, 237, 0.26), transparent 38%),
+        linear-gradient(180deg, #091426 0%, #0b1930 55%, #07111f 100%);
 
     border-right: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 16px 0 45px rgba(7, 17, 31, 0.24);
@@ -114,19 +100,15 @@
 
     border-radius: 17px;
 
-    background: linear-gradient(
-            135deg,
-            #60a5fa,
-            #2563eb 48%,
-            #7c3aed
-    );
+    background: linear-gradient(135deg, #60a5fa, #2563eb 48%, #7c3aed);
 
     color: #ffffff;
     font-size: 22px;
     font-weight: 950;
 
-    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.36),
-    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+    box-shadow:
+        0 12px 30px rgba(37, 99, 235, 0.36),
+        inset 0 1px 0 rgba(255, 255, 255, 0.38);
 }
 
 .rims-sidebar-brand h2 {
@@ -154,11 +136,7 @@
     border: 1px solid rgba(147, 197, 253, 0.18);
     border-radius: 17px;
 
-    background: linear-gradient(
-            135deg,
-            rgba(59, 130, 246, 0.17),
-            rgba(124, 58, 237, 0.11)
-    );
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.17), rgba(124, 58, 237, 0.11));
 
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
@@ -254,10 +232,11 @@
     text-decoration: none;
     font-weight: 750;
 
-    transition: transform 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .rims-sidebar-link:hover {
@@ -275,12 +254,7 @@
 
     border-color: rgba(191, 219, 254, 0.28);
 
-    background: linear-gradient(
-            100deg,
-            #2563eb,
-            #4f46e5 55%,
-            #7c3aed
-    );
+    background: linear-gradient(100deg, #2563eb, #4f46e5 55%, #7c3aed);
 
     box-shadow: 0 14px 32px rgba(37, 99, 235, 0.32);
 }
@@ -384,17 +358,9 @@
     min-width: 0;
     min-height: 100vh;
 
-    background: radial-gradient(
-            circle at 88% 5%,
-            rgba(59, 130, 246, 0.14),
-            transparent 28%
-    ),
-    radial-gradient(
-            circle at 25% 95%,
-            rgba(124, 58, 237, 0.09),
-            transparent 30%
-    ),
-    #eef3f9;
+    background:
+        radial-gradient(circle at 88% 5%, rgba(59, 130, 246, 0.14), transparent 28%),
+        radial-gradient(circle at 25% 95%, rgba(124, 58, 237, 0.09), transparent 30%), #eef3f9;
 }
 
 .rims-topbar {
@@ -486,11 +452,7 @@
 
     border-radius: 16px;
 
-    background: linear-gradient(
-            135deg,
-            #eff6ff,
-            #f5f3ff
-    );
+    background: linear-gradient(135deg, #eff6ff, #f5f3ff);
 
     box-shadow: 0 7px 20px rgba(15, 23, 42, 0.06);
 }
@@ -505,11 +467,7 @@
 
     border-radius: 14px;
 
-    background: linear-gradient(
-            135deg,
-            #dbeafe,
-            #ede9fe
-    );
+    background: linear-gradient(135deg, #dbeafe, #ede9fe);
 
     font-size: 19px;
 }
@@ -597,33 +555,38 @@
     letter-spacing: 0.01em;
     white-space: nowrap;
 
-    box-shadow: 0 0 0 1.5px rgba(190, 18, 60, 0.18),
-    0 4px 14px rgba(190, 18, 60, 0.10);
+    box-shadow:
+        0 0 0 1.5px rgba(190, 18, 60, 0.18),
+        0 4px 14px rgba(190, 18, 60, 0.1);
 
     cursor: pointer;
-    transition: background 0.22s ease,
-    color 0.22s ease,
-    box-shadow 0.22s ease,
-    transform 0.18s ease;
+    transition:
+        background 0.22s ease,
+        color 0.22s ease,
+        box-shadow 0.22s ease,
+        transform 0.18s ease;
 }
 
 .rims-logout-btn:hover {
     background: linear-gradient(135deg, #be123c, #e11d48);
     color: #ffffff;
-    box-shadow: 0 0 0 1.5px transparent,
-    0 8px 24px rgba(190, 18, 60, 0.30);
+    box-shadow:
+        0 0 0 1.5px transparent,
+        0 8px 24px rgba(190, 18, 60, 0.3);
     transform: translateY(-1px);
 }
 
 .rims-logout-btn:active {
     transform: translateY(0);
-    box-shadow: 0 0 0 1.5px rgba(190, 18, 60, 0.2),
-    0 2px 8px rgba(190, 18, 60, 0.18);
+    box-shadow:
+        0 0 0 1.5px rgba(190, 18, 60, 0.2),
+        0 2px 8px rgba(190, 18, 60, 0.18);
 }
 
 .rims-logout-btn:focus-visible {
-    box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.35),
-    0 4px 14px rgba(190, 18, 60, 0.10);
+    box-shadow:
+        0 0 0 3px rgba(190, 18, 60, 0.35),
+        0 4px 14px rgba(190, 18, 60, 0.1);
 }
 
 .rims-logout-icon {
@@ -690,8 +653,6 @@
         padding: 14px;
     }
 }
-
-
 
 /* =========================================================
    RIMS DASHBOARD LAYOUT
@@ -901,17 +862,9 @@
 
     padding: 26px;
 
-    background: radial-gradient(
-            circle at 85% 5%,
-            rgba(59, 130, 246, 0.1),
-            transparent 32%
-    ),
-    radial-gradient(
-            circle at 15% 90%,
-            rgba(139, 92, 246, 0.06),
-            transparent 30%
-    ),
-    #f1f5f9;
+    background:
+        radial-gradient(circle at 85% 5%, rgba(59, 130, 246, 0.1), transparent 32%),
+        radial-gradient(circle at 15% 90%, rgba(139, 92, 246, 0.06), transparent 30%), #f1f5f9;
 }
 
 /*
@@ -1058,42 +1011,22 @@
    ========================================================= */
 
 .theme-customer .rims-sidebar {
-    background: radial-gradient(
-            circle at 10% 0%,
-            rgba(212, 175, 55, 0.22),
-            transparent 34%
-    ),
-    radial-gradient(
-            circle at 95% 85%,
-            rgba(122, 16, 48, 0.3),
-            transparent 38%
-    ),
-    linear-gradient(
-            180deg,
-            #1a0d0d 0%,
-            #14090b 55%,
-            #0d0607 100%
-    );
+    background:
+        radial-gradient(circle at 10% 0%, rgba(212, 175, 55, 0.22), transparent 34%),
+        radial-gradient(circle at 95% 85%, rgba(122, 16, 48, 0.3), transparent 38%),
+        linear-gradient(180deg, #1a0d0d 0%, #14090b 55%, #0d0607 100%);
 }
 
 .theme-customer .rims-sidebar-logo {
-    background: linear-gradient(
-            135deg,
-            #d4af37,
-            #b8942e 48%,
-            #7a1030
-    );
-    box-shadow: 0 12px 30px rgba(122, 16, 48, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+    background: linear-gradient(135deg, #d4af37, #b8942e 48%, #7a1030);
+    box-shadow:
+        0 12px 30px rgba(122, 16, 48, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.38);
 }
 
 .theme-customer .rims-sidebar-role {
     border-color: rgba(212, 175, 55, 0.22);
-    background: linear-gradient(
-            135deg,
-            rgba(212, 175, 55, 0.16),
-            rgba(122, 16, 48, 0.14)
-    );
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.16), rgba(122, 16, 48, 0.14));
 }
 
 .theme-customer .rims-role-icon {
@@ -1107,12 +1040,7 @@
 
 .theme-customer .rims-sidebar-link.active {
     border-color: rgba(212, 175, 55, 0.32);
-    background: linear-gradient(
-            100deg,
-            #7a1030,
-            #9a1a3f 55%,
-            #b8942e
-    );
+    background: linear-gradient(100deg, #7a1030, #9a1a3f 55%, #b8942e);
     box-shadow: 0 14px 32px rgba(122, 16, 48, 0.35);
 }
 
@@ -1126,19 +1054,11 @@
 
 .theme-customer .rims-current-role {
     border-color: rgba(212, 175, 55, 0.25);
-    background: linear-gradient(
-            135deg,
-            #fbf3e3,
-            #f5e9d0
-    );
+    background: linear-gradient(135deg, #fbf3e3, #f5e9d0);
 }
 
 .theme-customer .rims-current-role-icon {
-    background: linear-gradient(
-            135deg,
-            #f2e2b8,
-            #ead9b3
-    );
+    background: linear-gradient(135deg, #f2e2b8, #ead9b3);
 }
 
 .theme-customer .rims-current-role strong {
@@ -1152,17 +1072,9 @@
 
 .theme-customer .app-content,
 .theme-customer .rims-app-content {
-    background: radial-gradient(
-            circle at 85% 5%,
-            rgba(212, 175, 55, 0.08),
-            transparent 32%
-    ),
-    radial-gradient(
-            circle at 15% 90%,
-            rgba(122, 16, 48, 0.06),
-            transparent 30%
-    ),
-    #f8f3ea;
+    background:
+        radial-gradient(circle at 85% 5%, rgba(212, 175, 55, 0.08), transparent 32%),
+        radial-gradient(circle at 15% 90%, rgba(122, 16, 48, 0.06), transparent 30%), #f8f3ea;
 }
 
 .theme-customer .rims-sidebar-brand h2 {

@@ -88,9 +88,7 @@ function onDisconnected(myId: number) {
     stompSubs.clear()
     clearReconnectTimer()
 
-    const hasActiveSubscribers = Array.from(registry.values()).some(
-        (set) => set.size > 0,
-    )
+    const hasActiveSubscribers = Array.from(registry.values()).some((set) => set.size > 0)
 
     if (hasActiveSubscribers) {
         reconnectTimer = setTimeout(connect, RECONNECT_DELAY_MS)
@@ -170,9 +168,7 @@ export function registerTopicCallback(
             stompSubs.delete(topic)
         }
 
-        const hasAny = Array.from(registry.values()).some(
-            (set) => set.size > 0,
-        )
+        const hasAny = Array.from(registry.values()).some((set) => set.size > 0)
 
         if (!hasAny) {
             clearReconnectTimer()

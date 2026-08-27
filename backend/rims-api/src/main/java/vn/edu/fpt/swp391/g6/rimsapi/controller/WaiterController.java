@@ -1,11 +1,17 @@
 package vn.edu.fpt.swp391.g6.rimsapi.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.order.CreateOrderRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.order.UpdateOrderRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.reservation.CreateReservationRequest;
@@ -14,15 +20,10 @@ import vn.edu.fpt.swp391.g6.rimsapi.dto.response.order.CreateOrderResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.order.OrderDetailResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.order.UpdateOrderResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.reservation.ReservationDetailResponse;
+import vn.edu.fpt.swp391.g6.rimsapi.dto.response.reservation.TimeRangeResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.table.TableDetailResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.security.UserPrincipal;
 import vn.edu.fpt.swp391.g6.rimsapi.service.WaiterService;
-import vn.edu.fpt.swp391.g6.rimsapi.dto.response.reservation.TimeRangeResponse;
-import java.time.format.DateTimeFormatter;
-
-import java.time.LocalDate;
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/rims/waiter")
@@ -69,7 +70,8 @@ public class WaiterController
     }
 
     @GetMapping("/reservation/{tableId}/{date}")
-    public ResponseEntity<List<ReservationDetailResponse>> getAllReservationsByTableAndDate(@PathVariable int tableId, @PathVariable LocalDate date)
+    public ResponseEntity<List<ReservationDetailResponse>> getAllReservationsByTableAndDate(@PathVariable int tableId,
+            @PathVariable LocalDate date)
     {
         return ResponseEntity.ok(waiterService.viewReservationsByTableAndTime(tableId, date));
     }
@@ -92,7 +94,8 @@ public class WaiterController
             @Valid @RequestBody CreateOrderRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal)
     {
-        CreateOrderResponse response = waiterService.createOrderFromReservation(reservationId, request, userPrincipal.getId());
+        CreateOrderResponse response = waiterService.createOrderFromReservation(reservationId, request,
+                userPrincipal.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -133,4 +136,3 @@ public class WaiterController
         return ResponseEntity.ok(waiterService.getBlockedTimeRanges(tableId, parsedDate, excludeReservationId));
     }
 }
-

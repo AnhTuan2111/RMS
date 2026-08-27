@@ -8,10 +8,7 @@ import {renderAuthRoutes} from './routes/AuthRoutes.tsx'
 import {renderAdminRoutes} from './routes/AdminRoutes.tsx'
 import {renderChefRoutes} from './routes/ChefRoutes.tsx'
 import {renderWaiterRoutes} from './routes/WaiterRoutes.tsx'
-import {
-    renderCashierRoutes,
-    renderPaymentResultRoutes,
-} from './routes/CashierRoutes.tsx'
+import {renderCashierRoutes, renderPaymentResultRoutes} from './routes/CashierRoutes.tsx'
 import {renderCustomerRoutes} from './routes/CustomerRoutes.tsx'
 
 function AppRoutes() {
@@ -21,8 +18,8 @@ function AppRoutes() {
             {renderAuthRoutes()}
             {renderPaymentResultRoutes()}
 
-            <Route element={<DashboardLayout/>}>
-                <Route path="/profile" element={<ProfilePage/>}/>
+            <Route element={<DashboardLayout />}>
+                <Route path="/profile" element={<ProfilePage />} />
 
                 {renderAdminRoutes()}
                 {renderChefRoutes()}
@@ -31,7 +28,7 @@ function AppRoutes() {
                 {renderCustomerRoutes()}
             </Route>
 
-            <Route path="*" element={<Navigate to="/" replace/>}/>
+            <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     )
 }

@@ -50,10 +50,7 @@ export const invoicesApi = {
         }),
 
     /** Returns detail for a single invoice */
-    getPaymentDetail: (
-        invoiceId: number,
-        signal?: AbortSignal,
-    ) =>
+    getPaymentDetail: (invoiceId: number, signal?: AbortSignal) =>
         apiClient.get<AdminPaymentDetail>(`/admin/invoice/${invoiceId}`, {
             signal,
         }),

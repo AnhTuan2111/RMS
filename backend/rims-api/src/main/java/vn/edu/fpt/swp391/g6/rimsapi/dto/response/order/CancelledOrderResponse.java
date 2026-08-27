@@ -7,7 +7,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CancelledOrderResponse {
+public class CancelledOrderResponse
+{
 
     private Long orderItemId;
 

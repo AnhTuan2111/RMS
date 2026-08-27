@@ -5,7 +5,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RestaurantTableResponse {
+public class RestaurantTableResponse
+{
     private Integer id;
     private String tableNumber;
     private Integer capacity;

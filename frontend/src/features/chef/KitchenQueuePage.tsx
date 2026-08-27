@@ -1,15 +1,5 @@
-import {
-    EmptyState,
-    ErrorState,
-    LoadingState,
-} from '@/shared/components/feedback'
-import {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react'
+import {EmptyState, ErrorState, LoadingState} from '@/shared/components/feedback'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useKitchenSocket} from '@/realtime'
 
 import {
@@ -31,15 +21,10 @@ type BrowserWindow = Window & {
 
 function createAudioContext(): AudioContext | null {
     const AudioContextClass =
-        window.AudioContext
-        || (window as BrowserWindow)
-            .webkitAudioContext
+        window.AudioContext || (window as BrowserWindow).webkitAudioContext
 
-    return AudioContextClass
-        ? new AudioContextClass()
-        : null
+    return AudioContextClass ? new AudioContextClass() : null
 }
-
 
 type SortOrder = 'OLDEST' | 'NEWEST'
 
@@ -61,78 +46,55 @@ function formatTime(value?: string) {
 }
 
 export default function KitchenQueuePage() {
-    const [items, setItems] =
-        useState<KitchenOrderItemResponse[]>([])
+    const [items, setItems] = useState<KitchenOrderItemResponse[]>([])
 
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
     const [searchText, setSearchText] = useState('')
     const [selectedTable, setSelectedTable] = useState('ALL')
-    const [sortOrder, setSortOrder] =
-        useState<SortOrder>('OLDEST')
+    const [sortOrder, setSortOrder] = useState<SortOrder>('OLDEST')
     const [currentPage, setCurrentPage] = useState(1)
 
-    const [selectedDish, setSelectedDish] =
-        useState<DishDetailResponse | null>(null)
-    const [isDetailLoading, setIsDetailLoading] =
-        useState(false)
-    const [detailError, setDetailError] =
-        useState<string | null>(null)
+    const [selectedDish, setSelectedDish] = useState<DishDetailResponse | null>(null)
+    const [isDetailLoading, setIsDetailLoading] = useState(false)
+    const [detailError, setDetailError] = useState<string | null>(null)
 
-    const [completingItemId, setCompletingItemId] =
-        useState<number | null>(null)
+    const [completingItemId, setCompletingItemId] = useState<number | null>(null)
 
     const [cancelReason, setCancelReason] = useState('')
-    const [cancelError, setCancelError] =
-        useState<string | null>(null)
-    const [isCancelSubmitting, setIsCancelSubmitting] =
-        useState(false)
+    const [cancelError, setCancelError] = useState<string | null>(null)
+    const [isCancelSubmitting, setIsCancelSubmitting] = useState(false)
 
-    const [chefInternalNote, setChefInternalNote] =
-        useState('')
+    const [chefInternalNote, setChefInternalNote] = useState('')
 
-    const [internalNoteError, setInternalNoteError] =
-        useState<string | null>(null)
+    const [internalNoteError, setInternalNoteError] = useState<string | null>(null)
 
-    const [
-        isInternalNoteSubmitting,
-        setIsInternalNoteSubmitting,
-    ] = useState(false)
+    const [isInternalNoteSubmitting, setIsInternalNoteSubmitting] = useState(false)
 
-    const [isSoundEnabled, setIsSoundEnabled] =
-        useState(false)
+    const [isSoundEnabled, setIsSoundEnabled] = useState(false)
 
-    const [newOrderMessage, setNewOrderMessage] =
-        useState<string | null>(null)
+    const [newOrderMessage, setNewOrderMessage] = useState<string | null>(null)
 
-    const audioContextRef =
-        useRef<AudioContext | null>(null)
+    const audioContextRef = useRef<AudioContext | null>(null)
 
-    const isSoundEnabledRef =
-        useRef(false)
+    const isSoundEnabledRef = useRef(false)
 
-    const knownOrderItemIdsRef =
-        useRef<Set<number>>(new Set())
+    const knownOrderItemIdsRef = useRef<Set<number>>(new Set())
 
-    const hasLoadedInitialOrdersRef =
-        useRef(false)
+    const hasLoadedInitialOrdersRef = useRef(false)
 
+    const newOrderMessageTimerRef = useRef<number | null>(null)
 
-
-    const newOrderMessageTimerRef =
-        useRef<number | null>(null)
-
-    const originalDocumentTitleRef =
-        useRef(document.title)
+    const originalDocumentTitleRef = useRef(document.title)
 
     const playNewOrderSound = useCallback(() => {
         const audioContext = audioContextRef.current
 
         if (
-            !isSoundEnabledRef.current
-            || !audioContext
-            || audioContext.state !== 'running'
+            !isSoundEnabledRef.current ||
+            !audioContext ||
+            audioContext.state !== 'running'
         ) {
             return
         }
@@ -158,11 +120,9 @@ export default function KitchenQueuePage() {
         ]
 
         tones.forEach((tone) => {
-            const oscillator =
-                audioContext.createOscillator()
+            const oscillator = audioContext.createOscillator()
 
-            const gain =
-                audioContext.createGain()
+            const gain = audioContext.createGain()
 
             oscillator.type = 'sine'
 
@@ -171,10 +131,7 @@ export default function KitchenQueuePage() {
                 startTime + tone.startOffset,
             )
 
-            gain.gain.setValueAtTime(
-                0.0001,
-                startTime + tone.startOffset,
-            )
+            gain.gain.setValueAtTime(0.0001, startTime + tone.startOffset)
 
             gain.gain.exponentialRampToValueAtTime(
                 0.18,
@@ -183,68 +140,44 @@ export default function KitchenQueuePage() {
 
             gain.gain.exponentialRampToValueAtTime(
                 0.0001,
-                startTime
-                + tone.startOffset
-                + tone.duration,
+                startTime + tone.startOffset + tone.duration,
             )
 
             oscillator.connect(gain)
             gain.connect(audioContext.destination)
 
-            oscillator.start(
-                startTime + tone.startOffset,
-            )
+            oscillator.start(startTime + tone.startOffset)
 
-            oscillator.stop(
-                startTime
-                + tone.startOffset
-                + tone.duration,
-            )
+            oscillator.stop(startTime + tone.startOffset + tone.duration)
         })
     }, [])
 
-    const showNewOrderMessage = useCallback(
-        (newOrderCount: number) => {
-            const message =
-                newOrderCount === 1
-                    ? 'Có 1 món mới vừa được gửi vào bếp.'
-                    : `Có ${newOrderCount} món mới vừa được gửi vào bếp.`
+    const showNewOrderMessage = useCallback((newOrderCount: number) => {
+        const message =
+            newOrderCount === 1
+                ? 'Có 1 món mới vừa được gửi vào bếp.'
+                : `Có ${newOrderCount} món mới vừa được gửi vào bếp.`
 
-            setNewOrderMessage(message)
+        setNewOrderMessage(message)
 
-            document.title =
-                `🔔 ${newOrderCount} món mới - `
-                + originalDocumentTitleRef.current
+        document.title =
+            `🔔 ${newOrderCount} món mới - ` + originalDocumentTitleRef.current
 
-            if (
-                newOrderMessageTimerRef.current
-                !== null
-            ) {
-                window.clearTimeout(
-                    newOrderMessageTimerRef.current,
-                )
-            }
+        if (newOrderMessageTimerRef.current !== null) {
+            window.clearTimeout(newOrderMessageTimerRef.current)
+        }
 
-            newOrderMessageTimerRef.current =
-                window.setTimeout(() => {
-                    setNewOrderMessage(null)
+        newOrderMessageTimerRef.current = window.setTimeout(() => {
+            setNewOrderMessage(null)
 
-                    document.title =
-                        originalDocumentTitleRef.current
+            document.title = originalDocumentTitleRef.current
 
-                    newOrderMessageTimerRef.current =
-                        null
-                }, NEW_ORDER_MESSAGE_DURATION_MS)
-        },
-        [],
-    )
+            newOrderMessageTimerRef.current = null
+        }, NEW_ORDER_MESSAGE_DURATION_MS)
+    }, [])
 
     const fetchKitchenOrders = useCallback(
-        async (
-            showFullLoading: boolean,
-            resetPage: boolean,
-            signal?: AbortSignal,
-        ) => {
+        async (showFullLoading: boolean, resetPage: boolean, signal?: AbortSignal) => {
             try {
                 if (showFullLoading) {
                     setIsLoading(true)
@@ -252,35 +185,23 @@ export default function KitchenQueuePage() {
 
                 const data = await getKitchenOrders(signal)
 
-                if (
-                    hasLoadedInitialOrdersRef.current
-                ) {
+                if (hasLoadedInitialOrdersRef.current) {
                     const newItems = data.filter(
-                        (item) =>
-                            !knownOrderItemIdsRef
-                                .current
-                                .has(item.orderItemId),
+                        (item) => !knownOrderItemIdsRef.current.has(item.orderItemId),
                     )
 
                     if (newItems.length > 0) {
                         playNewOrderSound()
 
-                        showNewOrderMessage(
-                            newItems.length,
-                        )
+                        showNewOrderMessage(newItems.length)
                     }
                 }
 
-                knownOrderItemIdsRef.current =
-                    new Set(
-                        data.map(
-                            (item) =>
-                                item.orderItemId,
-                        ),
-                    )
+                knownOrderItemIdsRef.current = new Set(
+                    data.map((item) => item.orderItemId),
+                )
 
-                hasLoadedInitialOrdersRef.current =
-                    true
+                hasLoadedInitialOrdersRef.current = true
 
                 setItems(data)
                 setError(null)
@@ -293,10 +214,7 @@ export default function KitchenQueuePage() {
                     return
                 }
 
-                console.error(
-                    '[CHEF_KITCHEN_QUEUE_FETCH_ERROR]',
-                    requestError,
-                )
+                console.error('[CHEF_KITCHEN_QUEUE_FETCH_ERROR]', requestError)
 
                 setError(
                     'Không thể tải danh sách món cần chế biến. Hãy kiểm tra backend hoặc đăng nhập bằng tài khoản Chef.',
@@ -307,37 +225,22 @@ export default function KitchenQueuePage() {
                 }
             }
         },
-        [
-            playNewOrderSound,
-            showNewOrderMessage,
-        ],
+        [playNewOrderSound, showNewOrderMessage],
     )
 
     useEffect(() => {
-        const originalTitle =
-            originalDocumentTitleRef.current
+        const originalTitle = originalDocumentTitleRef.current
 
         return () => {
-            if (
-                newOrderMessageTimerRef.current
-                !== null
-            ) {
-                window.clearTimeout(
-                    newOrderMessageTimerRef.current,
-                )
+            if (newOrderMessageTimerRef.current !== null) {
+                window.clearTimeout(newOrderMessageTimerRef.current)
             }
 
-            document.title =
-                originalTitle
+            document.title = originalTitle
 
-            audioContextRef.current
-                ?.close()
-                .catch((requestError) => {
-                    console.error(
-                        '[CHEF_AUDIO_CONTEXT_CLOSE_ERROR]',
-                        requestError,
-                    )
-                })
+            audioContextRef.current?.close().catch((requestError) => {
+                console.error('[CHEF_AUDIO_CONTEXT_CLOSE_ERROR]', requestError)
+            })
 
             audioContextRef.current = null
         }
@@ -353,8 +256,7 @@ export default function KitchenQueuePage() {
     }, [fetchKitchenOrders])
 
     // WebSocket: refresh when backend broadcasts a kitchen update
-    useKitchenSocket(() =>
-    {
+    useKitchenSocket(() => {
         void fetchKitchenOrders(false, false)
 
         // Nếu đang mở modal chi tiết, refetch để cập nhật trạng thái ghi chú/hủy...
@@ -383,14 +285,10 @@ export default function KitchenQueuePage() {
             return
         }
 
-        const audioContext =
-            audioContextRef.current
-            ?? createAudioContext()
+        const audioContext = audioContextRef.current ?? createAudioContext()
 
         if (!audioContext) {
-            alert(
-                'Trình duyệt này không hỗ trợ phát âm thanh.',
-            )
+            alert('Trình duyệt này không hỗ trợ phát âm thanh.')
 
             return
         }
@@ -404,8 +302,7 @@ export default function KitchenQueuePage() {
         isSoundEnabledRef.current = true
         setIsSoundEnabled(true)
 
-        const oscillator =
-            audioContext.createOscillator()
+        const oscillator = audioContext.createOscillator()
 
         const gain = audioContext.createGain()
 
@@ -431,13 +328,10 @@ export default function KitchenQueuePage() {
             setCancelReason('')
             setCancelError(null)
 
-            const data =
-                await getDishDetail(orderItemId)
+            const data = await getDishDetail(orderItemId)
 
             setSelectedDish(data)
-            setChefInternalNote(
-                data.chefInternalNote ?? '',
-            )
+            setChefInternalNote(data.chefInternalNote ?? '')
             setInternalNoteError(null)
         } catch (requestError) {
             console.error(requestError)
@@ -464,13 +358,10 @@ export default function KitchenQueuePage() {
             return
         }
 
-        const normalizedNote =
-            chefInternalNote.trim()
+        const normalizedNote = chefInternalNote.trim()
 
         if (normalizedNote.length > 500) {
-            setInternalNoteError(
-                'Ghi chú nội bộ không được vượt quá 500 ký tự.',
-            )
+            setInternalNoteError('Ghi chú nội bộ không được vượt quá 500 ký tự.')
             return
         }
 
@@ -488,16 +379,13 @@ export default function KitchenQueuePage() {
             setIsInternalNoteSubmitting(true)
             setInternalNoteError(null)
 
-            const updatedDetail =
-                await updateChefInternalNote(
-                    selectedDish.orderItemId,
-                    normalizedNote,
-                )
+            const updatedDetail = await updateChefInternalNote(
+                selectedDish.orderItemId,
+                normalizedNote,
+            )
 
             setSelectedDish(updatedDetail)
-            setChefInternalNote(
-                updatedDetail.chefInternalNote ?? '',
-            )
+            setChefInternalNote(updatedDetail.chefInternalNote ?? '')
 
             alert(
                 normalizedNote
@@ -506,23 +394,19 @@ export default function KitchenQueuePage() {
             )
         } catch (requestError) {
             console.error(requestError)
-            setInternalNoteError(
-                'Không thể lưu ghi chú nội bộ.',
-            )
+            setInternalNoteError('Không thể lưu ghi chú nội bộ.')
         } finally {
             setIsInternalNoteSubmitting(false)
         }
     }
 
     async function handleComplete(orderItemId: number) {
-        const currentItem = items.find(
-            (item) => item.orderItemId === orderItemId,
-        )
+        const currentItem = items.find((item) => item.orderItemId === orderItemId)
 
         const dishName =
             selectedDish?.orderItemId === orderItemId
                 ? selectedDish.dishName
-                : currentItem?.dishName ?? 'món này'
+                : (currentItem?.dishName ?? 'món này')
 
         const tableNumber =
             selectedDish?.orderItemId === orderItemId
@@ -535,11 +419,11 @@ export default function KitchenQueuePage() {
                 : currentItem?.quantity
 
         const confirmed = window.confirm(
-            `Xác nhận hoàn thành món "${dishName}"?\n\n`
-            + `${tableNumber ? `Bàn: ${tableNumber}\n` : ''}`
-            + `${quantity ? `Số lượng: x${quantity}\n` : ''}`
-            + 'Sau khi xác nhận, món sẽ được chuyển '
-            + 'sang danh sách đã hoàn thành.',
+            `Xác nhận hoàn thành món "${dishName}"?\n\n` +
+                `${tableNumber ? `Bàn: ${tableNumber}\n` : ''}` +
+                `${quantity ? `Số lượng: x${quantity}\n` : ''}` +
+                'Sau khi xác nhận, món sẽ được chuyển ' +
+                'sang danh sách đã hoàn thành.',
         )
 
         if (!confirmed) {
@@ -549,16 +433,10 @@ export default function KitchenQueuePage() {
         try {
             setCompletingItemId(orderItemId)
 
-            await updateOrderItemStatus(
-                orderItemId,
-                'COMPLETED',
-            )
+            await updateOrderItemStatus(orderItemId, 'COMPLETED')
 
             setItems((currentItems) =>
-                currentItems.filter(
-                    (item) =>
-                        item.orderItemId !== orderItemId,
-                ),
+                currentItems.filter((item) => item.orderItemId !== orderItemId),
             )
 
             if (selectedDish?.orderItemId === orderItemId) {
@@ -587,15 +465,13 @@ export default function KitchenQueuePage() {
         }
 
         if (normalizedReason.length > 500) {
-            setCancelError(
-                'Lý do hủy không được vượt quá 500 ký tự.',
-            )
+            setCancelError('Lý do hủy không được vượt quá 500 ký tự.')
             return
         }
 
         const confirmed = window.confirm(
             `Bạn có chắc muốn hủy món "${selectedDish.dishName}"?\n\n` +
-            'Món sẽ bị hủy ngay và Waiter sẽ được thông báo.',
+                'Món sẽ bị hủy ngay và Waiter sẽ được thông báo.',
         )
 
         if (!confirmed) {
@@ -606,24 +482,16 @@ export default function KitchenQueuePage() {
             setIsCancelSubmitting(true)
             setCancelError(null)
 
-            const cancelledOrderItemId =
-                selectedDish.orderItemId
+            const cancelledOrderItemId = selectedDish.orderItemId
 
-            await cancelDish(
-                cancelledOrderItemId,
-                normalizedReason,
-            )
+            await cancelDish(cancelledOrderItemId, normalizedReason)
 
             /*
              * Hủy từ modal chỉ xóa đúng OrderItem
              * đang được chọn khỏi hàng đợi.
              */
             setItems((currentItems) =>
-                currentItems.filter(
-                    (item) =>
-                        item.orderItemId
-                        !== cancelledOrderItemId,
-                ),
+                currentItems.filter((item) => item.orderItemId !== cancelledOrderItemId),
             )
 
             closeDishDetail()
@@ -645,14 +513,9 @@ export default function KitchenQueuePage() {
     }
 
     const tableNumbers = useMemo<string[]>(() => {
-        return Array.from(
-            new Set(items.map((item) => item.tableNumber)),
-        ).sort((firstTable, secondTable) =>
-            firstTable.localeCompare(
-                secondTable,
-                'vi',
-                { numeric: true },
-            ),
+        return Array.from(new Set(items.map((item) => item.tableNumber))).sort(
+            (firstTable, secondTable) =>
+                firstTable.localeCompare(secondTable, 'vi', {numeric: true}),
         )
     }, [items])
 
@@ -663,18 +526,13 @@ export default function KitchenQueuePage() {
             .filter((item) => {
                 const matchesSearch =
                     keyword === '' ||
-                    item.dishName
-                        .toLowerCase()
-                        .includes(keyword) ||
-                    item.tableNumber
-                        .toLowerCase()
-                        .includes(keyword) ||
+                    item.dishName.toLowerCase().includes(keyword) ||
+                    item.tableNumber.toLowerCase().includes(keyword) ||
                     String(item.orderId).includes(keyword) ||
                     String(item.orderItemId).includes(keyword)
 
                 const matchesTable =
-                    selectedTable === 'ALL' ||
-                    item.tableNumber === selectedTable
+                    selectedTable === 'ALL' || item.tableNumber === selectedTable
 
                 return matchesSearch && matchesTable
             })
@@ -693,31 +551,17 @@ export default function KitchenQueuePage() {
             })
     }, [items, searchText, selectedTable, sortOrder])
 
-    const totalPages = Math.max(
-        1,
-        Math.ceil(filteredItems.length / ITEMS_PER_PAGE),
-    )
+    const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE))
 
-    const safeCurrentPage = Math.min(
-        currentPage,
-        totalPages,
-    )
+    const safeCurrentPage = Math.min(currentPage, totalPages)
 
-    const startIndex =
-        (safeCurrentPage - 1) * ITEMS_PER_PAGE
+    const startIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE
 
-    const paginatedItems = filteredItems.slice(
-        startIndex,
-        startIndex + ITEMS_PER_PAGE,
-    )
+    const paginatedItems = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE)
 
-    const firstVisibleItem =
-        filteredItems.length === 0 ? 0 : startIndex + 1
+    const firstVisibleItem = filteredItems.length === 0 ? 0 : startIndex + 1
 
-    const lastVisibleItem = Math.min(
-        startIndex + ITEMS_PER_PAGE,
-        filteredItems.length,
-    )
+    const lastVisibleItem = Math.min(startIndex + ITEMS_PER_PAGE, filteredItems.length)
 
     if (isLoading) {
         return (
@@ -733,11 +577,9 @@ export default function KitchenQueuePage() {
             <ErrorState
                 message={error}
                 onRetry={() => {
-                    loadKitchenOrders().catch(
-                        (requestError) => {
-                            console.error(requestError)
-                        },
-                    )
+                    loadKitchenOrders().catch((requestError) => {
+                        console.error(requestError)
+                    })
                 }}
             />
         )
@@ -749,10 +591,7 @@ export default function KitchenQueuePage() {
                 <div className="page-header">
                     <div>
                         <h2>Đơn cần chế biến</h2>
-                        <p>
-                            Chọn món để xem chi tiết, hoàn
-                            thành món hoặc hủy món.
-                        </p>
+                        <p>Chọn món để xem chi tiết, hoàn thành món hoặc hủy món.</p>
                     </div>
 
                     <div className="chef-summary">
@@ -775,27 +614,21 @@ export default function KitchenQueuePage() {
                                     : 'secondary-button sound-toggle-button'
                             }
                             onClick={() => {
-                                handleSoundToggle().catch(
-                                    (requestError) => {
-                                        console.error(requestError)
-                                    },
-                                )
+                                handleSoundToggle().catch((requestError) => {
+                                    console.error(requestError)
+                                })
                             }}
                         >
-                            {isSoundEnabled
-                                ? '🔊 Âm thanh đang bật'
-                                : '🔇 Bật âm thanh'}
+                            {isSoundEnabled ? '🔊 Âm thanh đang bật' : '🔇 Bật âm thanh'}
                         </button>
 
                         <button
                             type="button"
                             className="secondary-button"
                             onClick={() => {
-                                loadKitchenOrders().catch(
-                                    (requestError) => {
-                                        console.error(requestError)
-                                    },
-                                )
+                                loadKitchenOrders().catch((requestError) => {
+                                    console.error(requestError)
+                                })
                             }}
                         >
                             Làm mới
@@ -805,14 +638,8 @@ export default function KitchenQueuePage() {
             </section>
 
             {newOrderMessage && (
-                <div
-                    className="new-order-notification"
-                    role="status"
-                    aria-live="polite"
-                >
-                    <span className="new-order-notification-icon">
-                        🔔
-                    </span>
+                <div className="new-order-notification" role="status" aria-live="polite">
+                    <span className="new-order-notification-icon">🔔</span>
 
                     <div>
                         <strong>Đơn mới</strong>
@@ -840,15 +667,10 @@ export default function KitchenQueuePage() {
                             setCurrentPage(1)
                         }}
                     >
-                        <option value="ALL">
-                            Tất cả bàn
-                        </option>
+                        <option value="ALL">Tất cả bàn</option>
 
                         {tableNumbers.map((tableNumber) => (
-                            <option
-                                key={tableNumber}
-                                value={tableNumber}
-                            >
+                            <option key={tableNumber} value={tableNumber}>
                                 Bàn {tableNumber}
                             </option>
                         ))}
@@ -857,19 +679,13 @@ export default function KitchenQueuePage() {
                     <select
                         value={sortOrder}
                         onChange={(event) => {
-                            setSortOrder(
-                                event.target.value as SortOrder,
-                            )
+                            setSortOrder(event.target.value as SortOrder)
                             setCurrentPage(1)
                         }}
                     >
-                        <option value="OLDEST">
-                            Cũ nhất trước
-                        </option>
+                        <option value="OLDEST">Cũ nhất trước</option>
 
-                        <option value="NEWEST">
-                            Mới nhất trước
-                        </option>
+                        <option value="NEWEST">Mới nhất trước</option>
                     </select>
 
                     <button
@@ -904,22 +720,16 @@ export default function KitchenQueuePage() {
                                 className="kitchen-order-card clickable-card"
                                 key={item.orderItemId}
                                 onClick={() => {
-                                    openDishDetail(
-                                        item.orderItemId,
-                                    ).catch(
+                                    openDishDetail(item.orderItemId).catch(
                                         (requestError) => {
-                                            console.error(
-                                                requestError,
-                                            )
+                                            console.error(requestError)
                                         },
                                     )
                                 }}
                             >
                                 <div className="kitchen-order-header">
                                     <div>
-                                        <h3>
-                                            Bàn {item.tableNumber}
-                                        </h3>
+                                        <h3>Bàn {item.tableNumber}</h3>
 
                                         <p>
                                             Order #{item.orderId} · Item #
@@ -936,18 +746,11 @@ export default function KitchenQueuePage() {
                                 <div className="kitchen-item-list">
                                     <div className="kitchen-item">
                                         <div>
-                                            <strong>
-                                                {item.dishName}
-                                            </strong>
+                                            <strong>{item.dishName}</strong>
 
-                                            <p>
-                                                Số lượng: x
-                                                {item.quantity}
-                                            </p>
+                                            <p>Số lượng: x{item.quantity}</p>
 
-                                            <small>
-                                                Chọn để xem chi tiết
-                                            </small>
+                                            <small>Chọn để xem chi tiết</small>
                                         </div>
 
                                         <div className="kitchen-item-actions">
@@ -955,24 +758,18 @@ export default function KitchenQueuePage() {
                                                 type="button"
                                                 className="primary-button"
                                                 disabled={
-                                                    completingItemId ===
-                                                    item.orderItemId
+                                                    completingItemId === item.orderItemId
                                                 }
                                                 onClick={(event) => {
                                                     event.stopPropagation()
                                                     handleComplete(
                                                         item.orderItemId,
-                                                    ).catch(
-                                                        (requestError) => {
-                                                            console.error(
-                                                                requestError,
-                                                            )
-                                                        },
-                                                    )
+                                                    ).catch((requestError) => {
+                                                        console.error(requestError)
+                                                    })
                                                 }}
                                             >
-                                                {completingItemId ===
-                                                item.orderItemId
+                                                {completingItemId === item.orderItemId
                                                     ? 'Đang cập nhật...'
                                                     : 'Xong món'}
                                             </button>
@@ -985,8 +782,7 @@ export default function KitchenQueuePage() {
 
                     <div className="chef-pagination">
                         <div className="pagination-result-info">
-                            Hiển thị {firstVisibleItem}–
-                            {lastVisibleItem} trong{' '}
+                            Hiển thị {firstVisibleItem}–{lastVisibleItem} trong{' '}
                             {filteredItems.length} món
                         </div>
 
@@ -995,34 +791,25 @@ export default function KitchenQueuePage() {
                                 type="button"
                                 className="pagination-button"
                                 disabled={safeCurrentPage === 1}
-                                onClick={() =>
-                                    setCurrentPage(
-                                        safeCurrentPage - 1,
-                                    )
-                                }
+                                onClick={() => setCurrentPage(safeCurrentPage - 1)}
                             >
                                 ← Trang trước
                             </button>
 
                             <div className="pagination-pages">
                                 {Array.from(
-                                    { length: totalPages },
+                                    {length: totalPages},
                                     (_, index) => index + 1,
                                 ).map((pageNumber) => (
                                     <button
                                         type="button"
                                         key={pageNumber}
                                         className={
-                                            pageNumber ===
-                                            safeCurrentPage
+                                            pageNumber === safeCurrentPage
                                                 ? 'pagination-number active'
                                                 : 'pagination-number'
                                         }
-                                        onClick={() =>
-                                            setCurrentPage(
-                                                pageNumber,
-                                            )
-                                        }
+                                        onClick={() => setCurrentPage(pageNumber)}
                                     >
                                         {pageNumber}
                                     </button>
@@ -1032,14 +819,8 @@ export default function KitchenQueuePage() {
                             <button
                                 type="button"
                                 className="pagination-button"
-                                disabled={
-                                    safeCurrentPage === totalPages
-                                }
-                                onClick={() =>
-                                    setCurrentPage(
-                                        safeCurrentPage + 1,
-                                    )
-                                }
+                                disabled={safeCurrentPage === totalPages}
+                                onClick={() => setCurrentPage(safeCurrentPage + 1)}
                             >
                                 Trang sau →
                             </button>
@@ -1049,21 +830,14 @@ export default function KitchenQueuePage() {
             )}
 
             {(isDetailLoading || detailError || selectedDish) && (
-                <div
-                    className="modal-backdrop"
-                    onClick={closeDishDetail}
-                >
+                <div className="modal-backdrop" onClick={closeDishDetail}>
                     <div
                         className="modal-card"
-                        onClick={(event) =>
-                            event.stopPropagation()
-                        }
+                        onClick={(event) => event.stopPropagation()}
                     >
                         <div className="modal-header">
                             <div>
-                                <h2>
-                                    Chi tiết món cần chế biến
-                                </h2>
+                                <h2>Chi tiết món cần chế biến</h2>
                                 <p>Thông tin chi tiết từ bếp.</p>
                             </div>
 
@@ -1084,9 +858,7 @@ export default function KitchenQueuePage() {
 
                         {detailError && (
                             <div className="modal-body">
-                                <p className="modal-error">
-                                    {detailError}
-                                </p>
+                                <p className="modal-error">{detailError}</p>
                             </div>
                         )}
 
@@ -1096,49 +868,33 @@ export default function KitchenQueuePage() {
                                     <div className="detail-grid">
                                         <div>
                                             <span>Bàn</span>
-                                            <strong>
-                                                {selectedDish.tableNumber}
-                                            </strong>
+                                            <strong>{selectedDish.tableNumber}</strong>
                                         </div>
 
                                         <div>
                                             <span>Mã item</span>
-                                            <strong>
-                                                #
-                                                {
-                                                    selectedDish.orderItemId
-                                                }
-                                            </strong>
+                                            <strong>#{selectedDish.orderItemId}</strong>
                                         </div>
 
                                         <div>
                                             <span>Tên món</span>
-                                            <strong>
-                                                {selectedDish.dishName}
-                                            </strong>
+                                            <strong>{selectedDish.dishName}</strong>
                                         </div>
 
                                         <div>
                                             <span>Số lượng</span>
-                                            <strong>
-                                                x
-                                                {selectedDish.quantity}
-                                            </strong>
+                                            <strong>x{selectedDish.quantity}</strong>
                                         </div>
 
                                         <div>
                                             <span>Trạng thái</span>
-                                            <strong>
-                                                {selectedDish.status}
-                                            </strong>
+                                            <strong>{selectedDish.status}</strong>
                                         </div>
 
                                         <div>
                                             <span>Thời gian</span>
                                             <strong>
-                                                {formatTime(
-                                                    selectedDish.createdAt,
-                                                )}
+                                                {formatTime(selectedDish.createdAt)}
                                             </strong>
                                         </div>
                                     </div>
@@ -1153,37 +909,29 @@ export default function KitchenQueuePage() {
 
                                     <div className="detail-section">
                                         <h3>Ghi chú</h3>
-                                        <p>
-                                            {selectedDish.note ||
-                                                'Không có ghi chú.'}
-                                        </p>
+                                        <p>{selectedDish.note || 'Không có ghi chú.'}</p>
                                     </div>
 
                                     <div className="chef-internal-note-box">
                                         <div className="chef-internal-note-heading">
                                             <div>
-                                                <h3>
-                                                    Ghi chú nội bộ cho Waiter
-                                                </h3>
+                                                <h3>Ghi chú nội bộ cho Waiter</h3>
 
                                                 <p>
-                                                    Dùng để báo tình trạng bếp
-                                                    trước khi Waiter trao đổi
-                                                    với khách.
+                                                    Dùng để báo tình trạng bếp trước khi
+                                                    Waiter trao đổi với khách.
                                                 </p>
                                             </div>
 
                                             {selectedDish.chefInternalNote && (
                                                 <span
                                                     className={
-                                                        selectedDish
-                                                            .chefInternalNoteAcknowledgedAt
+                                                        selectedDish.chefInternalNoteAcknowledgedAt
                                                             ? 'internal-note-status acknowledged'
                                                             : 'internal-note-status waiting'
                                                     }
                                                 >
-                                                    {selectedDish
-                                                        .chefInternalNoteAcknowledgedAt
+                                                    {selectedDish.chefInternalNoteAcknowledgedAt
                                                         ? 'Waiter đã xem'
                                                         : 'Chờ Waiter xem'}
                                                 </span>
@@ -1201,12 +949,8 @@ export default function KitchenQueuePage() {
                                                     type="button"
                                                     key={quickNote}
                                                     onClick={() => {
-                                                        setChefInternalNote(
-                                                            quickNote,
-                                                        )
-                                                        setInternalNoteError(
-                                                            null,
-                                                        )
+                                                        setChefInternalNote(quickNote)
+                                                        setInternalNoteError(null)
                                                     }}
                                                 >
                                                     {quickNote}
@@ -1220,40 +964,31 @@ export default function KitchenQueuePage() {
                                             value={chefInternalNote}
                                             placeholder="Ví dụ: Hết sốt tiêu đen, vui lòng hỏi khách đổi sang sốt nấm."
                                             onChange={(event) => {
-                                                setChefInternalNote(
-                                                    event.target.value,
-                                                )
+                                                setChefInternalNote(event.target.value)
                                                 setInternalNoteError(null)
                                             }}
                                         />
 
                                         <div className="internal-note-bottom-row">
-                                            <span>
-                                                {chefInternalNote.length}/500
-                                            </span>
+                                            <span>{chefInternalNote.length}/500</span>
 
                                             <button
                                                 type="button"
                                                 className="secondary-button internal-note-save-button"
-                                                disabled={
-                                                    isInternalNoteSubmitting
-                                                }
+                                                disabled={isInternalNoteSubmitting}
                                                 onClick={() =>
-                                                    handleSaveInternalNote()
-                                                        .catch(
-                                                            (requestError) => {
-                                                                console.error(
-                                                                    requestError,
-                                                                )
-                                                            },
-                                                        )
+                                                    handleSaveInternalNote().catch(
+                                                        (requestError) => {
+                                                            console.error(requestError)
+                                                        },
+                                                    )
                                                 }
                                             >
                                                 {isInternalNoteSubmitting
                                                     ? 'Đang gửi...'
                                                     : chefInternalNote.trim()
-                                                        ? 'Gửi cho Waiter'
-                                                        : 'Xóa ghi chú'}
+                                                      ? 'Gửi cho Waiter'
+                                                      : 'Xóa ghi chú'}
                                             </button>
                                         </div>
 
@@ -1268,8 +1003,8 @@ export default function KitchenQueuePage() {
                                         <h3>Hủy món</h3>
 
                                         <p>
-                                            Món sẽ bị hủy ngay. Waiter chỉ nhận
-                                            thông báo để báo lại với khách.
+                                            Món sẽ bị hủy ngay. Waiter chỉ nhận thông báo
+                                            để báo lại với khách.
                                         </p>
 
                                         <textarea
@@ -1278,9 +1013,7 @@ export default function KitchenQueuePage() {
                                             value={cancelReason}
                                             placeholder="Nhập lý do hủy món..."
                                             onChange={(event) => {
-                                                setCancelReason(
-                                                    event.target.value,
-                                                )
+                                                setCancelReason(event.target.value)
                                                 setCancelError(null)
                                             }}
                                         />
@@ -1290,9 +1023,7 @@ export default function KitchenQueuePage() {
                                         </div>
 
                                         {cancelError && (
-                                            <p className="modal-error">
-                                                {cancelError}
-                                            </p>
+                                            <p className="modal-error">{cancelError}</p>
                                         )}
                                     </div>
                                 </div>
@@ -1311,41 +1042,29 @@ export default function KitchenQueuePage() {
                                         className="danger-button"
                                         disabled={isCancelSubmitting}
                                         onClick={() =>
-                                            handleCancelDish().catch(
-                                                (requestError) => {
-                                                    console.error(
-                                                        requestError,
-                                                    )
-                                                },
-                                            )
+                                            handleCancelDish().catch((requestError) => {
+                                                console.error(requestError)
+                                            })
                                         }
                                     >
-                                        {isCancelSubmitting
-                                            ? 'Đang hủy...'
-                                            : 'Hủy món'}
+                                        {isCancelSubmitting ? 'Đang hủy...' : 'Hủy món'}
                                     </button>
 
                                     <button
                                         type="button"
                                         className="primary-button"
                                         disabled={
-                                            completingItemId ===
-                                            selectedDish.orderItemId
+                                            completingItemId === selectedDish.orderItemId
                                         }
                                         onClick={() =>
                                             handleComplete(
                                                 selectedDish.orderItemId,
-                                            ).catch(
-                                                (requestError) => {
-                                                    console.error(
-                                                        requestError,
-                                                    )
-                                                },
-                                            )
+                                            ).catch((requestError) => {
+                                                console.error(requestError)
+                                            })
                                         }
                                     >
-                                        {completingItemId ===
-                                        selectedDish.orderItemId
+                                        {completingItemId === selectedDish.orderItemId
                                             ? 'Đang cập nhật...'
                                             : 'Xong món'}
                                     </button>

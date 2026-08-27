@@ -1,14 +1,8 @@
-import { apiClient } from './client'
+import {apiClient} from './client'
 
-import type {
-    KitchenOrderItemResponse,
-    OrderItemStatus,
-} from '@/shared/types/order'
+import type {KitchenOrderItemResponse, OrderItemStatus} from '@/shared/types/order'
 
-export type {
-    KitchenOrderItemResponse,
-    OrderItemStatus,
-}
+export type {KitchenOrderItemResponse, OrderItemStatus}
 
 export type DishDetailResponse = {
     orderItemId: number
@@ -76,13 +70,9 @@ export type GroupedKitchenOrderResponse = {
 export async function getKitchenOrders(
     signal?: AbortSignal,
 ): Promise<KitchenOrderItemResponse[]> {
-    const response =
-        await apiClient.get<KitchenOrderItemResponse[]>(
-            '/chef/orders',
-            {
-                signal,
-            },
-        )
+    const response = await apiClient.get<KitchenOrderItemResponse[]>('/chef/orders', {
+        signal,
+    })
 
     return response.data
 }
@@ -91,13 +81,10 @@ export async function getKitchenOrders(
  * Xem chi tiết một món.
  * GET /rims/chef/orders/{orderItemId}
  */
-export async function getDishDetail(
-    orderItemId: number,
-): Promise<DishDetailResponse> {
-    const response =
-        await apiClient.get<DishDetailResponse>(
-            `/chef/orders/${orderItemId}`,
-        )
+export async function getDishDetail(orderItemId: number): Promise<DishDetailResponse> {
+    const response = await apiClient.get<DishDetailResponse>(
+        `/chef/orders/${orderItemId}`,
+    )
 
     return response.data
 }
@@ -110,12 +97,9 @@ export async function updateOrderItemStatus(
     orderItemId: number,
     status: OrderItemStatus,
 ): Promise<string> {
-    const response = await apiClient.put<string>(
-        `/chef/orders/${orderItemId}/status`,
-        {
-            status,
-        },
-    )
+    const response = await apiClient.put<string>(`/chef/orders/${orderItemId}/status`, {
+        status,
+    })
 
     return response.data
 }
@@ -124,16 +108,10 @@ export async function updateOrderItemStatus(
  * Lấy danh sách món ăn.
  * GET /rims/chef/dishes
  */
-export async function getChefDishes(
-    signal?: AbortSignal,
-): Promise<DishListResponse[]> {
-    const response =
-        await apiClient.get<DishListResponse[]>(
-            '/chef/dishes',
-            {
-                signal,
-            },
-        )
+export async function getChefDishes(signal?: AbortSignal): Promise<DishListResponse[]> {
+    const response = await apiClient.get<DishListResponse[]>('/chef/dishes', {
+        signal,
+    })
 
     return response.data
 }
@@ -146,12 +124,9 @@ export async function updateMenuStatus(
     dishId: number,
     available: boolean,
 ): Promise<string> {
-    const response = await apiClient.put<string>(
-        `/chef/dishes/${dishId}/status`,
-        {
-            available,
-        },
-    )
+    const response = await apiClient.put<string>(`/chef/dishes/${dishId}/status`, {
+        available,
+    })
 
     return response.data
 }
@@ -163,13 +138,9 @@ export async function updateMenuStatus(
 export async function getChefDashboard(
     signal?: AbortSignal,
 ): Promise<ChefDashboardResponse> {
-    const response =
-        await apiClient.get<ChefDashboardResponse>(
-            '/chef/dashboard',
-            {
-                signal,
-            },
-        )
+    const response = await apiClient.get<ChefDashboardResponse>('/chef/dashboard', {
+        signal,
+    })
 
     return response.data
 }
@@ -178,16 +149,10 @@ export async function getChefDashboard(
  * Hủy món.
  * PUT /rims/chef/orders/{orderItemId}/cancel
  */
-export async function cancelDish(
-    orderItemId: number,
-    reason: string,
-): Promise<void> {
-    await apiClient.put(
-        `/chef/orders/${orderItemId}/cancel`,
-        {
-            reason,
-        },
-    )
+export async function cancelDish(orderItemId: number, reason: string): Promise<void> {
+    await apiClient.put(`/chef/orders/${orderItemId}/cancel`, {
+        reason,
+    })
 }
 
 /**
@@ -197,13 +162,12 @@ export async function cancelDish(
 export async function getCompletedOrders(
     signal?: AbortSignal,
 ): Promise<KitchenOrderItemResponse[]> {
-    const response =
-        await apiClient.get<KitchenOrderItemResponse[]>(
-            '/chef/orders/completed',
-            {
-                signal,
-            },
-        )
+    const response = await apiClient.get<KitchenOrderItemResponse[]>(
+        '/chef/orders/completed',
+        {
+            signal,
+        },
+    )
 
     return response.data
 }
@@ -215,13 +179,12 @@ export async function getCompletedOrders(
 export async function getCancelledOrders(
     signal?: AbortSignal,
 ): Promise<CancelledOrderResponse[]> {
-    const response =
-        await apiClient.get<CancelledOrderResponse[]>(
-            '/chef/orders/cancelled',
-            {
-                signal,
-            },
-        )
+    const response = await apiClient.get<CancelledOrderResponse[]>(
+        '/chef/orders/cancelled',
+        {
+            signal,
+        },
+    )
 
     return response.data
 }
@@ -233,13 +196,12 @@ export async function getCancelledOrders(
 export async function getGroupedKitchenOrders(
     signal?: AbortSignal,
 ): Promise<GroupedKitchenOrderResponse[]> {
-    const response =
-        await apiClient.get<GroupedKitchenOrderResponse[]>(
-            '/chef/orders/grouped',
-            {
-                signal,
-            },
-        )
+    const response = await apiClient.get<GroupedKitchenOrderResponse[]>(
+        '/chef/orders/grouped',
+        {
+            signal,
+        },
+    )
 
     return response.data
 }
@@ -251,12 +213,9 @@ export async function getGroupedKitchenOrders(
 export async function completeGroupedKitchenOrders(
     orderItemIds: number[],
 ): Promise<void> {
-    await apiClient.put(
-        '/chef/orders/grouped/complete',
-        {
-            orderItemIds,
-        },
-    )
+    await apiClient.put('/chef/orders/grouped/complete', {
+        orderItemIds,
+    })
 }
 
 /**
@@ -267,13 +226,12 @@ export async function updateChefInternalNote(
     orderItemId: number,
     note: string,
 ): Promise<DishDetailResponse> {
-    const response =
-        await apiClient.put<DishDetailResponse>(
-            `/chef/orders/${orderItemId}/internal-note`,
-            {
-                note,
-            },
-        )
+    const response = await apiClient.put<DishDetailResponse>(
+        `/chef/orders/${orderItemId}/internal-note`,
+        {
+            note,
+        },
+    )
 
     return response.data
 }

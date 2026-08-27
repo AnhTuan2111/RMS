@@ -1,14 +1,6 @@
 import {apiClient} from './client'
-import type {
-    LoginRequest,
-    LoginResponse,
-    UserProfile,
-} from '@/shared/types/auth'
-import {
-    clearTokens,
-    setTokens,
-    getRefreshToken
-} from '../utils/tokenStorage'
+import type {LoginRequest, LoginResponse, UserProfile} from '@/shared/types/auth'
+import {clearTokens, setTokens, getRefreshToken} from '../utils/tokenStorage'
 
 export interface RegisterRequest {
     username: string
@@ -31,15 +23,11 @@ export interface RegisterResponse {
 }
 
 function saveCurrentUser(user: UserProfile) {
-    localStorage.setItem(
-        'currentUser',
-        JSON.stringify(user),
-    )
+    localStorage.setItem('currentUser', JSON.stringify(user))
 }
 
 function readCachedCurrentUser() {
-    const cached =
-        localStorage.getItem('currentUser')
+    const cached = localStorage.getItem('currentUser')
 
     if (!cached) {
         return null
@@ -53,18 +41,11 @@ function readCachedCurrentUser() {
     }
 }
 
-function normalizeLoginUser(
-    response: LoginResponse,
-): UserProfile {
+function normalizeLoginUser(response: LoginResponse): UserProfile {
     return {
-        userId:
-            response.userId
-            ?? response.id
-            ?? 0,
+        userId: response.userId ?? response.id ?? 0,
 
-        id:
-            response.id
-            ?? response.userId,
+        id: response.id ?? response.userId,
 
         username: response.username,
         fullName: response.fullName,
@@ -75,18 +56,11 @@ function normalizeLoginUser(
     }
 }
 
-function normalizeProfileUser(
-    response: UserProfile,
-): UserProfile {
+function normalizeProfileUser(response: UserProfile): UserProfile {
     return {
-        userId:
-            response.userId
-            ?? response.id
-            ?? 0,
+        userId: response.userId ?? response.id ?? 0,
 
-        id:
-            response.id
-            ?? response.userId,
+        id: response.id ?? response.userId,
         username: response.username,
         fullName: response.fullName,
         phone: response.phone,
@@ -96,47 +70,28 @@ function normalizeProfileUser(
     }
 }
 
-export async function login(
-    request: LoginRequest,
-): Promise<LoginResponse> {
-    const response =
-        await apiClient.post<LoginResponse>(
-            '/auth/login',
-            request,
-        )
+export async function login(request: LoginRequest): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>('/auth/login', request)
 
-    setTokens(
-        response.data.accessToken,
-        response.data.refreshToken,
-    )
+    setTokens(response.data.accessToken, response.data.refreshToken)
 
-    saveCurrentUser(
-        normalizeLoginUser(response.data),
-    )
+    saveCurrentUser(normalizeLoginUser(response.data))
 
     return response.data
 }
 
-export async function getCurrentUser(
-    signal?: AbortSignal,
-): Promise<UserProfile> {
-    const cached =
-        readCachedCurrentUser()
+export async function getCurrentUser(signal?: AbortSignal): Promise<UserProfile> {
+    const cached = readCachedCurrentUser()
 
     if (cached) {
         return cached
     }
 
-    const response =
-        await apiClient.get<UserProfile>(
-            '/auth/me',
-            {
-                signal,
-            },
-        )
+    const response = await apiClient.get<UserProfile>('/auth/me', {
+        signal,
+    })
 
-    const currentUser =
-        normalizeProfileUser(response.data)
+    const currentUser = normalizeProfileUser(response.data)
 
     saveCurrentUser(currentUser)
 
@@ -159,10 +114,7 @@ export async function logout(): Promise<void> {
     }
 }
 
-export async function forgotPassword(
-    email: string,
-    signal?: AbortSignal,
-): Promise<void> {
+export async function forgotPassword(email: string, signal?: AbortSignal): Promise<void> {
     await apiClient.post(
         '/auth/forgot-password',
         {
@@ -197,14 +149,9 @@ export async function register(
     data: RegisterRequest,
     signal?: AbortSignal,
 ): Promise<RegisterResponse> {
-    const response =
-        await apiClient.post<RegisterResponse>(
-            '/auth/register',
-            data,
-            {
-                signal,
-            },
-        )
+    const response = await apiClient.post<RegisterResponse>('/auth/register', data, {
+        signal,
+    })
 
     return response.data
 }

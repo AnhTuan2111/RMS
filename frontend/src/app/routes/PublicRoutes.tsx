@@ -5,7 +5,7 @@ import HomePage from '../../features/home/HomePage'
 export function renderPublicRoutes() {
     return (
         <>
-            <Route path="/" element={<HomePage/>}/>
+            <Route path="/" element={<HomePage />} />
         </>
     )
 }

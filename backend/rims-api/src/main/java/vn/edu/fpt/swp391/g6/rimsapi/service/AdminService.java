@@ -1,5 +1,8 @@
 package vn.edu.fpt.swp391.g6.rimsapi.service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu.CreateCategoryRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu.CreateDishRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu.UpdateCategoryRequest;
@@ -8,10 +11,6 @@ import vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu.CategoryResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu.DishResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu.MenuDashboardResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.report.*;
-
-import java.time.LocalDate;
-import java.util.List;
-
 
 public interface AdminService
 {
@@ -35,7 +34,7 @@ public interface AdminService
     // category service
     List<CategoryResponse> getAllCategories();
 
-    List<CategoryResponse> getAvailableCategories();  // Chỉ lấy category đang hoạt động
+    List<CategoryResponse> getAvailableCategories(); // Chỉ lấy category đang hoạt động
 
     CategoryResponse getCategoryById(Integer id);
 

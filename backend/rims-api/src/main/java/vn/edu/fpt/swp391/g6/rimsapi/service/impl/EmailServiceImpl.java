@@ -8,8 +8,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import vn.edu.fpt.swp391.g6.rimsapi.service.EmailService;
 
+import vn.edu.fpt.swp391.g6.rimsapi.service.EmailService;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +31,7 @@ public class EmailServiceImpl implements EmailService
                             "Mã OTP của bạn để đặt lại mật khẩu là: " + otp + "\n\n" +
                             "Mã có hiệu lực trong 5 phút.\n\n" +
                             "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n\n" +
-                            "Trân trọng,\nRIMS System"
-            );
+                            "Trân trọng,\nRIMS System");
             mailSender.send(message);
 
         } catch (MailAuthenticationException e)

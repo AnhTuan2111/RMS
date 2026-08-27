@@ -1,10 +1,9 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu;
 
-import lombok.Builder;
-import lombok.Data;
-
 import java.util.List;
 
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder

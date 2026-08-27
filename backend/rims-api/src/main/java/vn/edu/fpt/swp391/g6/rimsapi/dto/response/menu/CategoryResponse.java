@@ -1,9 +1,8 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu;
 
-import lombok.Data;
-
 import java.time.LocalDateTime;
 
+import lombok.Data;
 
 @Data
 public class CategoryResponse

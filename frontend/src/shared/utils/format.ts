@@ -25,10 +25,12 @@ export function formatNumber(value: number): string {
  * e.g. 1500000 → "1,5M đ"
  */
 export function formatCurrencyCompact(value: number): string {
-    return new Intl.NumberFormat('vi-VN', {
-        notation: 'compact',
-        compactDisplay: 'short',
-    }).format(value ?? 0) + ' đ'
+    return (
+        new Intl.NumberFormat('vi-VN', {
+            notation: 'compact',
+            compactDisplay: 'short',
+        }).format(value ?? 0) + ' đ'
+    )
 }
 
 /**

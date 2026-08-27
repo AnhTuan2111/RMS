@@ -1,8 +1,8 @@
-import { Fragment } from 'react'
-import { NavLink } from 'react-router-dom'
-import { ROLE_LABELS, roleMenus } from '@/app/config/roleMenus'
-import { useActor } from '@/app/providers/ActorContext'
-import { RoleType } from '@/shared/types/auth'
+import {Fragment} from 'react'
+import {NavLink} from 'react-router-dom'
+import {ROLE_LABELS, roleMenus} from '@/app/config/roleMenus'
+import {useActor} from '@/app/providers/ActorContext'
+import {RoleType} from '@/shared/types/auth'
 
 function getMenuIcon(path: string) {
     if (path.includes('dashboard')) return '▦'
@@ -26,20 +26,8 @@ function getMenuIcon(path: string) {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <circle
-                    cx="12"
-                    cy="12"
-                    r="9"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                />
-                <circle
-                    cx="12"
-                    cy="9"
-                    r="3"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                />
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+                <circle cx="12" cy="9" r="3" stroke="currentColor" strokeWidth="2" />
                 <path
                     d="M7.5 17C8.8 14.8 15.2 14.8 16.5 17"
                     stroke="currentColor"
@@ -52,11 +40,13 @@ function getMenuIcon(path: string) {
 }
 
 export function Sidebar() {
-    const { actor } = useActor()
+    const {actor} = useActor()
     const menus = roleMenus[actor] ?? []
 
     const stored = localStorage.getItem('currentUser')
-    const currentUser = stored ? JSON.parse(stored) as { fullName: string; username: string } : null
+    const currentUser = stored
+        ? (JSON.parse(stored) as {fullName: string; username: string})
+        : null
 
     return (
         <aside className="app-sidebar rims-sidebar">
@@ -83,12 +73,11 @@ export function Sidebar() {
             </div>
 
             <nav className="rims-sidebar-nav">
-
                 {menus.map((item) => (
                     <Fragment key={item.path}>
                         <NavLink
                             to={item.path}
-                            className={({ isActive }) =>
+                            className={({isActive}) =>
                                 isActive
                                     ? 'rims-sidebar-link active'
                                     : 'rims-sidebar-link'
@@ -98,13 +87,9 @@ export function Sidebar() {
                                 {getMenuIcon(item.path)}
                             </span>
 
-                            <span className="rims-menu-label">
-                                {item.label}
-                            </span>
+                            <span className="rims-menu-label">{item.label}</span>
 
-                            <span className="rims-menu-arrow">
-                                ›
-                            </span>
+                            <span className="rims-menu-arrow">›</span>
                         </NavLink>
 
                         {item.quickLinks && item.quickLinks.length > 0 && (
@@ -113,7 +98,7 @@ export function Sidebar() {
                                     <NavLink
                                         key={quickLink.path}
                                         to={quickLink.path}
-                                        className={({ isActive }) =>
+                                        className={({isActive}) =>
                                             [
                                                 'rims-sidebar-quick-link',
                                                 `quick-${quickLink.variant}`,
@@ -145,7 +130,9 @@ export function Sidebar() {
             <div className="rims-sidebar-status">
                 <span className="rims-online-dot" />
                 <div>
-                    <strong>{currentUser?.fullName ?? currentUser?.username ?? 'Người dùng'}</strong>
+                    <strong>
+                        {currentUser?.fullName ?? currentUser?.username ?? 'Người dùng'}
+                    </strong>
                     <small>Hệ thống hoạt động</small>
                 </div>
             </div>

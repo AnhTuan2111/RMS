@@ -1,15 +1,16 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.order;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Getter
 @Setter
-public class GroupedKitchenOrderResponse {
+public class GroupedKitchenOrderResponse
+{
 
     private String groupKey;
 
@@ -25,6 +26,5 @@ public class GroupedKitchenOrderResponse {
 
     private LocalDateTime earliestCreatedAt;
 
-    private List<GroupedKitchenItemResponse> items =
-            new ArrayList<>();
+    private List<GroupedKitchenItemResponse> items = new ArrayList<>();
 }

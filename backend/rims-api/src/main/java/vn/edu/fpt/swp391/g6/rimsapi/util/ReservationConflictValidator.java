@@ -1,13 +1,13 @@
 package vn.edu.fpt.swp391.g6.rimsapi.util;
 
-import org.springframework.stereotype.Component;
-import vn.edu.fpt.swp391.g6.rimsapi.entity.Reservation;
-import vn.edu.fpt.swp391.g6.rimsapi.enums.ReservationStatus;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
+import vn.edu.fpt.swp391.g6.rimsapi.entity.Reservation;
+import vn.edu.fpt.swp391.g6.rimsapi.enums.ReservationStatus;
 
 @Component
 public class ReservationConflictValidator
@@ -32,9 +32,9 @@ public class ReservationConflictValidator
      * @return {@code true} nếu xảy ra conflict, {@code false} nếu không
      */
     public boolean hasConflict(List<Reservation> existingReservations,
-                               LocalDateTime requestedTime,
-                               Long excludeReservationId,
-                               LocalDateTime servingOrderCreatedAt)
+            LocalDateTime requestedTime,
+            Long excludeReservationId,
+            LocalDateTime servingOrderCreatedAt)
     {
         // Kiểm tra conflict với order đang serving (nếu bàn đang ở trạng thái SERVING)
         if (servingOrderCreatedAt != null)

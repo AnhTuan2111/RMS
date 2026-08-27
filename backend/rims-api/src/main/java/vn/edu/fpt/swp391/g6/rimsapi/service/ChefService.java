@@ -1,5 +1,7 @@
 package vn.edu.fpt.swp391.g6.rimsapi.service;
 
+import java.util.List;
+
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.kitchen.ChefDashboardResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.kitchen.KitchenOrderResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu.DishDetailResponse;
@@ -7,9 +9,6 @@ import vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu.DishListResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.order.CancelledOrderResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.order.GroupedKitchenOrderResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.OrderItemStatus;
-
-import java.util.List;
-
 
 public interface ChefService
 {
@@ -33,13 +32,11 @@ public interface ChefService
     List<KitchenOrderResponse> getCompletedOrders();
     DishDetailResponse updateChefInternalNote(
             Long orderItemId,
-            String note
-    );
+            String note);
     List<GroupedKitchenOrderResponse> getGroupedKitchenOrders();
 
     void completeGroupedKitchenOrders(
-            List<Long> orderItemIds
-    );
+            List<Long> orderItemIds);
     List<CancelledOrderResponse> getCancelledOrders();
 
 }

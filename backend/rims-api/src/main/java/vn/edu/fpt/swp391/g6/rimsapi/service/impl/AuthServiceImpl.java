@@ -1,5 +1,7 @@
 package vn.edu.fpt.swp391.g6.rimsapi.service.impl;
 
+import java.time.LocalDateTime;
+
 import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -8,6 +10,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.auth.AuthenticationRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.auth.RefreshTokenRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.auth.AuthenticationResponse;
@@ -21,9 +24,6 @@ import vn.edu.fpt.swp391.g6.rimsapi.repository.UserRepository;
 import vn.edu.fpt.swp391.g6.rimsapi.security.UserPrincipal;
 import vn.edu.fpt.swp391.g6.rimsapi.service.AuthService;
 import vn.edu.fpt.swp391.g6.rimsapi.service.JwtService;
-
-import java.time.LocalDateTime;
-
 
 @Service
 @RequiredArgsConstructor
@@ -85,8 +85,7 @@ public class AuthServiceImpl implements AuthService
         try
         {
             revokedTokenRepository.save(new RevokedToken(oldJti, LocalDateTime.now(), oldExpiry));
-        }
-        catch (org.springframework.dao.DataIntegrityViolationException ex)
+        } catch (org.springframework.dao.DataIntegrityViolationException ex)
         {
             throw new InvalidTokenException("Refresh token đã được sử dụng hoặc đã bị thu hồi");
         }
@@ -132,8 +131,7 @@ public class AuthServiceImpl implements AuthService
                 {
                     revokeToken(rawRefreshToken);
                 }
-            }
-            catch (Exception ex)
+            } catch (Exception ex)
             {
                 return LogoutResponse.builder()
                         .message("Đăng xuất thất bại do " + ex.getMessage()).build();
@@ -160,8 +158,7 @@ public class AuthServiceImpl implements AuthService
             {
                 revokedTokenRepository.save(new RevokedToken(jti, LocalDateTime.now(), expiry));
             }
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             // Token không hợp lệ / đã hết hạn thì coi như không cần revoke nữa, không chặn luồng logout
         }
@@ -172,8 +169,7 @@ public class AuthServiceImpl implements AuthService
         String accessToken = jwtService.generateAccessToken(
                 user.getId(),
                 user.getUsername(),
-                user.getRole().name()
-        );
+                user.getRole().name());
         String refreshToken = jwtService.generateRefreshToken(user.getId());
 
         return AuthenticationResponse.builder()

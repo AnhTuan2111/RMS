@@ -24,8 +24,7 @@ public class WebSocketBroadcaster
                     messagingTemplate.convertAndSend(topic, payload);
                 }
             });
-        }
-        else
+        } else
         {
             messagingTemplate.convertAndSend(topic, payload);
         }

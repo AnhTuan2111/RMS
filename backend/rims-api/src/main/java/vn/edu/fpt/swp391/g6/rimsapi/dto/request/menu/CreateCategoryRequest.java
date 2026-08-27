@@ -2,9 +2,8 @@ package vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import org.hibernate.validator.constraints.Length;
 
+import lombok.Data;
 
 @Data
 public class CreateCategoryRequest

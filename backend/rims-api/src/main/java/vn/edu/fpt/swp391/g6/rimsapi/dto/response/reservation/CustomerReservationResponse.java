@@ -1,14 +1,16 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.reservation;
 
+import java.time.LocalDateTime;
+
 import lombok.Builder;
 import lombok.Data;
-import vn.edu.fpt.swp391.g6.rimsapi.enums.ReservationStatus;
 
-import java.time.LocalDateTime;
+import vn.edu.fpt.swp391.g6.rimsapi.enums.ReservationStatus;
 
 @Data
 @Builder
-public class CustomerReservationResponse {
+public class CustomerReservationResponse
+{
     private Long id;
     private String customerName;
     private String phone;

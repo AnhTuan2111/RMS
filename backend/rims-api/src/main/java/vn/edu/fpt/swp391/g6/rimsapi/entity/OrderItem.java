@@ -1,6 +1,10 @@
 package vn.edu.fpt.swp391.g6.rimsapi.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,11 +13,8 @@ import org.hibernate.annotations.Nationalized;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import vn.edu.fpt.swp391.g6.rimsapi.enums.OrderItemStatus;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 
 @Entity
 @Table(name = "order_items")

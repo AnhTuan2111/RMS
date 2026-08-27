@@ -15,30 +15,20 @@ type ActorContextType = {
     setActor: (actor: RoleType) => void
 }
 
-const ActorContext =
-    createContext<ActorContextType | null>(null)
+const ActorContext = createContext<ActorContextType | null>(null)
 
-const DEFAULT_ACTOR: RoleType =
-    RoleType.ADMIN
+const DEFAULT_ACTOR: RoleType = RoleType.ADMIN
 
-const SELECTED_ACTOR_KEY =
-    'selectedActor'
+const SELECTED_ACTOR_KEY = 'selectedActor'
 
-const ALL_ROLES =
-    Object.values(RoleType)
+const ALL_ROLES = Object.values(RoleType)
 
-function isActorRole(
-    value: unknown,
-): value is RoleType {
-    return (
-        typeof value === 'string'
-        && ALL_ROLES.includes(value as RoleType)
-    )
+function isActorRole(value: unknown): value is RoleType {
+    return typeof value === 'string' && ALL_ROLES.includes(value as RoleType)
 }
 
 function canUseLocalStorage() {
-    return typeof window !== 'undefined'
-        && typeof window.localStorage !== 'undefined'
+    return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
 }
 
 function readSavedActor(): RoleType {
@@ -47,12 +37,9 @@ function readSavedActor(): RoleType {
     }
 
     try {
-        const savedActor =
-            localStorage.getItem(SELECTED_ACTOR_KEY)
+        const savedActor = localStorage.getItem(SELECTED_ACTOR_KEY)
 
-        return isActorRole(savedActor)
-            ? savedActor
-            : DEFAULT_ACTOR
+        return isActorRole(savedActor) ? savedActor : DEFAULT_ACTOR
     } catch {
         return DEFAULT_ACTOR
     }
@@ -64,36 +51,22 @@ function saveActor(nextActor: RoleType) {
     }
 
     try {
-        localStorage.setItem(
-            SELECTED_ACTOR_KEY,
-            nextActor,
-        )
+        localStorage.setItem(SELECTED_ACTOR_KEY, nextActor)
     } catch {
         // Ignore storage failures.
     }
 }
 
-export function ActorProvider({
-                                  children,
-                              }: {
-    children: ReactNode
-}) {
-    const [actor, setActorState] =
-        useState<RoleType>(readSavedActor)
+export function ActorProvider({children}: {children: ReactNode}) {
+    const [actor, setActorState] = useState<RoleType>(readSavedActor)
 
-    const setActor =
-        useCallback(
-            (nextActor: RoleType) => {
-                saveActor(nextActor)
-                setActorState(nextActor)
-            },
-            [],
-        )
+    const setActor = useCallback((nextActor: RoleType) => {
+        saveActor(nextActor)
+        setActorState(nextActor)
+    }, [])
 
     useEffect(() => {
-        function handleStorageChange(
-            event: StorageEvent,
-        ) {
+        function handleStorageChange(event: StorageEvent) {
             if (event.key !== SELECTED_ACTOR_KEY) {
                 return
             }
@@ -106,47 +79,30 @@ export function ActorProvider({
             setActorState(DEFAULT_ACTOR)
         }
 
-        window.addEventListener(
-            'storage',
-            handleStorageChange,
-        )
+        window.addEventListener('storage', handleStorageChange)
 
         return () => {
-            window.removeEventListener(
-                'storage',
-                handleStorageChange,
-            )
+            window.removeEventListener('storage', handleStorageChange)
         }
     }, [])
 
-    const value =
-        useMemo<ActorContextType>(
-            () => ({
-                actor,
-                setActor,
-            }),
-            [
-                actor,
-                setActor,
-            ],
-        )
-
-    return (
-        <ActorContext.Provider value={value}>
-            {children}
-        </ActorContext.Provider>
+    const value = useMemo<ActorContextType>(
+        () => ({
+            actor,
+            setActor,
+        }),
+        [actor, setActor],
     )
+
+    return <ActorContext.Provider value={value}>{children}</ActorContext.Provider>
 }
 
 /* eslint-disable react-refresh/only-export-components */
 export function useActor() {
-    const context =
-        useContext(ActorContext)
+    const context = useContext(ActorContext)
 
     if (!context) {
-        throw new Error(
-            'useActor phải được sử dụng bên trong ActorProvider',
-        )
+        throw new Error('useActor phải được sử dụng bên trong ActorProvider')
     }
 
     return context

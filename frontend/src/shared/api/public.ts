@@ -9,13 +9,12 @@ export interface PublicBestSellingDish {
 export async function getPublicBestSellingDishes(
     signal?: AbortSignal,
 ): Promise<PublicBestSellingDish[]> {
-    const response =
-        await apiClient.get<PublicBestSellingDish[]>(
-            '/public/menu/best-selling',
-            {
-                signal,
-            },
-        )
+    const response = await apiClient.get<PublicBestSellingDish[]>(
+        '/public/menu/best-selling',
+        {
+            signal,
+        },
+    )
 
     return response.data
 }

@@ -6,8 +6,7 @@ export const RoleType = {
     CUSTOMER: 'CUSTOMER',
 } as const
 
-export type RoleType =
-    (typeof RoleType)[keyof typeof RoleType]
+export type RoleType = (typeof RoleType)[keyof typeof RoleType]
 
 export interface LoginRequest {
     username: string
@@ -30,7 +29,6 @@ export interface LoginResponse {
     rewardPoints?: number
 }
 
-
 export interface UserProfile {
     userId: number
     id?: number
@@ -41,7 +39,6 @@ export interface UserProfile {
     role: RoleType
     rewardPoints?: number
 }
-
 
 export interface AuthUser {
     userId: number

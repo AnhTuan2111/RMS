@@ -1,8 +1,4 @@
-import {
-    useEffect,
-    useState,
-    type CSSProperties,
-} from 'react'
+import {useEffect, useState, type CSSProperties} from 'react'
 
 import {cashierApi} from '@/shared/api/cashier'
 import type {
@@ -33,9 +29,9 @@ function isRequestCanceled(error: unknown) {
     }
 
     return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
+        requestError.name === 'CanceledError' ||
+        requestError.code === 'ERR_CANCELED' ||
+        requestError.message === 'canceled'
     )
 }
 
@@ -44,56 +40,44 @@ function formatCurrency(value: number) {
 }
 
 function methodDisplay(method: string) {
-    if (method === 'CASH') return { icon: '💵', label: 'Tiền mặt' }
-    if (method === 'QRCODE') return { icon: '💳', label: 'Thẻ / VNPay' }
-    return { icon: '💳', label: method }
+    if (method === 'CASH') return {icon: '💵', label: 'Tiền mặt'}
+    if (method === 'QRCODE') return {icon: '💳', label: 'Thẻ / VNPay'}
+    return {icon: '💳', label: method}
 }
 
 export default function PaymentModal({
-                                         orderId,
-                                         orderDetail,
-                                         customer,
-                                         pointsUsed,
-                                         onClose,
-                                         onSuccess,
-                                     }: PaymentModalProps) {
-    const [method, setMethod] =
-        useState<PaymentMethodType | null>(null)
+    orderId,
+    orderDetail,
+    customer,
+    pointsUsed,
+    onClose,
+    onSuccess,
+}: PaymentModalProps) {
+    const [method, setMethod] = useState<PaymentMethodType | null>(null)
 
-    const [amountReceived, setAmountReceived] =
-        useState<number>(0)
+    const [amountReceived, setAmountReceived] = useState<number>(0)
 
-    const [processing, setProcessing] =
-        useState<boolean>(false)
+    const [processing, setProcessing] = useState<boolean>(false)
 
-    const [paymentMethods, setPaymentMethods] =
-        useState<string[]>([])
+    const [paymentMethods, setPaymentMethods] = useState<string[]>([])
 
-    const [loadingMethods, setLoadingMethods] =
-        useState<boolean>(true)
+    const [loadingMethods, setLoadingMethods] = useState<boolean>(true)
 
-    const originalFinalAmount =
-        orderDetail.finalAmount
+    const originalFinalAmount = orderDetail.finalAmount
 
-    const discountAmount =
-        pointsUsed * 1000
+    const discountAmount = pointsUsed * 1000
 
-    const finalAmount =
-        Math.max(
-            0,
-            originalFinalAmount - discountAmount,
-        )
+    const finalAmount = Math.max(0, originalFinalAmount - discountAmount)
 
     const changeReturned =
-        amountReceived >= finalAmount
-            ? amountReceived - finalAmount
-            : 0
+        amountReceived >= finalAmount ? amountReceived - finalAmount : 0
 
     useEffect(() => {
         let active = true
         const controller = new AbortController()
 
-        cashierApi.getPaymentMethods(controller.signal)
+        cashierApi
+            .getPaymentMethods(controller.signal)
             .then((response) => {
                 if (active) setPaymentMethods(response.data)
             })
@@ -118,10 +102,7 @@ export default function PaymentModal({
             await cashierApi.unlockOrder(orderId)
         } catch (requestError: unknown) {
             if (!isRequestCanceled(requestError)) {
-                console.error(
-                    '[CASHIER_UNLOCK_ORDER_ERROR]',
-                    requestError,
-                )
+                console.error('[CASHIER_UNLOCK_ORDER_ERROR]', requestError)
             }
         } finally {
             onClose()
@@ -144,34 +125,22 @@ export default function PaymentModal({
                 pointsUsed,
             }
 
-            const response =
-                await cashierApi.completeCashPayment(
-                    orderId,
-                    request,
-                )
+            const response = await cashierApi.completeCashPayment(orderId, request)
 
             if (response?.data?.success) {
                 onSuccess(response.data)
                 return
             }
 
-            alert(
-                response?.data?.message
-                ?? 'Có lỗi xảy ra từ server!',
-            )
+            alert(response?.data?.message ?? 'Có lỗi xảy ra từ server!')
         } catch (requestError: unknown) {
             if (isRequestCanceled(requestError)) {
                 return
             }
 
-            console.error(
-                '[CASHIER_CASH_PAYMENT_ERROR]',
-                requestError,
-            )
+            console.error('[CASHIER_CASH_PAYMENT_ERROR]', requestError)
 
-            alert(
-                'Lỗi thanh toán: Kiểm tra lại mạng hoặc đơn hàng!',
-            )
+            alert('Lỗi thanh toán: Kiểm tra lại mạng hoặc đơn hàng!')
         } finally {
             setProcessing(false)
         }
@@ -181,27 +150,19 @@ export default function PaymentModal({
         setProcessing(true)
 
         try {
-            const response =
-                await cashierApi.getVNPayQrCode(
-                    orderId,
-                    customer?.id,
-                    pointsUsed,
-                )
+            const response = await cashierApi.getVNPayQrCode(
+                orderId,
+                customer?.id,
+                pointsUsed,
+            )
 
-            if (
-                response?.data?.success
-                && response.data.paymentUrl
-            ) {
-                window.location.href =
-                    response.data.paymentUrl
+            if (response?.data?.success && response.data.paymentUrl) {
+                window.location.href = response.data.paymentUrl
 
                 return
             }
 
-            alert(
-                response?.data?.message
-                ?? 'Không thể khởi tạo cổng VNPay.',
-            )
+            alert(response?.data?.message ?? 'Không thể khởi tạo cổng VNPay.')
 
             setProcessing(false)
         } catch (requestError: unknown) {
@@ -209,14 +170,9 @@ export default function PaymentModal({
                 return
             }
 
-            console.error(
-                '[CASHIER_VNPAY_CREATE_ERROR]',
-                requestError,
-            )
+            console.error('[CASHIER_VNPAY_CREATE_ERROR]', requestError)
 
-            alert(
-                'Lỗi tạo cổng VNPay! Kiểm tra lại mạng hoặc tải lại trang.',
-            )
+            alert('Lỗi tạo cổng VNPay! Kiểm tra lại mạng hoặc tải lại trang.')
 
             setMethod(null)
             setProcessing(false)
@@ -224,18 +180,9 @@ export default function PaymentModal({
     }
 
     return (
-        <div
-            className="modal-backdrop"
-            style={backdropStyle}
-        >
-            <div
-                className="modal-card"
-                style={modalCardStyle}
-            >
-                <div
-                    className="modal-header"
-                    style={modalHeaderStyle}
-                >
+        <div className="modal-backdrop" style={backdropStyle}>
+            <div className="modal-card" style={modalCardStyle}>
+                <div className="modal-header" style={modalHeaderStyle}>
                     <h2
                         style={{
                             margin: 0,
@@ -247,9 +194,7 @@ export default function PaymentModal({
                     <button
                         type="button"
                         style={closeButtonStyle}
-                        onClick={() =>
-                            void handleCloseModal()
-                        }
+                        onClick={() => void handleCloseModal()}
                     >
                         ×
                     </button>
@@ -263,9 +208,7 @@ export default function PaymentModal({
                 >
                     {customer && (
                         <div style={customerSummaryStyle}>
-                            👤 Khách:{' '}
-                            <strong>{customer.fullName}</strong>
-
+                            👤 Khách: <strong>{customer.fullName}</strong>
                             {pointsUsed > 0 && (
                                 <span
                                     style={{
@@ -290,15 +233,15 @@ export default function PaymentModal({
                         </strong>
                     </div>
 
-                    {method === null && (
-                        loadingMethods ? (
-                            <p style={{ textAlign: 'center', color: '#64748b' }}>
+                    {method === null &&
+                        (loadingMethods ? (
+                            <p style={{textAlign: 'center', color: '#64748b'}}>
                                 Đang tải phương thức thanh toán...
                             </p>
                         ) : (
                             <div style={methodGridStyle}>
                                 {paymentMethods.map((m) => {
-                                    const { icon, label } = methodDisplay(m)
+                                    const {icon, label} = methodDisplay(m)
                                     return (
                                         <button
                                             key={m}
@@ -314,8 +257,7 @@ export default function PaymentModal({
                                     )
                                 })}
                             </div>
-                        )
-                    )}
+                        ))}
 
                     {method === 'CASH' && (
                         <div style={cashFormStyle}>
@@ -328,12 +270,7 @@ export default function PaymentModal({
                                     value={amountReceived || ''}
                                     onChange={(event) =>
                                         setAmountReceived(
-                                            Math.max(
-                                                0,
-                                                Number(
-                                                    event.target.value,
-                                                ),
-                                            ),
+                                            Math.max(0, Number(event.target.value)),
                                         )
                                     }
                                 />
@@ -361,9 +298,7 @@ export default function PaymentModal({
                                         flex: 1,
                                     }}
                                     disabled={processing}
-                                    onClick={() =>
-                                        setMethod(null)
-                                    }
+                                    onClick={() => setMethod(null)}
                                 >
                                     Quay lại
                                 </button>
@@ -371,13 +306,8 @@ export default function PaymentModal({
                                 <button
                                     type="button"
                                     style={confirmCashButtonStyle}
-                                    disabled={
-                                        amountReceived < finalAmount
-                                        || processing
-                                    }
-                                    onClick={() =>
-                                        void handleConfirmCash()
-                                    }
+                                    disabled={amountReceived < finalAmount || processing}
+                                    onClick={() => void handleConfirmCash()}
                                 >
                                     {processing
                                         ? 'Đang xử lý...'
@@ -394,18 +324,13 @@ export default function PaymentModal({
                             }}
                         >
                             <div style={vnpayBoxStyle}>
-                                <div style={vnpayIconStyle}>
-                                    🌐
-                                </div>
+                                <div style={vnpayIconStyle}>🌐</div>
 
-                                <h3 style={vnpayTitleStyle}>
-                                    Cổng thanh toán VNPay
-                                </h3>
+                                <h3 style={vnpayTitleStyle}>Cổng thanh toán VNPay</h3>
 
                                 <p style={vnpayDescriptionStyle}>
-                                    Hệ thống sẽ chuyển hướng sang VNPay
-                                    để nhập thông tin thẻ. Hóa đơn sẽ
-                                    được in sau khi thanh toán thành công.
+                                    Hệ thống sẽ chuyển hướng sang VNPay để nhập thông tin
+                                    thẻ. Hóa đơn sẽ được in sau khi thanh toán thành công.
                                 </p>
                             </div>
 
@@ -417,9 +342,7 @@ export default function PaymentModal({
                                         flex: 1,
                                     }}
                                     disabled={processing}
-                                    onClick={() =>
-                                        setMethod(null)
-                                    }
+                                    onClick={() => setMethod(null)}
                                 >
                                     Hủy bỏ
                                 </button>
@@ -428,13 +351,9 @@ export default function PaymentModal({
                                     type="button"
                                     style={vnpayButtonStyle}
                                     disabled={processing}
-                                    onClick={() =>
-                                        void handleRedirectToVNPay()
-                                    }
+                                    onClick={() => void handleRedirectToVNPay()}
                                 >
-                                    {processing
-                                        ? 'Đang kết nối...'
-                                        : 'Chuyển hướng ngay'}
+                                    {processing ? 'Đang kết nối...' : 'Chuyển hướng ngay'}
                                 </button>
                             </div>
                         </div>

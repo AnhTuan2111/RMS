@@ -1,12 +1,5 @@
-﻿import {
-    useState,
-    type CSSProperties,
-    type FormEvent,
-} from 'react'
-import {
-    Link,
-    useNavigate,
-} from 'react-router-dom'
+﻿import {useState, type CSSProperties, type FormEvent} from 'react'
+import {Link, useNavigate} from 'react-router-dom'
 
 import {login} from '@/shared/api/auth'
 import {useActor} from '@/app/providers/ActorContext'
@@ -25,9 +18,9 @@ function isRequestCanceled(error: unknown) {
     }
 
     return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
+        requestError.name === 'CanceledError' ||
+        requestError.code === 'ERR_CANCELED' ||
+        requestError.message === 'canceled'
     )
 }
 
@@ -57,67 +50,47 @@ export default function LoginPage() {
     const navigate = useNavigate()
     const {setActor} = useActor()
 
-    const [username, setUsername] =
-        useState('')
+    const [username, setUsername] = useState('')
 
-    const [rawPassword, setRawPassword] =
-        useState('')
+    const [rawPassword, setRawPassword] = useState('')
 
-    const [error, setError] =
-        useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null)
 
-    const [isLoading, setIsLoading] =
-        useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
-    async function handleSubmit(
-        event: FormEvent<HTMLFormElement>,
-    ) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
         setIsLoading(true)
         setError(null)
 
         try {
-            const user =
-                await login({
-                    username,
-                    rawPassword,
-                })
+            const user = await login({
+                username,
+                rawPassword,
+            })
 
-            const role =
-                user.role as RoleType
+            const role = user.role as RoleType
 
             setActor(role)
 
-            localStorage.setItem(
-                'selectedActor',
-                role,
-            )
+            localStorage.setItem('selectedActor', role)
 
-            localStorage.setItem(
-                'currentUser',
-                JSON.stringify(user),
-            )
+            localStorage.setItem('currentUser', JSON.stringify(user))
 
-            navigate(
-                getRedirectPath(role),
-                {
-                    replace: true,
-                },
-            )
+            navigate(getRedirectPath(role), {
+                replace: true,
+            })
         } catch (requestError: unknown) {
             if (isRequestCanceled(requestError)) {
                 return
             }
 
-            console.error(
-                '[LOGIN_ERROR]',
-                requestError,
-            )
+            console.error('[LOGIN_ERROR]', requestError)
 
             setError(
-                getErrorMessage(requestError)
-                || 'Đăng nhập thất bại. Vui lòng kiểm tra tài khoản hoặc mật khẩu.',
+                getErrorMessage(requestError) ||
+                    'Đăng nhập thất bại. Vui lòng kiểm tra tài khoản hoặc mật khẩu.',
             )
         } finally {
             setIsLoading(false)
@@ -127,84 +100,56 @@ export default function LoginPage() {
     return (
         <main className="login-page">
             <section className="login-card">
-                <Link
-                    className="login-back-link"
-                    to="/"
-                >
+                <Link className="login-back-link" to="/">
                     ← Quay lại trang chủ
                 </Link>
 
                 <div className="login-header">
                     <h1>Đăng nhập Mãn Vị Lâu</h1>
 
-                    <p>
-                        Đăng nhập tài khoản để đặt bàn ngay hôm nay!
-                    </p>
+                    <p>Đăng nhập tài khoản để đặt bàn ngay hôm nay!</p>
                 </div>
 
-                {error && (
-                    <div className="auth-error">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="auth-error">{error}</div>}
 
                 <form onSubmit={(event) => void handleSubmit(event)}>
                     <label className="auth-field">
                         Username
-
                         <input
                             value={username}
                             placeholder="Nhập tên đăng nhập"
                             required
                             autoComplete="username"
-                            onChange={(event) =>
-                                setUsername(event.target.value)
-                            }
+                            onChange={(event) => setUsername(event.target.value)}
                         />
                     </label>
 
                     <label className="auth-field">
                         Password
-
                         <input
                             type="password"
                             value={rawPassword}
                             placeholder="Nhập mật khẩu"
                             required
                             autoComplete="current-password"
-                            onChange={(event) =>
-                                setRawPassword(event.target.value)
-                            }
+                            onChange={(event) => setRawPassword(event.target.value)}
                         />
                     </label>
 
                     <div style={forgotPasswordRowStyle}>
-                        <Link
-                            to="/forgot-password"
-                            style={forgotPasswordLinkStyle}
-                        >
+                        <Link to="/forgot-password" style={forgotPasswordLinkStyle}>
                             Quên mật khẩu?
                         </Link>
                     </div>
 
-                    <button
-                        type="submit"
-                        className="auth-submit"
-                        disabled={isLoading}
-                    >
-                        {isLoading
-                            ? 'Đang đăng nhập...'
-                            : 'Đăng nhập'}
+                    <button type="submit" className="auth-submit" disabled={isLoading}>
+                        {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                     </button>
                 </form>
 
                 <div style={registerTextStyle}>
                     Chưa có tài khoản?{' '}
-
-                    <Link
-                        to="/register"
-                        style={registerLinkStyle}
-                    >
+                    <Link to="/register" style={registerLinkStyle}>
                         Đăng ký ngay
                     </Link>
                 </div>

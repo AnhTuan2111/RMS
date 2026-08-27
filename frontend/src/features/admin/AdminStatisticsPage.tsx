@@ -1,9 +1,4 @@
-import {
-    useEffect,
-    useRef,
-    useState,
-    type KeyboardEvent,
-} from 'react'
+import {useEffect, useRef, useState, type KeyboardEvent} from 'react'
 import {useAdminSocket} from '@/realtime/useAdminSocket'
 import {
     adminApi,
@@ -15,11 +10,7 @@ import {
     type RevenueReportResponse,
 } from '@/shared/api/admin'
 
-type ReportKey =
-    | 'revenue'
-    | 'categoryBestsellers'
-    | 'bestsellers'
-    | 'orderShifts'
+type ReportKey = 'revenue' | 'categoryBestsellers' | 'bestsellers' | 'orderShifts'
 
 type RangePreset = 'TODAY' | 'LAST_7' | 'CUSTOM_WEEK'
 
@@ -91,7 +82,6 @@ const vietnameseMonthLabels = Array.from(
     },
     (_, index) => `Tháng ${index + 1}`,
 )
-
 
 function formatDateForApi(date: Date) {
     const year = date.getFullYear()
@@ -174,22 +164,20 @@ function buildWeekOptions(year: number): WeekOption[] {
     let weekStart = new Date(year, 0, 1)
 
     while (
-        weekStart.getFullYear() === year
-        && (year < currentYear || weekStart <= today)
-        ) {
+        weekStart.getFullYear() === year &&
+        (year < currentYear || weekStart <= today)
+    ) {
         const weekEnd = getSundayOfWeek(weekStart)
         const boundedEnd =
             year === currentYear && weekEnd > today
                 ? today
                 : weekEnd > endOfYear
-                    ? endOfYear
-                    : weekEnd
+                  ? endOfYear
+                  : weekEnd
 
         options.push({
             value: formatDateForApi(weekStart),
-            label: `${formatShortDate(weekStart)} - ${formatShortDate(
-                boundedEnd,
-            )}`,
+            label: `${formatShortDate(weekStart)} - ${formatShortDate(boundedEnd)}`,
             fromDate: formatDateForApi(weekStart),
             toDate: formatDateForApi(boundedEnd),
         })
@@ -203,18 +191,17 @@ function buildWeekOptions(year: number): WeekOption[] {
 function getDefaultWeek(year: number) {
     const options = buildWeekOptions(year)
 
-    return options[options.length - 1] ?? {
-        value: formatDateForApi(new Date()),
-        label: formatShortDate(new Date()),
-        fromDate: formatDateForApi(new Date()),
-        toDate: formatDateForApi(new Date()),
-    }
+    return (
+        options[options.length - 1] ?? {
+            value: formatDateForApi(new Date()),
+            label: formatShortDate(new Date()),
+            fromDate: formatDateForApi(new Date()),
+            toDate: formatDateForApi(new Date()),
+        }
+    )
 }
 
-function getRangeFromPreset(
-    preset: RangePreset,
-    selectedWeek?: WeekOption,
-) {
+function getRangeFromPreset(preset: RangePreset, selectedWeek?: WeekOption) {
     if (preset === 'CUSTOM_WEEK') {
         return selectedWeek ?? getDefaultWeek(new Date().getFullYear())
     }
@@ -247,9 +234,9 @@ function getCalendarDays(viewDate: Date) {
 
 function isSameCalendarDate(firstDate: Date, secondDate: Date) {
     return (
-        firstDate.getFullYear() === secondDate.getFullYear()
-        && firstDate.getMonth() === secondDate.getMonth()
-        && firstDate.getDate() === secondDate.getDate()
+        firstDate.getFullYear() === secondDate.getFullYear() &&
+        firstDate.getMonth() === secondDate.getMonth() &&
+        firstDate.getDate() === secondDate.getDate()
     )
 }
 
@@ -286,10 +273,10 @@ function resolveDishImageSrc(imageUrl?: string | null) {
     }
 
     if (
-        value.startsWith('http')
-        || value.startsWith('//')
-        || value.startsWith('data:')
-        || value.startsWith('/')
+        value.startsWith('http') ||
+        value.startsWith('//') ||
+        value.startsWith('data:') ||
+        value.startsWith('/')
     ) {
         return value
     }
@@ -338,9 +325,9 @@ function parseVietnameseDate(value: string) {
     const parsedDate = new Date(year, month - 1, day)
 
     if (
-        parsedDate.getFullYear() !== year
-        || parsedDate.getMonth() !== month - 1
-        || parsedDate.getDate() !== day
+        parsedDate.getFullYear() !== year ||
+        parsedDate.getMonth() !== month - 1 ||
+        parsedDate.getDate() !== day
     ) {
         return null
     }
@@ -373,15 +360,10 @@ function getApiErrorMessage(error: unknown, fallback: string) {
     return response?.data?.message ?? response?.data?.error ?? fallback
 }
 
-function getRangeLabelFromPreset(
-    preset: RangePreset,
-    selectedWeek?: WeekOption,
-) {
+function getRangeLabelFromPreset(preset: RangePreset, selectedWeek?: WeekOption) {
     const range = getRangeFromPreset(preset, selectedWeek)
 
-    return `${formatDisplayDate(range.fromDate)} - ${formatDisplayDate(
-        range.toDate,
-    )}`
+    return `${formatDisplayDate(range.fromDate)} - ${formatDisplayDate(range.toDate)}`
 }
 
 function getOrderShiftRangeLabel(
@@ -393,14 +375,10 @@ function getOrderShiftRangeLabel(
         return getRangeLabelFromPreset(preset, selectedWeek)
     }
 
-    return `${formatDisplayDate(report.startDate)} - ${formatDisplayDate(
-        report.endDate,
-    )}`
+    return `${formatDisplayDate(report.startDate)} - ${formatDisplayDate(report.endDate)}`
 }
 
-function buildShiftRows(
-    report: OrderShiftReportResponse | null,
-): ShiftViewItem[] {
+function buildShiftRows(report: OrderShiftReportResponse | null): ShiftViewItem[] {
     return shiftCatalog.map((shift) => {
         const apiShift = report?.shifts?.find(
             (item) => item.shiftName === shift.shiftName,
@@ -412,19 +390,14 @@ function buildShiftRows(
 
         return {
             ...shift,
-            orderCount:
-                apiShift?.orderCount ?? fallbackShift?.orderCount ?? 0,
-            percentage:
-                apiShift?.percentage ?? fallbackShift?.percentage ?? 0,
+            orderCount: apiShift?.orderCount ?? fallbackShift?.orderCount ?? 0,
+            percentage: apiShift?.percentage ?? fallbackShift?.percentage ?? 0,
         }
     })
 }
 
 function buildDonutGradient(rows: ShiftViewItem[]) {
-    const totalOrders = rows.reduce(
-        (sum, row) => sum + row.orderCount,
-        0,
-    )
+    const totalOrders = rows.reduce((sum, row) => sum + row.orderCount, 0)
 
     if (totalOrders === 0) {
         return '#e5e7eb'
@@ -448,13 +421,7 @@ function buildDonutGradient(rows: ShiftViewItem[]) {
         .join(', ')
 }
 
-function StatIcon({
-                      children,
-                      className,
-                  }: {
-    children: string
-    className: string
-}) {
+function StatIcon({children, className}: {children: string; className: string}) {
     return (
         <span className={`rims-stat-card-icon-wrapper ${className}`}>
             <span>{children}</span>
@@ -464,10 +431,7 @@ function StatIcon({
 
 function DongIcon() {
     return (
-        <span
-            aria-hidden="true"
-            className="admin-revenue-card-icon"
-        >
+        <span aria-hidden="true" className="admin-revenue-card-icon">
             ₫
         </span>
     )
@@ -480,75 +444,62 @@ function CalendarIcon() {
             className="admin-revenue-calendar-icon"
             viewBox="0 0 24 24"
         >
-            <path d="M8 2v4"/>
-            <path d="M16 2v4"/>
-            <path d="M3 10h18"/>
-            <path d="M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/>
+            <path d="M8 2v4" />
+            <path d="M16 2v4" />
+            <path d="M3 10h18" />
+            <path d="M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
         </svg>
     )
 }
 
 function FileIcon() {
     return (
-        <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-        >
-            <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/>
-            <path d="M14 2v5h5"/>
-            <path d="M9 13h6"/>
-            <path d="M9 17h6"/>
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z" />
+            <path d="M14 2v5h5" />
+            <path d="M9 13h6" />
+            <path d="M9 17h6" />
         </svg>
     )
 }
 
 function TrophyIcon() {
     return (
-        <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-        >
-            <path d="M8 21h8"/>
-            <path d="M12 17v4"/>
-            <path d="M7 4h10v4a5 5 0 0 1-10 0z"/>
-            <path d="M7 6H4a2 2 0 0 0 2 4h1"/>
-            <path d="M17 6h3a2 2 0 0 1-2 4h-1"/>
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M8 21h8" />
+            <path d="M12 17v4" />
+            <path d="M7 4h10v4a5 5 0 0 1-10 0z" />
+            <path d="M7 6H4a2 2 0 0 0 2 4h1" />
+            <path d="M17 6h3a2 2 0 0 1-2 4h-1" />
         </svg>
     )
 }
 
 function CrownIcon() {
     return (
-        <svg
-            aria-hidden="true"
-            className="bestseller-rank-crown"
-            viewBox="0 0 24 24"
-        >
-            <path d="m3 8 4 3 5-7 5 7 4-3-2 10H5z"/>
-            <path d="M5 18h14"/>
+        <svg aria-hidden="true" className="bestseller-rank-crown" viewBox="0 0 24 24">
+            <path d="m3 8 4 3 5-7 5 7 4-3-2 10H5z" />
+            <path d="M5 18h14" />
         </svg>
     )
 }
 
 function TrendingIcon() {
     return (
-        <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-        >
-            <path d="M3 17 9 11l4 4 7-8"/>
-            <path d="M14 7h6v6"/>
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M3 17 9 11l4 4 7-8" />
+            <path d="M14 7h6v6" />
         </svg>
     )
 }
 
 function StatisticsReportSelector({
-                                      activeReport,
-                                      totalRevenue,
-                                      bestSellerCount,
-                                      highestShiftName,
-                                      onSelectReport,
-                                  }: {
+    activeReport,
+    totalRevenue,
+    bestSellerCount,
+    highestShiftName,
+    onSelectReport,
+}: {
     activeReport: ReportKey
     totalRevenue?: number | null
     bestSellerCount: number
@@ -628,10 +579,10 @@ function StatisticsReportSelector({
 }
 
 function RevenueCard({
-                         title,
-                         amount,
-                         className = '',
-                     }: {
+    title,
+    amount,
+    className = '',
+}: {
     title: string
     amount?: number | null
     className?: string
@@ -640,7 +591,7 @@ function RevenueCard({
         <article className={`admin-revenue-card ${className}`.trim()}>
             <div className="admin-revenue-card-header">
                 <span>{title}</span>
-                <DongIcon/>
+                <DongIcon />
             </div>
 
             <strong>{formatRevenueCurrency(amount)}</strong>
@@ -649,11 +600,11 @@ function RevenueCard({
 }
 
 function RevenueDateInput({
-                              id,
-                              label,
-                              value,
-                              onChange,
-                          }: {
+    id,
+    label,
+    value,
+    onChange,
+}: {
     id: string
     label: string
     value: string
@@ -666,9 +617,7 @@ function RevenueDateInput({
         getCalendarMonthDate(selectedDate ?? new Date()),
     )
     const calendarDays = getCalendarDays(calendarDate)
-    const calendarYearOptions = getCalendarYearOptions(
-        calendarDate.getFullYear(),
-    )
+    const calendarYearOptions = getCalendarYearOptions(calendarDate.getFullYear())
 
     useEffect(() => {
         if (!isCalendarOpen) {
@@ -685,8 +634,7 @@ function RevenueDateInput({
 
         document.addEventListener('mousedown', handlePointerDown)
 
-        return () =>
-            document.removeEventListener('mousedown', handlePointerDown)
+        return () => document.removeEventListener('mousedown', handlePointerDown)
     }, [isCalendarOpen])
 
     function openCalendar() {
@@ -717,17 +665,11 @@ function RevenueDateInput({
     }
 
     function handleMonthChange(month: number) {
-        setCalendarDate(
-            (currentDate) =>
-                new Date(currentDate.getFullYear(), month, 1),
-        )
+        setCalendarDate((currentDate) => new Date(currentDate.getFullYear(), month, 1))
     }
 
     function handleYearChange(year: number) {
-        setCalendarDate(
-            (currentDate) =>
-                new Date(year, currentDate.getMonth(), 1),
-        )
+        setCalendarDate((currentDate) => new Date(year, currentDate.getMonth(), 1))
     }
 
     function handleCalendarKeyDown(event: KeyboardEvent) {
@@ -737,10 +679,7 @@ function RevenueDateInput({
     }
 
     return (
-        <div
-            className="admin-revenue-date-field"
-            ref={fieldRef}
-        >
+        <div className="admin-revenue-date-field" ref={fieldRef}>
             <label htmlFor={id}>{label}</label>
 
             <span className="admin-revenue-date-input-shell">
@@ -763,7 +702,7 @@ function RevenueDateInput({
                     type="button"
                     onClick={openCalendar}
                 >
-                    <CalendarIcon/>
+                    <CalendarIcon />
                 </button>
             </span>
 
@@ -798,21 +737,14 @@ function RevenueDateInput({
                                 aria-label="Chọn tháng"
                                 value={calendarDate.getMonth()}
                                 onChange={(event) =>
-                                    handleMonthChange(
-                                        Number(event.target.value),
-                                    )
+                                    handleMonthChange(Number(event.target.value))
                                 }
                             >
-                                {vietnameseMonthLabels.map(
-                                    (monthLabel, monthIndex) => (
-                                        <option
-                                            key={monthLabel}
-                                            value={monthIndex}
-                                        >
-                                            {monthLabel}
-                                        </option>
-                                    ),
-                                )}
+                                {vietnameseMonthLabels.map((monthLabel, monthIndex) => (
+                                    <option key={monthLabel} value={monthIndex}>
+                                        {monthLabel}
+                                    </option>
+                                ))}
                             </select>
 
                             <span>năm</span>
@@ -821,16 +753,11 @@ function RevenueDateInput({
                                 aria-label="Chọn năm"
                                 value={calendarDate.getFullYear()}
                                 onChange={(event) =>
-                                    handleYearChange(
-                                        Number(event.target.value),
-                                    )
+                                    handleYearChange(Number(event.target.value))
                                 }
                             >
                                 {calendarYearOptions.map((year) => (
-                                    <option
-                                        key={year}
-                                        value={year}
-                                    >
+                                    <option key={year} value={year}>
                                         {year}
                                     </option>
                                 ))}
@@ -856,10 +783,7 @@ function RevenueDateInput({
                         </button>
                     </div>
 
-                    <div
-                        aria-hidden="true"
-                        className="admin-revenue-calendar-weekdays"
-                    >
+                    <div aria-hidden="true" className="admin-revenue-calendar-weekdays">
                         {vietnameseWeekdayLabels.map((weekdayLabel) => (
                             <span key={weekdayLabel}>{weekdayLabel}</span>
                         ))}
@@ -870,17 +794,11 @@ function RevenueDateInput({
                             const dateValue = formatDateForApi(date)
                             const displayDate = formatDisplayDate(dateValue)
                             const isCurrentMonth =
-                                date.getFullYear()
-                                === calendarDate.getFullYear()
-                                && date.getMonth()
-                                === calendarDate.getMonth()
+                                date.getFullYear() === calendarDate.getFullYear() &&
+                                date.getMonth() === calendarDate.getMonth()
                             const isSelected =
-                                selectedDate
-                                && isSameCalendarDate(date, selectedDate)
-                            const isToday = isSameCalendarDate(
-                                date,
-                                new Date(),
-                            )
+                                selectedDate && isSameCalendarDate(date, selectedDate)
+                            const isToday = isSameCalendarDate(date, new Date())
                             const className = [
                                 'admin-revenue-calendar-day',
                                 isCurrentMonth ? '' : 'outside-month',
@@ -929,16 +847,16 @@ function RevenueDateInput({
 }
 
 function PresetButtonGroup({
-                               activePreset,
-                               selectedWeek,
-                               selectedYear,
-                               weekOptions,
-                               yearOptions,
-                               isLoading,
-                               onChange,
-                               onWeekChange,
-                               onYearChange,
-                           }: {
+    activePreset,
+    selectedWeek,
+    selectedYear,
+    weekOptions,
+    yearOptions,
+    isLoading,
+    onChange,
+    onWeekChange,
+    onYearChange,
+}: {
     activePreset: RangePreset
     selectedWeek: WeekOption
     selectedYear: number
@@ -960,9 +878,7 @@ function PresetButtonGroup({
             <div className="rims-btn-group">
                 <button
                     className={
-                        activePreset === 'TODAY'
-                            ? 'rims-btn-tab active'
-                            : 'rims-btn-tab'
+                        activePreset === 'TODAY' ? 'rims-btn-tab active' : 'rims-btn-tab'
                     }
                     disabled={isLoading}
                     type="button"
@@ -972,9 +888,7 @@ function PresetButtonGroup({
                 </button>
                 <button
                     className={
-                        activePreset === 'LAST_7'
-                            ? 'rims-btn-tab active'
-                            : 'rims-btn-tab'
+                        activePreset === 'LAST_7' ? 'rims-btn-tab active' : 'rims-btn-tab'
                     }
                     disabled={isLoading}
                     type="button"
@@ -1003,15 +917,10 @@ function PresetButtonGroup({
                         <select
                             disabled={isLoading}
                             value={selectedYear}
-                            onChange={(event) =>
-                                onYearChange(Number(event.target.value))
-                            }
+                            onChange={(event) => onYearChange(Number(event.target.value))}
                         >
                             {yearOptions.map((year) => (
-                                <option
-                                    key={year}
-                                    value={year}
-                                >
+                                <option key={year} value={year}>
                                     {year}
                                 </option>
                             ))}
@@ -1023,15 +932,10 @@ function PresetButtonGroup({
                         <select
                             disabled={isLoading}
                             value={selectedWeek.value}
-                            onChange={(event) =>
-                                onWeekChange(event.target.value)
-                            }
+                            onChange={(event) => onWeekChange(event.target.value)}
                         >
                             {weekOptions.map((week) => (
-                                <option
-                                    key={week.value}
-                                    value={week.value}
-                                >
+                                <option key={week.value} value={week.value}>
                                     {week.label}
                                 </option>
                             ))}
@@ -1044,18 +948,18 @@ function PresetButtonGroup({
 }
 
 function RevenueDashboard({
-                              data,
-                              fromDate,
-                              toDate,
-                              isLoading,
-                              isCustomLoading,
-                              error,
-                              customRangeError,
-                              onFromDateChange,
-                              onToDateChange,
-                              onReload,
-                              onApplyCustomRange,
-                          }: {
+    data,
+    fromDate,
+    toDate,
+    isLoading,
+    isCustomLoading,
+    error,
+    customRangeError,
+    onFromDateChange,
+    onToDateChange,
+    onReload,
+    onApplyCustomRange,
+}: {
     data: RevenueDashboardData
     fromDate: string
     toDate: string
@@ -1078,24 +982,14 @@ function RevenueDashboard({
             {error && (
                 <div className="admin-revenue-alert">
                     <span>{error}</span>
-                    <button
-                        disabled={isLoading}
-                        type="button"
-                        onClick={onReload}
-                    >
+                    <button disabled={isLoading} type="button" onClick={onReload}>
                         Thử lại
                     </button>
                 </div>
             )}
 
-            <div
-                aria-busy={isLoading}
-                className="admin-revenue-card-row"
-            >
-                <RevenueCard
-                    amount={data.totalRevenue?.revenue}
-                    title="Tổng doanh thu"
-                />
+            <div aria-busy={isLoading} className="admin-revenue-card-row">
+                <RevenueCard amount={data.totalRevenue?.revenue} title="Tổng doanh thu" />
                 <RevenueCard
                     amount={data.todayRevenue?.revenue}
                     title="Doanh thu hôm nay"
@@ -1108,10 +1002,7 @@ function RevenueDashboard({
                     amount={data.monthlyRevenue?.revenue}
                     title="Doanh thu tháng"
                 />
-                <RevenueCard
-                    amount={data.yearlyRevenue?.revenue}
-                    title="Doanh thu năm"
-                />
+                <RevenueCard amount={data.yearlyRevenue?.revenue} title="Doanh thu năm" />
             </div>
 
             <section className="admin-revenue-filter-panel">
@@ -1170,9 +1061,9 @@ function RevenueDashboard({
 }
 
 function BestSellerDishImage({
-                                 dishName,
-                                 imageUrl,
-                             }: {
+    dishName,
+    imageUrl,
+}: {
     dishName: string
     imageUrl?: string | null
 }) {
@@ -1198,23 +1089,23 @@ function BestSellerDishImage({
 }
 
 function BestSellersReport({
-                               title = 'Món bán chạy',
-                               subtitle = 'Báo cáo món ăn bán chạy theo khoảng thời gian.',
-                               items,
-                               preset,
-                               selectedWeek,
-                               selectedYear,
-                               weekOptions,
-                               yearOptions,
-                               categories,
-                               selectedCategoryId,
-                               isLoading,
-                               error,
-                               onCategoryChange,
-                               onPresetChange,
-                               onWeekChange,
-                               onYearChange,
-                           }: {
+    title = 'Món bán chạy',
+    subtitle = 'Báo cáo món ăn bán chạy theo khoảng thời gian.',
+    items,
+    preset,
+    selectedWeek,
+    selectedYear,
+    weekOptions,
+    yearOptions,
+    categories,
+    selectedCategoryId,
+    isLoading,
+    error,
+    onCategoryChange,
+    onPresetChange,
+    onWeekChange,
+    onYearChange,
+}: {
     title?: string
     subtitle?: string
     items: BestSellingDishItem[]
@@ -1232,19 +1123,14 @@ function BestSellersReport({
     onWeekChange: (weekValue: string) => void
     onYearChange: (year: number) => void
 }) {
-    const maxQuantity = Math.max(
-        ...items.map((item) => item.totalQuantity),
-        1,
-    )
+    const maxQuantity = Math.max(...items.map((item) => item.totalQuantity), 1)
 
     return (
         <section className="order-shift-dashboard-panel admin-bestseller-dashboard-panel">
             <header className="order-shift-dashboard-header">
                 <div>
                     <h2>{title}</h2>
-                    <p className="rims-report-subtitle">
-                        {subtitle}
-                    </p>
+                    <p className="rims-report-subtitle">{subtitle}</p>
                 </div>
 
                 <div className="order-shift-filter-area">
@@ -1269,20 +1155,13 @@ function BestSellersReport({
                         <select
                             disabled={isLoading || categories.length === 0}
                             value={selectedCategoryId}
-                            onChange={(event) =>
-                                onCategoryChange(event.target.value)
-                            }
+                            onChange={(event) => onCategoryChange(event.target.value)}
                         >
                             {categories.length === 0 ? (
-                                <option value="ALL">
-                                    Chưa có danh mục
-                                </option>
+                                <option value="ALL">Chưa có danh mục</option>
                             ) : (
                                 categories.map((category) => (
-                                    <option
-                                        key={category.id}
-                                        value={String(category.id)}
-                                    >
+                                    <option key={category.id} value={String(category.id)}>
                                         {category.name}
                                     </option>
                                 ))
@@ -1292,11 +1171,7 @@ function BestSellersReport({
                 </div>
             )}
 
-            {error && (
-                <p className="revenue-comparison-error">
-                    {error}
-                </p>
-            )}
+            {error && <p className="revenue-comparison-error">{error}</p>}
 
             <section className="rims-bestsellers-list-section">
                 {isLoading ? (
@@ -1326,7 +1201,7 @@ function BestSellersReport({
                                         3,
                                     )}`}
                                 >
-                                    {rank === 1 && <CrownIcon/>}
+                                    {rank === 1 && <CrownIcon />}
                                     <span>{rank}</span>
                                 </span>
                                 <BestSellerDishImage
@@ -1337,9 +1212,7 @@ function BestSellersReport({
                                     <div className="item-title-row">
                                         <strong>{item.dishName}</strong>
                                         <span className="item-category-tag">
-                                            {formatRevenueCurrency(
-                                                item.totalRevenue,
-                                            )}
+                                            {formatRevenueCurrency(item.totalRevenue)}
                                         </span>
                                     </div>
 
@@ -1349,9 +1222,8 @@ function BestSellersReport({
                                             style={{
                                                 width: `${Math.max(
                                                     8,
-                                                    (item.totalQuantity
-                                                        / maxQuantity)
-                                                    * 100,
+                                                    (item.totalQuantity / maxQuantity) *
+                                                        100,
                                                 )}%`,
                                             }}
                                         />
@@ -1374,18 +1246,18 @@ function BestSellersReport({
 }
 
 function OrderShiftDashboard({
-                                 report,
-                                 preset,
-                                 selectedWeek,
-                                 selectedYear,
-                                 weekOptions,
-                                 yearOptions,
-                                 isLoading,
-                                 error,
-                                 onPresetChange,
-                                 onWeekChange,
-                                 onYearChange,
-                             }: {
+    report,
+    preset,
+    selectedWeek,
+    selectedYear,
+    weekOptions,
+    yearOptions,
+    isLoading,
+    error,
+    onPresetChange,
+    onWeekChange,
+    onYearChange,
+}: {
     report: OrderShiftReportResponse | null
     preset: RangePreset
     selectedWeek: WeekOption
@@ -1431,16 +1303,12 @@ function OrderShiftDashboard({
                 </div>
             </header>
 
-            {error && (
-                <p className="revenue-comparison-error">
-                    {error}
-                </p>
-            )}
+            {error && <p className="revenue-comparison-error">{error}</p>}
 
             <div className="order-shift-kpi-grid">
                 <article className="order-shift-kpi-card">
                     <span className="order-shift-kpi-icon icon-green">
-                        <FileIcon/>
+                        <FileIcon />
                     </span>
                     <div>
                         <span>Tổng đơn đã thanh toán</span>
@@ -1450,33 +1318,25 @@ function OrderShiftDashboard({
 
                 <article className="order-shift-kpi-card featured">
                     <span className="order-shift-kpi-icon icon-orange">
-                        <TrophyIcon/>
+                        <TrophyIcon />
                     </span>
                     <div>
                         <span>Ca có nhiều đơn nhất</span>
-                        <strong>
-                            {highestShift?.displayName
-                                ?? 'Chưa có dữ liệu'}
-                        </strong>
+                        <strong>{highestShift?.displayName ?? 'Chưa có dữ liệu'}</strong>
                         <small>
-                            {formatNumber(highestShift?.orderCount ?? 0)} đơn
-                            {' '}• {formatDecimal(
-                            highestShift?.percentage ?? 0,
-                        )}
-                            %
+                            {formatNumber(highestShift?.orderCount ?? 0)} đơn •{' '}
+                            {formatDecimal(highestShift?.percentage ?? 0)}%
                         </small>
                     </div>
                 </article>
 
                 <article className="order-shift-kpi-card">
                     <span className="order-shift-kpi-icon icon-green">
-                        <TrendingIcon/>
+                        <TrendingIcon />
                     </span>
                     <div>
                         <span>Trung bình mỗi ngày</span>
-                        <strong>
-                            {formatDecimal(averageOrdersPerDay)} đơn
-                        </strong>
+                        <strong>{formatDecimal(averageOrdersPerDay)} đơn</strong>
                     </div>
                 </article>
             </div>
@@ -1501,8 +1361,7 @@ function OrderShiftDashboard({
                             {rows.map((row) => (
                                 <div
                                     className={
-                                        row.shiftName
-                                        === highestShift?.shiftName
+                                        row.shiftName === highestShift?.shiftName
                                             ? 'order-shift-table-row highlighted'
                                             : 'order-shift-table-row'
                                     }
@@ -1512,12 +1371,8 @@ function OrderShiftDashboard({
                                     <span>
                                         {row.startTime} - {row.endTime}
                                     </span>
-                                    <span>
-                                        {formatNumber(row.orderCount)} đơn
-                                    </span>
-                                    <span>
-                                        {formatDecimal(row.percentage)}%
-                                    </span>
+                                    <span>{formatNumber(row.orderCount)} đơn</span>
+                                    <span>{formatDecimal(row.percentage)}%</span>
                                 </div>
                             ))}
 
@@ -1567,10 +1422,8 @@ function OrderShiftDashboard({
                                         <div>
                                             <strong>{row.displayName}</strong>
                                             <span>
-                                                {formatDecimal(row.percentage)}
-                                                % •{' '}
-                                                {formatNumber(row.orderCount)}
-                                                {' '}đơn
+                                                {formatDecimal(row.percentage)}% •{' '}
+                                                {formatNumber(row.orderCount)} đơn
                                             </span>
                                         </div>
                                     </div>
@@ -1585,70 +1438,56 @@ function OrderShiftDashboard({
 }
 
 export default function AdminStatisticsPage() {
-    const [activeReport, setActiveReport] =
-        useState<ReportKey>('revenue')
-    const [revenueData, setRevenueData] =
-        useState<RevenueDashboardData>(emptyRevenueDashboardData)
+    const [activeReport, setActiveReport] = useState<ReportKey>('revenue')
+    const [revenueData, setRevenueData] = useState<RevenueDashboardData>(
+        emptyRevenueDashboardData,
+    )
     const [fromDate, setFromDate] = useState('')
     const [toDate, setToDate] = useState('')
     const [revenueError, setRevenueError] = useState<string | null>(null)
-    const [customRangeError, setCustomRangeError] =
-        useState<string | null>(null)
+    const [customRangeError, setCustomRangeError] = useState<string | null>(null)
     const [isRevenueLoading, setIsRevenueLoading] = useState(true)
     const [isCustomLoading, setIsCustomLoading] = useState(false)
 
     const [categories, setCategories] = useState<CategoryResponse[]>([])
     const [categoryBestSellingPreset, setCategoryBestSellingPreset] =
         useState<RangePreset>('LAST_7')
-    const [categoryBestSellingYear, setCategoryBestSellingYear] =
-        useState(() => new Date().getFullYear())
-    const [
-        selectedCategoryBestSellingWeek,
-        setSelectedCategoryBestSellingWeek,
-    ] =
-        useState<WeekOption>(() =>
-            getDefaultWeek(new Date().getFullYear()),
-        )
+    const [categoryBestSellingYear, setCategoryBestSellingYear] = useState(() =>
+        new Date().getFullYear(),
+    )
+    const [selectedCategoryBestSellingWeek, setSelectedCategoryBestSellingWeek] =
+        useState<WeekOption>(() => getDefaultWeek(new Date().getFullYear()))
     const [selectedBestSellingCategoryId, setSelectedBestSellingCategoryId] =
         useState('ALL')
-    const [categoryBestSellers, setCategoryBestSellers] =
-        useState<BestSellingDishItem[]>([])
-    const [categoryBestSellingError, setCategoryBestSellingError] =
-        useState<string | null>(null)
+    const [categoryBestSellers, setCategoryBestSellers] = useState<BestSellingDishItem[]>(
+        [],
+    )
+    const [categoryBestSellingError, setCategoryBestSellingError] = useState<
+        string | null
+    >(null)
     const [isCategoryBestSellingLoading, setIsCategoryBestSellingLoading] =
         useState(false)
 
-    const [bestSellingPreset, setBestSellingPreset] =
-        useState<RangePreset>('LAST_7')
-    const [bestSellingYear, setBestSellingYear] =
-        useState(() => new Date().getFullYear())
-    const [selectedBestSellingWeek, setSelectedBestSellingWeek] =
-        useState<WeekOption>(() =>
-            getDefaultWeek(new Date().getFullYear()),
-        )
+    const [bestSellingPreset, setBestSellingPreset] = useState<RangePreset>('LAST_7')
+    const [bestSellingYear, setBestSellingYear] = useState(() => new Date().getFullYear())
+    const [selectedBestSellingWeek, setSelectedBestSellingWeek] = useState<WeekOption>(
+        () => getDefaultWeek(new Date().getFullYear()),
+    )
     const [bestSellers, setBestSellers] = useState<BestSellingDishItem[]>([])
-    const [bestSellingError, setBestSellingError] =
-        useState<string | null>(null)
-    const [isBestSellingLoading, setIsBestSellingLoading] =
-        useState(false)
+    const [bestSellingError, setBestSellingError] = useState<string | null>(null)
+    const [isBestSellingLoading, setIsBestSellingLoading] = useState(false)
 
-    const [orderShiftPreset, setOrderShiftPreset] =
-        useState<RangePreset>('LAST_7')
-    const [orderShiftYear, setOrderShiftYear] =
-        useState(() => new Date().getFullYear())
-    const [selectedOrderShiftWeek, setSelectedOrderShiftWeek] =
-        useState<WeekOption>(() =>
-            getDefaultWeek(new Date().getFullYear()),
-        )
+    const [orderShiftPreset, setOrderShiftPreset] = useState<RangePreset>('LAST_7')
+    const [orderShiftYear, setOrderShiftYear] = useState(() => new Date().getFullYear())
+    const [selectedOrderShiftWeek, setSelectedOrderShiftWeek] = useState<WeekOption>(() =>
+        getDefaultWeek(new Date().getFullYear()),
+    )
     const [orderShiftReport, setOrderShiftReport] =
         useState<OrderShiftReportResponse | null>(null)
-    const [orderShiftError, setOrderShiftError] =
-        useState<string | null>(null)
+    const [orderShiftError, setOrderShiftError] = useState<string | null>(null)
     const [isOrderShiftLoading, setIsOrderShiftLoading] = useState(false)
     const yearOptions = getYearOptions()
-    const categoryBestSellingWeekOptions = buildWeekOptions(
-        categoryBestSellingYear,
-    )
+    const categoryBestSellingWeekOptions = buildWeekOptions(categoryBestSellingYear)
     const bestSellingWeekOptions = buildWeekOptions(bestSellingYear)
     const orderShiftWeekOptions = buildWeekOptions(orderShiftYear)
 
@@ -1685,13 +1524,10 @@ export default function AdminStatisticsPage() {
         ])
 
         return () => controller.abort()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    async function loadRevenueDashboard(
-        showFullLoading = true,
-        signal?: AbortSignal,
-    ) {
+    async function loadRevenueDashboard(showFullLoading = true, signal?: AbortSignal) {
         try {
             if (showFullLoading) {
                 setIsRevenueLoading(true)
@@ -1726,12 +1562,7 @@ export default function AdminStatisticsPage() {
             }
 
             console.error(error)
-            setRevenueError(
-                getApiErrorMessage(
-                    error,
-                    'Không thể tải báo cáo doanh thu.',
-                ),
-            )
+            setRevenueError(getApiErrorMessage(error, 'Không thể tải báo cáo doanh thu.'))
         } finally {
             if (showFullLoading && !signal?.aborted) {
                 setIsRevenueLoading(false)
@@ -1747,9 +1578,7 @@ export default function AdminStatisticsPage() {
             const {data} = await categoryApi.getAllCategories(signal)
             const nextCategories = data ?? []
             const defaultCategoryId =
-                nextCategories[0]?.id != null
-                    ? String(nextCategories[0].id)
-                    : 'ALL'
+                nextCategories[0]?.id != null ? String(nextCategories[0].id) : 'ALL'
 
             setCategories(nextCategories)
             setSelectedBestSellingCategoryId(defaultCategoryId)
@@ -1768,10 +1597,7 @@ export default function AdminStatisticsPage() {
 
             console.error(error)
             setCategoryBestSellingError(
-                getApiErrorMessage(
-                    error,
-                    'Không thể tải danh mục món ăn.',
-                ),
+                getApiErrorMessage(error, 'Không thể tải danh mục món ăn.'),
             )
         }
     }
@@ -1785,9 +1611,7 @@ export default function AdminStatisticsPage() {
     ) {
         const range = getRangeFromPreset(preset, selectedWeek)
         const parsedCategoryId =
-            categoryIdValue === 'ALL'
-                ? null
-                : Number(categoryIdValue)
+            categoryIdValue === 'ALL' ? null : Number(categoryIdValue)
         const categoryId =
             parsedCategoryId !== null && Number.isFinite(parsedCategoryId)
                 ? parsedCategoryId
@@ -1855,10 +1679,7 @@ export default function AdminStatisticsPage() {
 
             console.error(error)
             setBestSellingError(
-                getApiErrorMessage(
-                    error,
-                    'Không thể tải dữ liệu món bán chạy.',
-                ),
+                getApiErrorMessage(error, 'Không thể tải dữ liệu món bán chạy.'),
             )
         } finally {
             if (showFullLoading && !signal?.aborted) {
@@ -1971,9 +1792,7 @@ export default function AdminStatisticsPage() {
     }
 
     function handleBestSellingWeekChange(weekValue: string) {
-        const nextWeek = bestSellingWeekOptions.find(
-            (week) => week.value === weekValue,
-        )
+        const nextWeek = bestSellingWeekOptions.find((week) => week.value === weekValue)
 
         if (!nextWeek) {
             return
@@ -1999,9 +1818,7 @@ export default function AdminStatisticsPage() {
     }
 
     function handleOrderShiftWeekChange(weekValue: string) {
-        const nextWeek = orderShiftWeekOptions.find(
-            (week) => week.value === weekValue,
-        )
+        const nextWeek = orderShiftWeekOptions.find((week) => week.value === weekValue)
 
         if (!nextWeek) {
             return
@@ -2017,16 +1834,12 @@ export default function AdminStatisticsPage() {
         const apiToDate = parseManualDateForApi(toDate)
 
         if (!apiFromDate || !apiToDate) {
-            setCustomRangeError(
-                'Vui lòng nhập ngày theo định dạng ngày/tháng/năm.',
-            )
+            setCustomRangeError('Vui lòng nhập ngày theo định dạng ngày/tháng/năm.')
             return
         }
 
         if (apiFromDate > apiToDate) {
-            setCustomRangeError(
-                'Từ ngày phải nhỏ hơn hoặc bằng đến ngày.',
-            )
+            setCustomRangeError('Từ ngày phải nhỏ hơn hoặc bằng đến ngày.')
             return
         }
 
@@ -2034,10 +1847,7 @@ export default function AdminStatisticsPage() {
             setIsCustomLoading(true)
             setCustomRangeError(null)
 
-            const {data} = await adminApi.getCustomRevenue(
-                apiFromDate,
-                apiToDate,
-            )
+            const {data} = await adminApi.getCustomRevenue(apiFromDate, apiToDate)
 
             setRevenueData((currentData) => ({
                 ...currentData,
@@ -2061,9 +1871,7 @@ export default function AdminStatisticsPage() {
             <StatisticsReportSelector
                 activeReport={activeReport}
                 bestSellerCount={bestSellers.length}
-                highestShiftName={
-                    orderShiftReport?.highestOrderShift?.displayName
-                }
+                highestShiftName={orderShiftReport?.highestOrderShift?.displayName}
                 totalRevenue={revenueData.totalRevenue?.revenue}
                 onSelectReport={setActiveReport}
             />

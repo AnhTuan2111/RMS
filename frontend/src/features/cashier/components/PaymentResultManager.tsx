@@ -1,12 +1,6 @@
-﻿import {
-    useState,
-    type CSSProperties,
-} from 'react'
+﻿import {useState, type CSSProperties} from 'react'
 
-import type {
-    OrderDetailResponse,
-    PaymentResponse,
-} from '@/shared/types/cashier'
+import type {OrderDetailResponse, PaymentResponse} from '@/shared/types/cashier'
 
 interface Props {
     paymentResult: PaymentResponse
@@ -34,116 +28,74 @@ function getPaymentMethodLabel(method: string | null | undefined) {
 }
 
 export default function PaymentResultManager({
-                                                 paymentResult,
-                                                 orderDetail,
-                                                 onClose,
-                                                 onDownload,
-                                             }: Props) {
-    const [step, setStep] =
-        useState<ResultStep>('SUCCESS')
+    paymentResult,
+    orderDetail,
+    onClose,
+    onDownload,
+}: Props) {
+    const [step, setStep] = useState<ResultStep>('SUCCESS')
 
-    const itemsList =
-        orderDetail.orderItems ?? []
+    const itemsList = orderDetail.orderItems ?? []
 
-    const beforeVat =
-        orderDetail.totalAmountBeforeVat ?? 0
+    const beforeVat = orderDetail.totalAmountBeforeVat ?? 0
 
-    const vatAmount =
-        orderDetail.vatAmount ?? 0
+    const vatAmount = orderDetail.vatAmount ?? 0
 
-    const invoiceId =
-        paymentResult.invoiceId
+    const invoiceId = paymentResult.invoiceId
 
-    const finalAmount =
-        paymentResult.finalAmount
+    const finalAmount = paymentResult.finalAmount
 
-    const customerName =
-        paymentResult.customerName
+    const customerName = paymentResult.customerName
 
-    const pointsUsed =
-        paymentResult.pointsUsed ?? 0
+    const pointsUsed = paymentResult.pointsUsed ?? 0
 
-    const pointsEarned =
-        paymentResult.pointsEarned ?? 0
+    const pointsEarned = paymentResult.pointsEarned ?? 0
 
-    const amountPaid =
-        paymentResult.amountPaid ?? 0
+    const amountPaid = paymentResult.amountPaid ?? 0
 
-    const excessAmount =
-        paymentResult.excessAmount ?? 0
+    const excessAmount = paymentResult.excessAmount ?? 0
 
-    const paymentMethodLabel =
-        getPaymentMethodLabel(
-            paymentResult.paymentMethod,
-        )
+    const paymentMethodLabel = getPaymentMethodLabel(paymentResult.paymentMethod)
 
     if (step === 'SUCCESS') {
         return (
-            <div
-                style={successScreenStyle}
-                onClick={() => setStep('BILL')}
-            >
-                <div style={successIconStyle}>
-                    ✔
-                </div>
+            <div style={successScreenStyle} onClick={() => setStep('BILL')}>
+                <div style={successIconStyle}>✔</div>
 
-                <h1 style={successTitleStyle}>
-                    THANH TOÁN THÀNH CÔNG
-                </h1>
+                <h1 style={successTitleStyle}>THANH TOÁN THÀNH CÔNG</h1>
 
-                <p style={successInvoiceStyle}>
-                    Mã hóa đơn: INV-{invoiceId}
-                </p>
+                <p style={successInvoiceStyle}>Mã hóa đơn: INV-{invoiceId}</p>
 
                 {customerName && (
                     <div style={successCustomerBoxStyle}>
                         <p style={successCustomerNameStyle}>
-                            Khách hàng:{' '}
-                            <strong>{customerName}</strong>
+                            Khách hàng: <strong>{customerName}</strong>
                         </p>
 
                         <p style={successPointsStyle}>
-                            Tích lũy thêm:{' '}
-                            <strong>
-                                +{pointsEarned} điểm
-                            </strong>
+                            Tích lũy thêm: <strong>+{pointsEarned} điểm</strong>
                         </p>
                     </div>
                 )}
 
-                <p style={successHintStyle}>
-                    — Chạm vào màn hình để xem hóa đơn —
-                </p>
+                <p style={successHintStyle}>— Chạm vào màn hình để xem hóa đơn —</p>
             </div>
         )
     }
 
     return (
         <div style={billOverlayStyle}>
-            <div
-                className="page-card"
-                style={billCardStyle}
-            >
+            <div className="page-card" style={billCardStyle}>
                 <h2 style={billTitleStyle}>
                     HÓA ĐƠN THANH TOÁN
-
-                    <div style={billCodeStyle}>
-                        Mã: INV-{invoiceId}
-                    </div>
+                    <div style={billCodeStyle}>Mã: INV-{invoiceId}</div>
                 </h2>
 
                 <div style={tableWrapperStyle}>
-                    <div className="simple-table"
-                         style={{ minWidth: 0 }}
-                    >
-                        <div
-                            className="simple-table-header"
-                            style={tableHeaderStyle}
-                        >
+                    <div className="simple-table" style={{minWidth: 0}}>
+                        <div className="simple-table-header" style={tableHeaderStyle}>
                             <span style={cellStyle}>Món ăn</span>
-                            <span style={{...centerTextStyle, ...cellStyle}}>
-                                SL
-                            </span>
+                            <span style={{...centerTextStyle, ...cellStyle}}>SL</span>
                             <span style={{...rightTextStyle, ...cellStyle}}>
                                 Thành tiền
                             </span>
@@ -160,9 +112,7 @@ export default function PaymentResultManager({
                                         key={`${item.dishName}-${index}`}
                                         style={tableRowStyle}
                                     >
-                                        <span style={cellStyle}>
-                                            {item.dishName}
-                                        </span>
+                                        <span style={cellStyle}>{item.dishName}</span>
 
                                         <span style={{...rightTextStyle, ...cellStyle}}>
                                             {item.quantity}
@@ -179,10 +129,7 @@ export default function PaymentResultManager({
                 </div>
 
                 <div style={summaryBoxStyle}>
-                    <SummaryRow
-                        label="Tạm tính:"
-                        value={formatCurrency(beforeVat)}
-                    />
+                    <SummaryRow label="Tạm tính:" value={formatCurrency(beforeVat)} />
 
                     <SummaryRow
                         label="Thuế VAT (10%):"
@@ -221,16 +168,11 @@ export default function PaymentResultManager({
                         style={{
                             ...totalRowStyle,
                             paddingTop: customerName ? 0 : 12,
-                            borderTop:
-                                customerName
-                                    ? 'none'
-                                    : '1px dashed #cbd5e1',
+                            borderTop: customerName ? 'none' : '1px dashed #cbd5e1',
                         }}
                     >
                         <span>TỔNG THANH TOÁN:</span>
-                        <span>
-                            {formatCurrency(finalAmount)}
-                        </span>
+                        <span>{formatCurrency(finalAmount)}</span>
                     </div>
 
                     <div style={paymentMethodRowStyle}>
@@ -257,18 +199,12 @@ export default function PaymentResultManager({
                     <button
                         type="button"
                         style={downloadButtonStyle}
-                        onClick={() =>
-                            void onDownload(invoiceId)
-                        }
+                        onClick={() => void onDownload(invoiceId)}
                     >
                         📥 Tải PDF
                     </button>
 
-                    <button
-                        type="button"
-                        style={closeButtonStyle}
-                        onClick={onClose}
-                    >
+                    <button type="button" style={closeButtonStyle} onClick={onClose}>
                         Đóng & Tiếp tục
                     </button>
                 </div>
@@ -278,13 +214,13 @@ export default function PaymentResultManager({
 }
 
 function SummaryRow({
-                        label,
-                        value,
-                        color = '#475569',
-                        bold = false,
-                        strongValue = false,
-                        marginBottom = 6,
-                    }: {
+    label,
+    value,
+    color = '#475569',
+    bold = false,
+    strongValue = false,
+    marginBottom = 6,
+}: {
     label: string
     value: string
     color?: string
@@ -305,11 +241,7 @@ function SummaryRow({
         >
             <span>{label}</span>
 
-            {strongValue ? (
-                <strong>{value}</strong>
-            ) : (
-                <span>{value}</span>
-            )}
+            {strongValue ? <strong>{value}</strong> : <span>{value}</span>}
         </div>
     )
 }

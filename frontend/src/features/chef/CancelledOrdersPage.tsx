@@ -1,8 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react'
-import {
-    getCancelledOrders,
-    type CancelledOrderResponse,
-} from '@/shared/api/chef'
+﻿import {useEffect, useMemo, useState} from 'react'
+import {getCancelledOrders, type CancelledOrderResponse} from '@/shared/api/chef'
 
 const ITEMS_PER_PAGE = 20
 
@@ -27,13 +24,11 @@ function formatDateTime(value?: string) {
 }
 
 export default function CancelledOrdersPage() {
-    const [items, setItems] =
-        useState<CancelledOrderResponse[]>([])
+    const [items, setItems] = useState<CancelledOrderResponse[]>([])
 
     const [searchText, setSearchText] = useState('')
     const [isLoading, setIsLoading] = useState(true)
-    const [error, setError] =
-        useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null)
 
     const [currentPage, setCurrentPage] = useState(1)
 
@@ -52,8 +47,8 @@ export default function CancelledOrdersPage() {
             console.error(requestError)
 
             setError(
-                'Không thể tải danh sách món đã hủy. '
-                + 'Hãy kiểm tra backend hoặc tài khoản Chef.',
+                'Không thể tải danh sách món đã hủy. ' +
+                    'Hãy kiểm tra backend hoặc tài khoản Chef.',
             )
         } finally {
             setIsLoading(false)
@@ -61,8 +56,7 @@ export default function CancelledOrdersPage() {
     }
 
     const filteredItems = useMemo(() => {
-        const keyword =
-            searchText.trim().toLowerCase()
+        const keyword = searchText.trim().toLowerCase()
 
         return items
             .filter((item) => {
@@ -71,19 +65,11 @@ export default function CancelledOrdersPage() {
                 }
 
                 return (
-                    item.dishName
-                        .toLowerCase()
-                        .includes(keyword)
-                    || item.tableNumber
-                        .toLowerCase()
-                        .includes(keyword)
-                    || String(item.orderId)
-                        .includes(keyword)
-                    || String(item.orderItemId)
-                        .includes(keyword)
-                    || (item.cancelReason ?? '')
-                        .toLowerCase()
-                        .includes(keyword)
+                    item.dishName.toLowerCase().includes(keyword) ||
+                    item.tableNumber.toLowerCase().includes(keyword) ||
+                    String(item.orderId).includes(keyword) ||
+                    String(item.orderItemId).includes(keyword) ||
+                    (item.cancelReason ?? '').toLowerCase().includes(keyword)
                 )
             })
             .sort((firstItem, secondItem) => {
@@ -103,27 +89,17 @@ export default function CancelledOrdersPage() {
             })
     }, [items, searchText])
 
-    const totalPages = Math.max(
-        1,
-        Math.ceil(filteredItems.length / ITEMS_PER_PAGE),
-    )
+    const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE))
 
     const safeCurrentPage = Math.min(currentPage, totalPages)
 
     const startIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE
 
-    const paginatedItems = filteredItems.slice(
-        startIndex,
-        startIndex + ITEMS_PER_PAGE,
-    )
+    const paginatedItems = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE)
 
-    const firstVisibleItem =
-        filteredItems.length === 0 ? 0 : startIndex + 1
+    const firstVisibleItem = filteredItems.length === 0 ? 0 : startIndex + 1
 
-    const lastVisibleItem = Math.min(
-        startIndex + ITEMS_PER_PAGE,
-        filteredItems.length,
-    )
+    const lastVisibleItem = Math.min(startIndex + ITEMS_PER_PAGE, filteredItems.length)
 
     const pageNumbersToShow = useMemo(() => {
         const pages: (number | 'ellipsis')[] = []
@@ -173,11 +149,7 @@ export default function CancelledOrdersPage() {
     }, [totalPages, safeCurrentPage])
 
     if (isLoading) {
-        return (
-            <section className="page-card">
-                Đang tải danh sách món đã hủy...
-            </section>
-        )
+        return <section className="page-card">Đang tải danh sách món đã hủy...</section>
     }
 
     if (error) {
@@ -185,16 +157,12 @@ export default function CancelledOrdersPage() {
             <section className="page-card">
                 <h2>Lỗi tải dữ liệu</h2>
 
-                <p className="modal-error">
-                    {error}
-                </p>
+                <p className="modal-error">{error}</p>
 
                 <button
                     type="button"
                     className="primary-button"
-                    onClick={() =>
-                        void loadCancelledOrders()
-                    }
+                    onClick={() => void loadCancelledOrders()}
                 >
                     Thử lại
                 </button>
@@ -210,9 +178,8 @@ export default function CancelledOrdersPage() {
                         <h2>Món đã hủy hôm nay</h2>
 
                         <p>
-                            Danh sách món Chef hủy trực tiếp
-                            hoặc tự động bị hủy khi món được
-                            đánh dấu tạm hết, trong ngày hôm nay.
+                            Danh sách món Chef hủy trực tiếp hoặc tự động bị hủy khi món
+                            được đánh dấu tạm hết, trong ngày hôm nay.
                         </p>
                     </div>
 
@@ -220,9 +187,7 @@ export default function CancelledOrdersPage() {
                         <button
                             type="button"
                             className="secondary-button"
-                            onClick={() =>
-                                void loadCancelledOrders()
-                            }
+                            onClick={() => void loadCancelledOrders()}
                         >
                             Làm mới
                         </button>
@@ -241,10 +206,7 @@ export default function CancelledOrdersPage() {
                     <input
                         type="search"
                         value={searchText}
-                        placeholder={
-                            'Tìm tên món, bàn, mã đơn '
-                            + 'hoặc lý do hủy...'
-                        }
+                        placeholder={'Tìm tên món, bàn, mã đơn ' + 'hoặc lý do hủy...'}
                         onChange={(event) => {
                             setSearchText(event.target.value)
                             setCurrentPage(1)
@@ -275,8 +237,8 @@ export default function CancelledOrdersPage() {
 
                         <p>
                             {items.length === 0
-                                ? 'Các món có trạng thái CANCELLED '
-                                + 'sẽ xuất hiện tại đây.'
+                                ? 'Các món có trạng thái CANCELLED ' +
+                                  'sẽ xuất hiện tại đây.'
                                 : 'Hãy thử thay đổi từ khóa tìm kiếm.'}
                         </p>
                     </div>
@@ -298,40 +260,31 @@ export default function CancelledOrdersPage() {
                                         <h3>{item.dishName}</h3>
                                     </div>
 
-                                    <span className="status-badge danger">
-                                        Đã hủy
-                                    </span>
+                                    <span className="status-badge danger">Đã hủy</span>
                                 </div>
 
                                 <div className="completed-order-info">
                                     <div>
                                         <small>BÀN</small>
-                                        <strong>
-                                            {item.tableNumber}
-                                        </strong>
+                                        <strong>{item.tableNumber}</strong>
                                     </div>
 
                                     <div>
                                         <small>SỐ LƯỢNG</small>
-                                        <strong>
-                                            x{item.quantity}
-                                        </strong>
+                                        <strong>x{item.quantity}</strong>
                                     </div>
 
                                     <div>
                                         <small>THỜI GIAN HỦY</small>
                                         <strong>
-                                            {formatDateTime(
-                                                item.cancelledAt,
-                                            )}
+                                            {formatDateTime(item.cancelledAt)}
                                         </strong>
                                     </div>
 
                                     <div>
                                         <small>LÝ DO HỦY</small>
                                         <strong>
-                                            {item.cancelReason
-                                                || 'Không có lý do'}
+                                            {item.cancelReason || 'Không có lý do'}
                                         </strong>
                                     </div>
                                 </div>
@@ -361,29 +314,29 @@ export default function CancelledOrdersPage() {
 
                         <div className="pagination-pages">
                             {pageNumbersToShow.map((pageNumber, index) =>
-                                    pageNumber === 'ellipsis' ? (
-                                        <span
-                                            key={`ellipsis-${index}`}
-                                            className="pagination-ellipsis"
-                                        >
-                            …
-                        </span>
-                                    ) : (
-                                        <button
-                                            type="button"
-                                            key={pageNumber}
-                                            className={
-                                                pageNumber === safeCurrentPage
-                                                    ? 'pagination-number active'
-                                                    : 'pagination-number'
-                                            }
-                                            onClick={() => {
-                                                setCurrentPage(pageNumber)
-                                            }}
-                                        >
-                                            {pageNumber}
-                                        </button>
-                                    ),
+                                pageNumber === 'ellipsis' ? (
+                                    <span
+                                        key={`ellipsis-${index}`}
+                                        className="pagination-ellipsis"
+                                    >
+                                        …
+                                    </span>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        key={pageNumber}
+                                        className={
+                                            pageNumber === safeCurrentPage
+                                                ? 'pagination-number active'
+                                                : 'pagination-number'
+                                        }
+                                        onClick={() => {
+                                            setCurrentPage(pageNumber)
+                                        }}
+                                    >
+                                        {pageNumber}
+                                    </button>
+                                ),
                             )}
                         </div>
 

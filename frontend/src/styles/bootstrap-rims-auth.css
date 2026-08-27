@@ -11,9 +11,9 @@
     display: grid;
     place-items: center;
     padding: 1.5rem;
-    background: radial-gradient(circle at top left, rgba(122, 16, 48, 0.22), transparent 35%),
-    radial-gradient(circle at bottom right, rgba(212, 175, 55, 0.14), transparent 35%),
-    #14090b;
+    background:
+        radial-gradient(circle at top left, rgba(122, 16, 48, 0.22), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(212, 175, 55, 0.14), transparent 35%), #14090b;
 }
 
 .login-card {
@@ -122,8 +122,6 @@
     font-size: 0.9rem;
     line-height: 1.5;
 }
-
-
 
 /* Old auth compatibility */
 

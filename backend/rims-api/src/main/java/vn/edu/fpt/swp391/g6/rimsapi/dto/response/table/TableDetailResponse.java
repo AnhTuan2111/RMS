@@ -1,10 +1,10 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.table;
 
-import lombok.*;
-import vn.edu.fpt.swp391.g6.rimsapi.enums.TableStatus;
-
 import java.time.LocalDateTime;
 
+import lombok.*;
+
+import vn.edu.fpt.swp391.g6.rimsapi.enums.TableStatus;
 
 @Getter
 @Setter

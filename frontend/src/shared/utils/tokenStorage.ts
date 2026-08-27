@@ -2,8 +2,7 @@ const ACCESS_TOKEN_KEY = 'accessToken'
 const REFRESH_TOKEN_KEY = 'refreshToken'
 
 function canUseLocalStorage() {
-    return typeof window !== 'undefined'
-        && typeof window.localStorage !== 'undefined'
+    return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
 }
 
 function readStorageValue(key: string) {
@@ -18,10 +17,7 @@ function readStorageValue(key: string) {
     }
 }
 
-function writeStorageValue(
-    key: string,
-    value: string,
-) {
+function writeStorageValue(key: string, value: string) {
     if (!canUseLocalStorage()) {
         return
     }
@@ -53,19 +49,10 @@ export function getRefreshToken() {
     return readStorageValue(REFRESH_TOKEN_KEY)
 }
 
-export function setTokens(
-    accessToken: string,
-    refreshToken: string,
-) {
-    writeStorageValue(
-        ACCESS_TOKEN_KEY,
-        accessToken,
-    )
+export function setTokens(accessToken: string, refreshToken: string) {
+    writeStorageValue(ACCESS_TOKEN_KEY, accessToken)
 
-    writeStorageValue(
-        REFRESH_TOKEN_KEY,
-        refreshToken,
-    )
+    writeStorageValue(REFRESH_TOKEN_KEY, refreshToken)
 }
 
 export function clearTokens() {

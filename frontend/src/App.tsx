@@ -4,7 +4,7 @@ import AppRoutes from './app/routes'
 function App() {
     return (
         <AppProviders>
-            <AppRoutes/>
+            <AppRoutes />
         </AppProviders>
     )
 }

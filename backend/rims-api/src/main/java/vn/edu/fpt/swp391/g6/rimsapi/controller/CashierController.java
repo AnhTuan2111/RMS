@@ -1,12 +1,17 @@
 package vn.edu.fpt.swp391.g6.rimsapi.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.payment.PaymentRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.order.OrderDetailResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.payment.PaymentResponse;
@@ -14,15 +19,10 @@ import vn.edu.fpt.swp391.g6.rimsapi.dto.response.payment.VNPayResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.report.CashierInvoiceDetailResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.report.PagedInvoiceResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.table.TableDashboardResponse;
-import vn.edu.fpt.swp391.g6.rimsapi.entity.Invoice;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.User;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.PaymentMethod;
 import vn.edu.fpt.swp391.g6.rimsapi.service.CashierService;
 import vn.edu.fpt.swp391.g6.rimsapi.service.InvoicePdfService;
-
-import java.util.List;
-import java.util.Map;
-
 
 @RestController
 @RequestMapping("/rims/cashier")
@@ -50,8 +50,7 @@ public class CashierController
     @PostMapping("/orders/{id}/payment")
     public ResponseEntity<PaymentResponse> processPayment(
             @PathVariable Long id,
-            @RequestBody PaymentRequest request
-    )
+            @RequestBody PaymentRequest request)
     {
         return ResponseEntity.ok(cashierService.processPayment(id, request));
     }
@@ -70,8 +69,7 @@ public class CashierController
     @PostMapping("/orders/{id}/complete-cash")
     public ResponseEntity<PaymentResponse> completeCashPayment(
             @PathVariable Long id,
-            @RequestBody PaymentRequest request
-    )
+            @RequestBody PaymentRequest request)
     {
         return ResponseEntity.ok(cashierService.completeCashPayment(id, request));
     }
@@ -81,8 +79,7 @@ public class CashierController
     public ResponseEntity<VNPayResponse> getVNPayQrCode(
             @PathVariable Long id,
             @RequestParam(required = false) Integer customerId,
-            @RequestParam(required = false) Integer pointsUsed
-    )
+            @RequestParam(required = false) Integer pointsUsed)
     {
         return ResponseEntity.ok(cashierService.createVNPayPaymentUrl(id, customerId, pointsUsed));
     }
@@ -138,26 +135,28 @@ public class CashierController
     }
 
     @GetMapping("/customers/search")
-    public ResponseEntity<?> searchCustomer(@RequestParam String phone) {
+    public ResponseEntity<?> searchCustomer(@RequestParam String phone)
+    {
         User customer = cashierService.searchCustomerByPhone(phone);
-        if (customer == null) return ResponseEntity.notFound().build();
+        if (customer == null)
+            return ResponseEntity.notFound().build();
         return ResponseEntity.ok(Map.of(
                 "id", customer.getId(),
                 "fullName", customer.getFullName(),
                 "phone", customer.getPhone(),
-                "rewardPoints", customer.getRewardPoints()
-        ));
+                "rewardPoints", customer.getRewardPoints()));
     }
 
     @PostMapping("/customers/create")
-    public ResponseEntity<?> createCustomer(@RequestBody Map<String, String> body) {
-        User newCustomer = cashierService.createCustomerFast(body.get("fullName"), body.get("phone"), body.get("email"));
+    public ResponseEntity<?> createCustomer(@RequestBody Map<String, String> body)
+    {
+        User newCustomer = cashierService.createCustomerFast(body.get("fullName"), body.get("phone"),
+                body.get("email"));
         return ResponseEntity.ok(Map.of(
                 "id", newCustomer.getId(),
                 "fullName", newCustomer.getFullName(),
                 "phone", newCustomer.getPhone(),
-                "rewardPoints", newCustomer.getRewardPoints()
-        ));
+                "rewardPoints", newCustomer.getRewardPoints()));
     }
 
     @GetMapping("/invoices/today")
@@ -167,10 +166,10 @@ public class CashierController
             @RequestParam(required = false) String tableNumber,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String paymentMethod,
-            @RequestParam(required = false) String invoiceCode
-    )
+            @RequestParam(required = false) String invoiceCode)
     {
-        return ResponseEntity.ok(cashierService.getTodayInvoices(tableNumber, keyword, paymentMethod, invoiceCode, page, size));
+        return ResponseEntity
+                .ok(cashierService.getTodayInvoices(tableNumber, keyword, paymentMethod, invoiceCode, page, size));
     }
 
     @GetMapping("/invoices/{invoiceId}")

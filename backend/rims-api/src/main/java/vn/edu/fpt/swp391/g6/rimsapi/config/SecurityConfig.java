@@ -10,11 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter; // Filter mặc định xử lý login form (ta sẽ chèn JWT filter trước nó)
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import vn.edu.fpt.swp391.g6.rimsapi.security.JwtAccessDeniedHandler;
 import vn.edu.fpt.swp391.g6.rimsapi.security.JwtAuthenticationEntryPoint;
-import vn.edu.fpt.swp391.g6.rimsapi.security.JwtAuthenticationFilter; // Dùng để xác thực user cho mỗi request, đọc file này sẽ rõ
-
+import vn.edu.fpt.swp391.g6.rimsapi.security.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity // Kích hoạt toàn bộ cơ chế Spring Security cho ứng dụng web. Khi annotation này được bật, Spring sẽ tạo ra chuỗi Security Filter để xử lý mọi HTTP Request trước khi request đi vào Controller. Nói cách khác, mọi request từ client đều phải đi qua các lớp bảo mật trước rồi mới đến tầng nghiệp vụ.
@@ -62,7 +62,8 @@ public class SecurityConfig
                                 "/rims/auth/logout",
                                 "/rims/auth/refresh",
                                 "/rims/auth/forgot-password",
-                                "/rims/auth/reset-password").permitAll() // Đều KHÔNG cần token vì user chưa đăng nhập lúc gọi các API này
+                                "/rims/auth/reset-password")
+                        .permitAll() // Đều KHÔNG cần token vì user chưa đăng nhập lúc gọi các API này
 
                         // Kết nối WebSocket có quá trình bắt tay (Handshake) riêng
                         // Sau khi kết nối được thiết lập, việc xác thực người dùng được thực hiện ở tầng STOMP thông qua interceptor StompAuthChannelInterceptor, thay vì Security Filter của HTTP.
@@ -79,8 +80,7 @@ public class SecurityConfig
                         .requestMatchers("/rims/customer/**").hasRole("CUSTOMER")
 
                         // Mọi request không khớp bất kỳ rule nào phía trên đều phải đăng nhập.
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
 
                 // Chèn "jwtAuthenticationFilter" chạy TRƯỚC filter mặc định "UsernamePasswordAuthenticationFilter" của Spring Security
                 // Điều này có nghĩa là ngay khi request đi vào hệ thống, JWT Filter sẽ chạy trước để:

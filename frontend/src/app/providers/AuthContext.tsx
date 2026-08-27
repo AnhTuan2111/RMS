@@ -9,10 +9,7 @@ import {
 } from 'react'
 
 import * as authApi from '@/shared/api/auth'
-import type {
-    AuthUser,
-    LoginRequest,
-} from '@/shared/types/auth'
+import type {AuthUser, LoginRequest} from '@/shared/types/auth'
 import {hasAccessToken} from '@/shared/utils/tokenStorage'
 import {getErrorMessage} from '@/shared/utils/error'
 
@@ -26,8 +23,7 @@ interface AuthContextValue {
     clearError: () => void
 }
 
-const AuthContext =
-    createContext<AuthContextValue | null>(null)
+const AuthContext = createContext<AuthContextValue | null>(null)
 
 function isRequestCanceled(error: unknown) {
     if (typeof error !== 'object' || error === null) {
@@ -41,29 +37,21 @@ function isRequestCanceled(error: unknown) {
     }
 
     return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
+        requestError.name === 'CanceledError' ||
+        requestError.code === 'ERR_CANCELED' ||
+        requestError.message === 'canceled'
     )
 }
 
-export function AuthProvider({
-                                 children,
-                             }: {
-    children: ReactNode
-}) {
-    const [user, setUser] =
-        useState<AuthUser | null>(null)
+export function AuthProvider({children}: {children: ReactNode}) {
+    const [user, setUser] = useState<AuthUser | null>(null)
 
-    const [isLoading, setIsLoading] =
-        useState(true)
+    const [isLoading, setIsLoading] = useState(true)
 
-    const [error, setError] =
-        useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        const controller =
-            new AbortController()
+        const controller = new AbortController()
 
         async function restoreSession() {
             if (!hasAccessToken()) {
@@ -72,10 +60,7 @@ export function AuthProvider({
             }
 
             try {
-                const currentUser =
-                    await authApi.getCurrentUser(
-                        controller.signal,
-                    )
+                const currentUser = await authApi.getCurrentUser(controller.signal)
 
                 if (controller.signal.aborted) {
                     return
@@ -83,17 +68,11 @@ export function AuthProvider({
 
                 setUser(currentUser)
             } catch (requestError: unknown) {
-                if (
-                    controller.signal.aborted
-                    || isRequestCanceled(requestError)
-                ) {
+                if (controller.signal.aborted || isRequestCanceled(requestError)) {
                     return
                 }
 
-                console.error(
-                    '[AUTH_RESTORE_SESSION_ERROR]',
-                    requestError,
-                )
+                console.error('[AUTH_RESTORE_SESSION_ERROR]', requestError)
 
                 await authApi.logout()
                 setUser(null)
@@ -111,98 +90,65 @@ export function AuthProvider({
         }
     }, [])
 
-    const login =
-        useCallback(
-            async (request: LoginRequest) => {
-                setError(null)
-                setIsLoading(true)
+    const login = useCallback(async (request: LoginRequest) => {
+        setError(null)
+        setIsLoading(true)
 
-                try {
-                    const loggedInUser =
-                        await authApi.login(request)
+        try {
+            const loggedInUser = await authApi.login(request)
 
-                    setUser(loggedInUser)
-                } catch (requestError: unknown) {
-                    if (isRequestCanceled(requestError)) {
-                        return
-                    }
+            setUser(loggedInUser)
+        } catch (requestError: unknown) {
+            if (isRequestCanceled(requestError)) {
+                return
+            }
 
-                    console.error(
-                        '[AUTH_LOGIN_ERROR]',
-                        requestError,
-                    )
+            console.error('[AUTH_LOGIN_ERROR]', requestError)
 
-                    setError(
-                        getErrorMessage(requestError),
-                    )
+            setError(getErrorMessage(requestError))
 
-                    throw requestError
-                } finally {
-                    setIsLoading(false)
-                }
-            },
-            [],
-        )
+            throw requestError
+        } finally {
+            setIsLoading(false)
+        }
+    }, [])
 
-    const logout =
-        useCallback(
-            async () => {
-                setIsLoading(true)
+    const logout = useCallback(async () => {
+        setIsLoading(true)
 
-                try {
-                    await authApi.logout()
-                } finally {
-                    setUser(null)
-                    setError(null)
-                    setIsLoading(false)
-                }
-            },
-            [],
-        )
+        try {
+            await authApi.logout()
+        } finally {
+            setUser(null)
+            setError(null)
+            setIsLoading(false)
+        }
+    }, [])
 
-    const clearError =
-        useCallback(
-            () => setError(null),
-            [],
-        )
+    const clearError = useCallback(() => setError(null), [])
 
-    const value =
-        useMemo<AuthContextValue>(
-            () => ({
-                user,
-                isAuthenticated: user !== null,
-                isLoading,
-                error,
-                login,
-                logout,
-                clearError,
-            }),
-            [
-                user,
-                isLoading,
-                error,
-                login,
-                logout,
-                clearError,
-            ],
-        )
-
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
+    const value = useMemo<AuthContextValue>(
+        () => ({
+            user,
+            isAuthenticated: user !== null,
+            isLoading,
+            error,
+            login,
+            logout,
+            clearError,
+        }),
+        [user, isLoading, error, login, logout, clearError],
     )
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 /* eslint-disable react-refresh/only-export-components */
 export function useAuth(): AuthContextValue {
-    const context =
-        useContext(AuthContext)
+    const context = useContext(AuthContext)
 
     if (!context) {
-        throw new Error(
-            'useAuth phải được sử dụng bên trong AuthProvider',
-        )
+        throw new Error('useAuth phải được sử dụng bên trong AuthProvider')
     }
 
     return context

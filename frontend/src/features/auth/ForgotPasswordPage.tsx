@@ -1,29 +1,12 @@
-﻿import {
-    useState,
-    type CSSProperties,
-    type KeyboardEvent,
-} from 'react'
-import {
-    Link,
-    useNavigate,
-} from 'react-router-dom'
+﻿import {useState, type CSSProperties, type KeyboardEvent} from 'react'
+import {Link, useNavigate} from 'react-router-dom'
 
-import {
-    forgotPassword,
-    resetPassword,
-} from '@/shared/api/auth'
+import {forgotPassword, resetPassword} from '@/shared/api/auth'
 import {getErrorMessage} from '@/shared/utils/error'
 
-type Step =
-    | 'email'
-    | 'otp'
-    | 'done'
+type Step = 'email' | 'otp' | 'done'
 
-const STEPS: Step[] = [
-    'email',
-    'otp',
-    'done',
-]
+const STEPS: Step[] = ['email', 'otp', 'done']
 
 const STEP_LABELS: Record<Step, string> = {
     email: 'Nhập email',
@@ -43,9 +26,9 @@ function isRequestCanceled(error: unknown) {
     }
 
     return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
+        requestError.name === 'CanceledError' ||
+        requestError.code === 'ERR_CANCELED' ||
+        requestError.message === 'canceled'
     )
 }
 
@@ -56,33 +39,24 @@ function isValidEmail(value: string) {
 export default function ForgotPasswordPage() {
     const navigate = useNavigate()
 
-    const [step, setStep] =
-        useState<Step>('email')
+    const [step, setStep] = useState<Step>('email')
 
-    const [email, setEmail] =
-        useState('')
+    const [email, setEmail] = useState('')
 
-    const [otp, setOtp] =
-        useState('')
+    const [otp, setOtp] = useState('')
 
-    const [newPassword, setNewPassword] =
-        useState('')
+    const [newPassword, setNewPassword] = useState('')
 
-    const [confirmPassword, setConfirmPassword] =
-        useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
 
-    const [isLoading, setIsLoading] =
-        useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
-    const [error, setError] =
-        useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null)
 
-    const currentStepIdx =
-        STEPS.indexOf(step)
+    const currentStepIdx = STEPS.indexOf(step)
 
     async function handleSendOtp() {
-        const normalizedEmail =
-            email.trim()
+        const normalizedEmail = email.trim()
 
         if (!normalizedEmail) {
             setError('Vui lòng nhập email')
@@ -106,14 +80,9 @@ export default function ForgotPasswordPage() {
                 return
             }
 
-            console.error(
-                '[FORGOT_PASSWORD_SEND_OTP_ERROR]',
-                requestError,
-            )
+            console.error('[FORGOT_PASSWORD_SEND_OTP_ERROR]', requestError)
 
-            setError(
-                getErrorMessage(requestError),
-            )
+            setError(getErrorMessage(requestError))
         } finally {
             setIsLoading(false)
         }
@@ -139,11 +108,7 @@ export default function ForgotPasswordPage() {
         setError(null)
 
         try {
-            await resetPassword(
-                email.trim(),
-                otp,
-                newPassword,
-            )
+            await resetPassword(email.trim(), otp, newPassword)
 
             setStep('done')
         } catch (requestError: unknown) {
@@ -151,31 +116,22 @@ export default function ForgotPasswordPage() {
                 return
             }
 
-            console.error(
-                '[FORGOT_PASSWORD_RESET_ERROR]',
-                requestError,
-            )
+            console.error('[FORGOT_PASSWORD_RESET_ERROR]', requestError)
 
-            setError(
-                getErrorMessage(requestError),
-            )
+            setError(getErrorMessage(requestError))
         } finally {
             setIsLoading(false)
         }
     }
 
-    function handleEmailKeyDown(
-        event: KeyboardEvent<HTMLInputElement>,
-    ) {
+    function handleEmailKeyDown(event: KeyboardEvent<HTMLInputElement>) {
         if (event.key === 'Enter') {
             event.preventDefault()
             void handleSendOtp()
         }
     }
 
-    function handleResetKeyDown(
-        event: KeyboardEvent<HTMLInputElement>,
-    ) {
+    function handleResetKeyDown(event: KeyboardEvent<HTMLInputElement>) {
         if (event.key === 'Enter') {
             event.preventDefault()
             void handleResetPassword()
@@ -193,10 +149,7 @@ export default function ForgotPasswordPage() {
     return (
         <main className="login-page">
             <section className="login-card">
-                <Link
-                    className="login-back-link"
-                    to="/login"
-                >
+                <Link className="login-back-link" to="/login">
                     ← Quay lại đăng nhập
                 </Link>
 
@@ -211,10 +164,7 @@ export default function ForgotPasswordPage() {
                             key={stepItem}
                             style={{
                                 ...stepItemStyle,
-                                flex:
-                                    index < STEPS.length - 1
-                                        ? 1
-                                        : 'none',
+                                flex: index < STEPS.length - 1 ? 1 : 'none',
                             }}
                         >
                             <div style={stepInnerStyle}>
@@ -225,17 +175,13 @@ export default function ForgotPasswordPage() {
                                             index < currentStepIdx
                                                 ? '#22c55e'
                                                 : index === currentStepIdx
-                                                    ? '#7a1030'
-                                                    : '#e5e7eb',
+                                                  ? '#7a1030'
+                                                  : '#e5e7eb',
                                         color:
-                                            index <= currentStepIdx
-                                                ? '#fff'
-                                                : '#9ca3af',
+                                            index <= currentStepIdx ? '#fff' : '#9ca3af',
                                     }}
                                 >
-                                    {index < currentStepIdx
-                                        ? '✓'
-                                        : index + 1}
+                                    {index < currentStepIdx ? '✓' : index + 1}
                                 </div>
 
                                 <span
@@ -245,10 +191,7 @@ export default function ForgotPasswordPage() {
                                             index === currentStepIdx
                                                 ? '#7a1030'
                                                 : '#9ca3af',
-                                        fontWeight:
-                                            index === currentStepIdx
-                                                ? 600
-                                                : 400,
+                                        fontWeight: index === currentStepIdx ? 600 : 400,
                                     }}
                                 >
                                     {STEP_LABELS[stepItem]}
@@ -271,10 +214,7 @@ export default function ForgotPasswordPage() {
                 </div>
 
                 {error && (
-                    <div
-                        className="auth-error"
-                        style={errorBoxStyle}
-                    >
+                    <div className="auth-error" style={errorBoxStyle}>
                         <span>{error}</span>
 
                         <button
@@ -291,7 +231,6 @@ export default function ForgotPasswordPage() {
                     <>
                         <label className="auth-field">
                             Email tài khoản khách hàng
-
                             <input
                                 type="email"
                                 value={email}
@@ -306,21 +245,17 @@ export default function ForgotPasswordPage() {
                         </label>
 
                         <p style={hintTextStyle}>
-                            Nhập đúng email đã đăng ký. Chúng tôi sẽ
-                            gửi mã OTP 6 số — có hiệu lực trong 5 phút.
+                            Nhập đúng email đã đăng ký. Chúng tôi sẽ gửi mã OTP 6 số — có
+                            hiệu lực trong 5 phút.
                         </p>
 
                         <button
                             type="button"
                             className="auth-submit"
                             disabled={isLoading}
-                            onClick={() =>
-                                void handleSendOtp()
-                            }
+                            onClick={() => void handleSendOtp()}
                         >
-                            {isLoading
-                                ? 'Đang gửi...'
-                                : 'Gửi mã OTP →'}
+                            {isLoading ? 'Đang gửi...' : 'Gửi mã OTP →'}
                         </button>
                     </>
                 )}
@@ -328,13 +263,11 @@ export default function ForgotPasswordPage() {
                 {step === 'otp' && (
                     <>
                         <div style={otpNoticeStyle}>
-                            ✓ Đã gửi mã OTP đến{' '}
-                            <strong>{email}</strong>
+                            ✓ Đã gửi mã OTP đến <strong>{email}</strong>
                         </div>
 
                         <label className="auth-field">
                             Mã OTP (6 chữ số)
-
                             <input
                                 value={otp}
                                 maxLength={6}
@@ -342,50 +275,35 @@ export default function ForgotPasswordPage() {
                                 style={otpInputStyle}
                                 autoFocus
                                 onChange={(event) => {
-                                    setOtp(
-                                        event.target.value
-                                            .replace(/\D/g, ''),
-                                    )
+                                    setOtp(event.target.value.replace(/\D/g, ''))
 
                                     setError(null)
                                 }}
                             />
                         </label>
 
-                        <label
-                            className="auth-field"
-                            style={fieldTopStyle}
-                        >
+                        <label className="auth-field" style={fieldTopStyle}>
                             Mật khẩu mới
-
                             <input
                                 type="password"
                                 value={newPassword}
                                 placeholder="Tối thiểu 6 ký tự"
                                 onChange={(event) => {
-                                    setNewPassword(
-                                        event.target.value,
-                                    )
+                                    setNewPassword(event.target.value)
 
                                     setError(null)
                                 }}
                             />
                         </label>
 
-                        <label
-                            className="auth-field"
-                            style={fieldTopStyle}
-                        >
+                        <label className="auth-field" style={fieldTopStyle}>
                             Xác nhận mật khẩu mới
-
                             <input
                                 type="password"
                                 value={confirmPassword}
                                 placeholder="Nhập lại mật khẩu mới"
                                 onChange={(event) => {
-                                    setConfirmPassword(
-                                        event.target.value,
-                                    )
+                                    setConfirmPassword(event.target.value)
 
                                     setError(null)
                                 }}
@@ -398,13 +316,9 @@ export default function ForgotPasswordPage() {
                             className="auth-submit"
                             disabled={isLoading}
                             style={resetButtonStyle}
-                            onClick={() =>
-                                void handleResetPassword()
-                            }
+                            onClick={() => void handleResetPassword()}
                         >
-                            {isLoading
-                                ? 'Đang xử lý...'
-                                : 'Đặt lại mật khẩu'}
+                            {isLoading ? 'Đang xử lý...' : 'Đặt lại mật khẩu'}
                         </button>
 
                         <button
@@ -421,22 +335,17 @@ export default function ForgotPasswordPage() {
                     <div style={doneBoxStyle}>
                         <div style={doneIconStyle}>✅</div>
 
-                        <h3 style={doneTitleStyle}>
-                            Đặt lại mật khẩu thành công!
-                        </h3>
+                        <h3 style={doneTitleStyle}>Đặt lại mật khẩu thành công!</h3>
 
                         <p style={doneTextStyle}>
-                            Mật khẩu đã được cập nhật. Vui lòng đăng
-                            nhập lại.
+                            Mật khẩu đã được cập nhật. Vui lòng đăng nhập lại.
                         </p>
 
                         <button
                             type="button"
                             className="primary-button"
                             style={doneButtonStyle}
-                            onClick={() =>
-                                navigate('/login')
-                            }
+                            onClick={() => navigate('/login')}
                         >
                             Đăng nhập ngay
                         </button>

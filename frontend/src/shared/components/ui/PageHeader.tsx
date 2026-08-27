@@ -10,52 +10,38 @@ type PageHeaderProps = {
 }
 
 export function PageHeader({
-                               title,
-                               description,
-                               eyebrow,
-                               actions,
-                               icon,
-                               className,
-                           }: PageHeaderProps) {
+    title,
+    description,
+    eyebrow,
+    actions,
+    icon,
+    className,
+}: PageHeaderProps) {
     return (
         <header
-            className={
-                [
-                    'page-header',
-                    'rims-page-header',
-                    'd-flex',
-                    'align-items-start',
-                    'justify-content-between',
-                    'gap-3',
-                    'flex-wrap',
-                    className,
-                ]
-                    .filter(Boolean)
-                    .join(' ')
-            }
+            className={[
+                'page-header',
+                'rims-page-header',
+                'd-flex',
+                'align-items-start',
+                'justify-content-between',
+                'gap-3',
+                'flex-wrap',
+                className,
+            ]
+                .filter(Boolean)
+                .join(' ')}
         >
             <div className="d-flex align-items-start gap-3 min-w-0">
-                {icon && (
-                    <div className="rims-page-header-icon">
-                        {icon}
-                    </div>
-                )}
+                {icon && <div className="rims-page-header-icon">{icon}</div>}
 
                 <div className="min-w-0">
-                    {eyebrow && (
-                        <div className="rims-page-eyebrow">
-                            {eyebrow}
-                        </div>
-                    )}
+                    {eyebrow && <div className="rims-page-eyebrow">{eyebrow}</div>}
 
-                    <h2 className="rims-page-title mb-1">
-                        {title}
-                    </h2>
+                    <h2 className="rims-page-title mb-1">{title}</h2>
 
                     {description && (
-                        <p className="rims-page-description mb-0">
-                            {description}
-                        </p>
+                        <p className="rims-page-description mb-0">{description}</p>
                     )}
                 </div>
             </div>

@@ -7,7 +7,6 @@ import vn.edu.fpt.swp391.g6.rimsapi.dto.response.auth.LogoutResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.user.UserProfileResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.security.UserPrincipal;
 
-
 public interface AuthService
 {
     AuthenticationResponse login(AuthenticationRequest loginRequest);

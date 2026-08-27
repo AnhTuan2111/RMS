@@ -6,10 +6,7 @@
  */
 
 /** Status of a single order item in the kitchen */
-export type OrderItemStatus =
-    | 'PREPARING'
-    | 'COMPLETED'
-    | 'CANCELLED'
+export type OrderItemStatus = 'PREPARING' | 'COMPLETED' | 'CANCELLED'
 
 /** A line item within an order (waiter/cashier view) */
 export interface OrderItemResponse {
@@ -30,7 +27,7 @@ export interface OrderItemResponse {
 export interface OrderDetailResponse {
     orderId: number
     tableNumber: string
-    tableName?: string  // alias used by cashier
+    tableName?: string // alias used by cashier
     createdAt: string
     orderItems: OrderItemResponse[]
     totalAmountBeforeVat: number

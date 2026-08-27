@@ -1,9 +1,8 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.order;
 
-import lombok.*;
-
 import java.math.BigDecimal;
 
+import lombok.*;
 
 @Getter
 @Setter

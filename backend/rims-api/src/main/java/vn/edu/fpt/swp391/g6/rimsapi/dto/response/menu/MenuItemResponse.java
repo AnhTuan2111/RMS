@@ -2,7 +2,6 @@ package vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu;
 
 import lombok.*;
 
-
 @Getter
 @Setter
 @Builder

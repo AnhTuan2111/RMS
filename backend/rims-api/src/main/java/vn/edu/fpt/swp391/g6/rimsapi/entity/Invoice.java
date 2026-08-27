@@ -1,17 +1,17 @@
 package vn.edu.fpt.swp391.g6.rimsapi.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-
 
 @Entity
 @Table(name = "invoices")
@@ -20,7 +20,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Invoice {
+public class Invoice
+{
 
     @Id
     @Column(name = "invoice_id", nullable = false)
@@ -53,8 +54,10 @@ public class Invoice {
     private Integer pointsEarnedOnInvoice;
 
     //Tính doanh thu thực tế bằng cách trừ thẳng tiền VAT
-    public void calculateAndSetRevenue(BigDecimal vatAmount) {
-        if (this.finalAmount != null && vatAmount != null) {
+    public void calculateAndSetRevenue(BigDecimal vatAmount)
+    {
+        if (this.finalAmount != null && vatAmount != null)
+        {
             this.restaurantRevenueAmount = this.finalAmount.subtract(vatAmount);
         }
     }

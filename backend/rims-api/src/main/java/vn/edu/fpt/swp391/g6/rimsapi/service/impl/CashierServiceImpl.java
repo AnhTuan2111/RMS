@@ -1,11 +1,23 @@
 package vn.edu.fpt.swp391.g6.rimsapi.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.Comparator;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import vn.edu.fpt.swp391.g6.rimsapi.config.VNPayConfig;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.payment.PaymentRequest;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.order.OrderDetailResponse;
@@ -18,26 +30,16 @@ import vn.edu.fpt.swp391.g6.rimsapi.dto.response.report.CashierInvoiceSummaryRes
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.report.PagedInvoiceResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.table.TableDashboardResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.*;
-import vn.edu.fpt.swp391.g6.rimsapi.enums.*;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.OrderItem;
+import vn.edu.fpt.swp391.g6.rimsapi.enums.*;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.*;
 import vn.edu.fpt.swp391.g6.rimsapi.service.CashierService;
 import vn.edu.fpt.swp391.g6.rimsapi.util.WebSocketBroadcaster;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
-public class CashierServiceImpl implements CashierService {
+public class CashierServiceImpl implements CashierService
+{
 
     private final OrderRepository orderRepository;
     private final RestaurantTableRepository tableRepository;
@@ -64,8 +66,7 @@ public class CashierServiceImpl implements CashierService {
                         (existing, replacement) -> existing));
 
         return tables.stream()
-                .map(t ->
-                {
+                .map(t -> {
                     Long orderId = tableOrderMap.get(t.getId());
                     TableStatus cashierStatus = (orderId != null) ? TableStatus.SERVING : TableStatus.AVAILABLE;
                     return TableDashboardResponse.builder()
@@ -192,11 +193,13 @@ public class CashierServiceImpl implements CashierService {
     // lần 2 (applyLoyaltyPoints) mới là tính + trừ điểm thật. Sửa rule tính điểm phải sửa khớp cả 2 chỗ.
     @Override
     @Transactional
-    public PaymentResponse completeCashPayment(Long orderId, PaymentRequest request) {
+    public PaymentResponse completeCashPayment(Long orderId, PaymentRequest request)
+    {
         Order order = orderRepository.findOrderForUpdateWithItems(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
-        if (order.getStatus() != OrderStatus.LOCKED) {
+        if (order.getStatus() != OrderStatus.LOCKED)
+        {
             throw new RuntimeException("Đơn hàng chưa được chốt (LOCKED) hoặc đã thanh toán xong!");
         }
 
@@ -208,14 +211,17 @@ public class CashierServiceImpl implements CashierService {
         Integer customerId = request.getCustomerId();
         Integer pointsUsed = request.getPointsUsed();
         BigDecimal previewDiscount = BigDecimal.ZERO;
-        if (customerId != null && pointsUsed != null && pointsUsed > 0) {
+        if (customerId != null && pointsUsed != null && pointsUsed > 0)
+        {
             previewDiscount = new BigDecimal(pointsUsed).multiply(new BigDecimal("1000"));
         }
         BigDecimal previewFinalAmount = finalAmount.subtract(previewDiscount);
-        if (previewFinalAmount.compareTo(BigDecimal.ZERO) < 0) previewFinalAmount = BigDecimal.ZERO;
+        if (previewFinalAmount.compareTo(BigDecimal.ZERO) < 0)
+            previewFinalAmount = BigDecimal.ZERO;
 
         BigDecimal amountPaid = BigDecimal.valueOf(request.getAmountPaid());
-        if (amountPaid.compareTo(previewFinalAmount) < 0) {
+        if (amountPaid.compareTo(previewFinalAmount) < 0)
+        {
             throw new RuntimeException("Khách đưa thiếu tiền!");
         }
 
@@ -350,7 +356,8 @@ public class CashierServiceImpl implements CashierService {
                     throw new RuntimeException("Số điểm sử dụng vượt quá 50% hóa đơn cho phép!");
                 }
                 finalAmount = finalAmount.subtract(discount);
-                if (finalAmount.compareTo(BigDecimal.ZERO) < 0) finalAmount = BigDecimal.ZERO;
+                if (finalAmount.compareTo(BigDecimal.ZERO) < 0)
+                    finalAmount = BigDecimal.ZERO;
             }
         }
 
@@ -492,9 +499,11 @@ public class CashierServiceImpl implements CashierService {
     // Tra cứu khách hàng theo SĐT - chỉ trả về nếu đúng role CUSTOMER (tránh nhầm tài khoản nhân viên có cùng SĐT)
     @Override
     @Transactional(readOnly = true)
-    public User searchCustomerByPhone(String phone) {
+    public User searchCustomerByPhone(String phone)
+    {
         User user = userRepository.findByPhone(phone).orElse(null);
-        if (user != null && user.getRole() == RoleType.CUSTOMER) {
+        if (user != null && user.getRole() == RoleType.CUSTOMER)
+        {
             return user;
         }
         return null;
@@ -503,8 +512,10 @@ public class CashierServiceImpl implements CashierService {
     // Tạo nhanh tài khoản khách vãng lai ngay tại quầy: username = phone, mật khẩu mặc định "123456" (đã mã hóa BCrypt)
     @Override
     @Transactional
-    public User createCustomerFast(String fullName, String phone, String email) {
-        if (userRepository.existsByPhone(phone)) {
+    public User createCustomerFast(String fullName, String phone, String email)
+    {
+        if (userRepository.existsByPhone(phone))
+        {
             throw new RuntimeException("Số điện thoại này đã tồn tại!");
         }
         User user = new User();
@@ -517,9 +528,11 @@ public class CashierServiceImpl implements CashierService {
         user.setRewardPoints(0);
         user.setActive(true);
 
-        try {
+        try
+        {
             return userRepository.save(user);
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException e)
+        {
             // Bắt trường hợp race condition: 2 request cùng tạo 1 SĐT gần như đồng thời,
             // request đầu đã pass check existsByPhone nhưng request thứ 2 mới thực sự save trước.
             // DB tự chặn nhờ unique constraint trên cột phone — chuyển thành message thân thiện.
@@ -527,14 +540,14 @@ public class CashierServiceImpl implements CashierService {
         }
     }
 
-
     // Danh sách hóa đơn HÔM NAY cho Cashier, có filter theo bàn/từ khóa khách/phương thức/mã HĐ.
     // LƯU Ý HIỆU NĂNG: khác với InvoiceRepository.getInvoiceHistory() (lọc + phân trang ở DB),
     // hàm này load TOÀN BỘ invoice trong ngày rồi lọc/phân trang bằng Java Stream + subList().
     // Nếu số hóa đơn/ngày tăng nhiều, đây là chỗ cần tối ưu lại (chuyển filter xuống SQL).
     @Override
     @Transactional(readOnly = true)
-    public PagedInvoiceResponse getTodayInvoices(String tableNumber, String keyword, String paymentMethod, String invoiceCode, int page, int size)
+    public PagedInvoiceResponse getTodayInvoices(String tableNumber, String keyword, String paymentMethod,
+            String invoiceCode, int page, int size)
     {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
@@ -544,14 +557,14 @@ public class CashierServiceImpl implements CashierService {
         List<Invoice> filtered = todayInvoices.stream()
                 .filter(inv -> tableNumber == null || tableNumber.isBlank()
                         || (inv.getOrder().getTable() != null
-                        && inv.getOrder().getTable().getTableNumber().equalsIgnoreCase(tableNumber)))
+                                && inv.getOrder().getTable().getTableNumber().equalsIgnoreCase(tableNumber)))
                 .filter(inv -> paymentMethod == null || paymentMethod.isBlank()
                         || (inv.getPayments() != null && !inv.getPayments().isEmpty()
-                        && inv.getPayments().get(0).getPaymentMethod().name().equalsIgnoreCase(paymentMethod)))
+                                && inv.getPayments().get(0).getPaymentMethod().name().equalsIgnoreCase(paymentMethod)))
                 .filter(inv -> keyword == null || keyword.isBlank()
-                        || (inv.getCustomer() != null && (
-                        inv.getCustomer().getFullName().toLowerCase().contains(keyword.toLowerCase())
-                                || inv.getCustomer().getPhone().contains(keyword))))
+                        || (inv.getCustomer() != null
+                                && (inv.getCustomer().getFullName().toLowerCase().contains(keyword.toLowerCase())
+                                        || inv.getCustomer().getPhone().contains(keyword))))
                 .filter(inv -> invoiceCode == null || invoiceCode.isBlank()
                         || String.valueOf(inv.getId()).contains(invoiceCode.replaceAll("[^0-9]", "")))
                 .sorted(Comparator.comparing(Invoice::getInvoiceDate).reversed())
@@ -566,12 +579,15 @@ public class CashierServiceImpl implements CashierService {
         List<CashierInvoiceSummaryResponse> content = pageContent.stream()
                 .map(inv -> CashierInvoiceSummaryResponse.builder()
                         .invoiceId(inv.getId())
-                        .tableNumber(inv.getOrder().getTable() != null ? inv.getOrder().getTable().getTableNumber() : "Mang về")
+                        .tableNumber(inv.getOrder().getTable() != null
+                                ? inv.getOrder().getTable().getTableNumber()
+                                : "Mang về")
                         .invoiceDate(inv.getInvoiceDate())
                         .finalAmount(inv.getFinalAmount())
                         .customerName(inv.getCustomer() != null ? inv.getCustomer().getFullName() : null)
                         .paymentMethod(inv.getPayments() != null && !inv.getPayments().isEmpty()
-                                ? inv.getPayments().get(0).getPaymentMethod().name() : null)
+                                ? inv.getPayments().get(0).getPaymentMethod().name()
+                                : null)
                         .pointsUsed(inv.getPointsUsedOnInvoice())
                         .pointsEarned(inv.getPointsEarnedOnInvoice())
                         .build())
@@ -617,12 +633,15 @@ public class CashierServiceImpl implements CashierService {
                 .toList();
 
         Payment firstPayment = (invoice.getPayments() != null && !invoice.getPayments().isEmpty())
-                ? invoice.getPayments().get(0) : null;
+                ? invoice.getPayments().get(0)
+                : null;
 
         BigDecimal amountPaid = (firstPayment != null && firstPayment.getAmount() != null)
-                ? firstPayment.getAmount() : invoice.getFinalAmount();
+                ? firstPayment.getAmount()
+                : invoice.getFinalAmount();
         BigDecimal excessAmount = amountPaid.subtract(invoice.getFinalAmount());
-        if (excessAmount.compareTo(BigDecimal.ZERO) < 0) excessAmount = BigDecimal.ZERO;
+        if (excessAmount.compareTo(BigDecimal.ZERO) < 0)
+            excessAmount = BigDecimal.ZERO;
 
         return CashierInvoiceDetailResponse.builder()
                 .invoiceId(invoice.getId())
@@ -683,8 +702,10 @@ public class CashierServiceImpl implements CashierService {
     // HÀM DÙNG CHUNG: công thức tính tiền chuẩn (chỉ cộng các món COMPLETED) - dùng ở nhiều nơi (completeCashPayment,
     // createVNPayPaymentUrl, processVnPaySuccess). Đổi công thức tính tiền thì sửa ở đây trước, nhưng nhớ kiểm tra
     // thêm các chỗ viết logic tương tự thủ công ở getOrderDetail/getInvoiceDetailForCashier.
-    private BigDecimal calculateActualTotal(Order order) {
-        if (order.getOrderItems() == null) return BigDecimal.ZERO;
+    private BigDecimal calculateActualTotal(Order order)
+    {
+        if (order.getOrderItems() == null)
+            return BigDecimal.ZERO;
 
         return order.getOrderItems().stream()
                 .filter(oi -> oi.getStatus() == OrderItemStatus.COMPLETED)
@@ -696,12 +717,15 @@ public class CashierServiceImpl implements CashierService {
     // HÀM LÕI hệ thống điểm thưởng - dùng chung cho cả CASH và QRCODE:
     // 1) set customer vào invoice, 2) nếu dùng điểm: check đủ điểm -> check không vượt 50% hóa đơn -> trừ điểm -> trừ tiền,
     // 3) LUÔN cộng điểm mới = 1% giá trị hóa đơn SAU KHI đã trừ điểm dùng (làm tròn xuống theo mỗi 1.000đ).
-    private BigDecimal applyLoyaltyPoints(Invoice invoice, Integer customerId, Integer pointsUsed, BigDecimal finalAmount)
+    private BigDecimal applyLoyaltyPoints(Invoice invoice, Integer customerId, Integer pointsUsed,
+            BigDecimal finalAmount)
     {
-        if (customerId == null) return finalAmount;
+        if (customerId == null)
+            return finalAmount;
 
         User customer = userRepository.findById(customerId).orElse(null);
-        if (customer == null) return finalAmount;
+        if (customer == null)
+            return finalAmount;
 
         invoice.setCustomer(customer);
         int safePointsUsed = pointsUsed != null ? pointsUsed : 0;
@@ -720,7 +744,8 @@ public class CashierServiceImpl implements CashierService {
             }
             customer.setRewardPoints(customer.getRewardPoints() - safePointsUsed);
             finalAmount = finalAmount.subtract(discount);
-            if (finalAmount.compareTo(BigDecimal.ZERO) < 0) finalAmount = BigDecimal.ZERO;
+            if (finalAmount.compareTo(BigDecimal.ZERO) < 0)
+                finalAmount = BigDecimal.ZERO;
             invoice.setPointsUsedOnInvoice(safePointsUsed);
         }
 
@@ -738,7 +763,8 @@ public class CashierServiceImpl implements CashierService {
     // KHÔNG xét QUEUED ở đây (xem comment gốc bên dưới) - đây là bug đã từng gặp và được note lại cẩn thận.
     private void releaseTableAfterOrderClose(Order order)
     {
-        if (order.getTable() == null) return;
+        if (order.getTable() == null)
+            return;
 
         RestaurantTable table = order.getTable();
         // Chỉ giữ bàn (RESERVED) khi có reservation đang ở đúng khung giờ WAITING

@@ -1,12 +1,12 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.report;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Getter
 @Builder

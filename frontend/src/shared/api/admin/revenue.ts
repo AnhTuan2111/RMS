@@ -50,22 +50,14 @@ export const revenueApi = {
         apiClient.get<RevenueReportResponse>('/admin/revenue/yearly', {signal}),
 
     /** Daily revenue chart data for a date range */
-    getDailyRevenue: (
-        fromDate: string,
-        toDate: string,
-        signal?: AbortSignal,
-    ) =>
+    getDailyRevenue: (fromDate: string, toDate: string, signal?: AbortSignal) =>
         apiClient.get<WeeklyRevenueChartResponse>('/admin/revenue/daily', {
             params: {fromDate, toDate},
             signal,
         }),
 
     /** Revenue for a custom date range */
-    getCustomRevenue: (
-        fromDate: string,
-        toDate: string,
-        signal?: AbortSignal,
-    ) =>
+    getCustomRevenue: (fromDate: string, toDate: string, signal?: AbortSignal) =>
         apiClient.get<RevenueReportResponse>('/admin/revenue/custom', {
             params: {fromDate, toDate},
             signal,

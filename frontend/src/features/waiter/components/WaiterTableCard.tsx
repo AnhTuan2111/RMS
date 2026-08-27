@@ -1,26 +1,26 @@
-import type {TableDetailResponse} from '@/shared/api/waiter';
+import type {TableDetailResponse} from '@/shared/api/waiter'
 
-type WaiterTableStatus = 'AVAILABLE' | 'SERVING' | 'RESERVED';
+type WaiterTableStatus = 'AVAILABLE' | 'SERVING' | 'RESERVED'
 
 interface WaiterTableCardProps {
-    table: TableDetailResponse;
-    status: WaiterTableStatus;
-    statusLabel: string;
-    nextReservationTime?: string;
-    hasStatusNotification?: boolean;
-    onClick: (table: TableDetailResponse) => void;
+    table: TableDetailResponse
+    status: WaiterTableStatus
+    statusLabel: string
+    nextReservationTime?: string
+    hasStatusNotification?: boolean
+    onClick: (table: TableDetailResponse) => void
 }
 
 export function WaiterTableCard({
-                                    table,
-                                    status,
-                                    statusLabel,
-                                    nextReservationTime,
-                                    hasStatusNotification = false,
-                                    onClick,
-                                }: WaiterTableCardProps) {
+    table,
+    status,
+    statusLabel,
+    nextReservationTime,
+    hasStatusNotification = false,
+    onClick,
+}: WaiterTableCardProps) {
     const isAvailableButReserved =
-        status === 'AVAILABLE' && Boolean(table.upcomingReservationTime);
+        status === 'AVAILABLE' && Boolean(table.upcomingReservationTime)
 
     const cardClass = [
         'waiter-table-card',
@@ -28,13 +28,10 @@ export function WaiterTableCard({
         isAvailableButReserved ? 'has-warning' : '',
     ]
         .filter(Boolean)
-        .join(' ');
+        .join(' ')
 
     return (
-        <button
-            onClick={() => onClick(table)}
-            className={cardClass}
-        >
+        <button onClick={() => onClick(table)} className={cardClass}>
             {hasStatusNotification && (
                 <span
                     className="waiter-table-notification-dot"
@@ -53,10 +50,11 @@ export function WaiterTableCard({
                 )}
                 {isAvailableButReserved && table.upcomingReservationTime && (
                     <span className="waiter-table-warning-badge">
-                        Đã đặt lúc {table.upcomingReservationTime.split('T')[1].substring(0, 5)}
+                        Đã đặt lúc{' '}
+                        {table.upcomingReservationTime.split('T')[1].substring(0, 5)}
                     </span>
                 )}
             </div>
         </button>
-    );
+    )
 }

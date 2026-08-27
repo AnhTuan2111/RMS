@@ -1,17 +1,7 @@
-﻿import {
-    useState,
-    type CSSProperties,
-    type FormEvent,
-} from 'react'
-import {
-    Link,
-    useNavigate,
-} from 'react-router-dom'
+﻿import {useState, type CSSProperties, type FormEvent} from 'react'
+import {Link, useNavigate} from 'react-router-dom'
 
-import {
-    register,
-    type RegisterRequest,
-} from '@/shared/api/auth'
+import {register, type RegisterRequest} from '@/shared/api/auth'
 import {getErrorMessage} from '@/shared/utils/error'
 
 function isRequestCanceled(error: unknown) {
@@ -26,9 +16,9 @@ function isRequestCanceled(error: unknown) {
     }
 
     return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
+        requestError.name === 'CanceledError' ||
+        requestError.code === 'ERR_CANCELED' ||
+        requestError.message === 'canceled'
     )
 }
 
@@ -50,14 +40,11 @@ const DEFAULT_FORM: RegisterRequest = {
 export default function RegisterPage() {
     const navigate = useNavigate()
 
-    const [formData, setFormData] =
-        useState<RegisterRequest>(DEFAULT_FORM)
+    const [formData, setFormData] = useState<RegisterRequest>(DEFAULT_FORM)
 
-    const [error, setError] =
-        useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null)
 
-    const [isLoading, setIsLoading] =
-        useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
     function updateField<K extends keyof RegisterRequest>(
         key: K,
@@ -99,13 +86,10 @@ export default function RegisterPage() {
         return null
     }
 
-    async function handleSubmit(
-        event: FormEvent<HTMLFormElement>,
-    ) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        const validationError =
-            validateForm()
+        const validationError = validateForm()
 
         if (validationError) {
             setError(validationError)
@@ -123,28 +107,19 @@ export default function RegisterPage() {
                 phone: formData.phone.trim(),
             })
 
-            navigate(
-                '/login',
-                {
-                    state: {
-                        message:
-                            'Đăng ký thành công! Mật khẩu mặc định của bạn là: 123456',
-                    },
+            navigate('/login', {
+                state: {
+                    message: 'Đăng ký thành công! Mật khẩu mặc định của bạn là: 123456',
                 },
-            )
+            })
         } catch (requestError: unknown) {
             if (isRequestCanceled(requestError)) {
                 return
             }
 
-            console.error(
-                '[REGISTER_ERROR]',
-                requestError,
-            )
+            console.error('[REGISTER_ERROR]', requestError)
 
-            setError(
-                getErrorMessage(requestError),
-            )
+            setError(getErrorMessage(requestError))
         } finally {
             setIsLoading(false)
         }
@@ -153,10 +128,7 @@ export default function RegisterPage() {
     return (
         <main className="login-page">
             <section className="login-card">
-                <Link
-                    className="login-back-link"
-                    to="/login"
-                >
+                <Link className="login-back-link" to="/login">
                     ← Quay lại đăng nhập
                 </Link>
 
@@ -165,68 +137,49 @@ export default function RegisterPage() {
                     <p>Tạo tài khoản khách hàng mới</p>
                 </div>
 
-                {error && (
-                    <div className="auth-error">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="auth-error">{error}</div>}
 
                 <form onSubmit={(event) => void handleSubmit(event)}>
                     <label className="auth-field">
                         Username *
-
                         <input
                             value={formData.username}
                             placeholder="Tên đăng nhập"
                             required
                             autoComplete="username"
                             onChange={(event) =>
-                                updateField(
-                                    'username',
-                                    event.target.value,
-                                )
+                                updateField('username', event.target.value)
                             }
                         />
                     </label>
 
                     <label className="auth-field">
                         Họ và tên *
-
                         <input
                             value={formData.fullName}
                             placeholder="Nguyễn Văn A"
                             required
                             autoComplete="name"
                             onChange={(event) =>
-                                updateField(
-                                    'fullName',
-                                    event.target.value,
-                                )
+                                updateField('fullName', event.target.value)
                             }
                         />
                     </label>
 
                     <label className="auth-field">
                         Email *
-
                         <input
                             type="email"
                             value={formData.email}
                             placeholder="email@gmail.com"
                             required
                             autoComplete="email"
-                            onChange={(event) =>
-                                updateField(
-                                    'email',
-                                    event.target.value,
-                                )
-                            }
+                            onChange={(event) => updateField('email', event.target.value)}
                         />
                     </label>
 
                     <label className="auth-field">
                         Số điện thoại *
-
                         <input
                             value={formData.phone}
                             placeholder="0123456789"
@@ -235,46 +188,27 @@ export default function RegisterPage() {
                             autoComplete="tel"
                             maxLength={10}
                             onChange={(event) =>
-                                updateField(
-                                    'phone',
-                                    normalizePhone(
-                                        event.target.value,
-                                    ),
-                                )
+                                updateField('phone', normalizePhone(event.target.value))
                             }
                         />
                     </label>
 
                     <div style={defaultPasswordNoticeStyle}>
-                        ℹ️ Mật khẩu mặc định sẽ là:{' '}
-                        <strong>123456</strong>
-
+                        ℹ️ Mật khẩu mặc định sẽ là: <strong>123456</strong>
                         <br />
-
                         <small>
-                            Vui lòng thay đổi mật khẩu sau khi đăng nhập
-                            lần đầu.
+                            Vui lòng thay đổi mật khẩu sau khi đăng nhập lần đầu.
                         </small>
                     </div>
 
-                    <button
-                        type="submit"
-                        className="auth-submit"
-                        disabled={isLoading}
-                    >
-                        {isLoading
-                            ? 'Đang đăng ký...'
-                            : 'Tạo tài khoản'}
+                    <button type="submit" className="auth-submit" disabled={isLoading}>
+                        {isLoading ? 'Đang đăng ký...' : 'Tạo tài khoản'}
                     </button>
                 </form>
 
                 <div style={loginTextStyle}>
                     Đã có tài khoản?{' '}
-
-                    <Link
-                        to="/login"
-                        style={loginLinkStyle}
-                    >
+                    <Link to="/login" style={loginLinkStyle}>
                         Đăng nhập
                     </Link>
                 </div>

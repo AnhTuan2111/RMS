@@ -7,9 +7,9 @@ import RegisterPage from '../../features/auth/RegisterPage'
 export function renderAuthRoutes() {
     return (
         <>
-            <Route path="/login" element={<LoginPage/>}/>
-            <Route path="/forgot-password" element={<ForgotPasswordPage/>}/>
-            <Route path="/register" element={<RegisterPage/>}/>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/register" element={<RegisterPage />} />
         </>
     )
 }

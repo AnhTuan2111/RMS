@@ -1,20 +1,9 @@
-import {
-    type CSSProperties,
-    useCallback,
-    useEffect,
-    useState,
-} from 'react'
+import {type CSSProperties, useCallback, useEffect, useState} from 'react'
 
 import {cashierApi} from '@/shared/api/cashier'
 import {REALTIME_CONFIG} from '@/app/config/realtime'
-import {
-    ErrorState,
-    LoadingState,
-} from '@/shared/components/feedback'
-import {
-    PageCard,
-    PageHeader,
-} from '@/shared/components/ui'
+import {ErrorState, LoadingState} from '@/shared/components/feedback'
+import {PageCard, PageHeader} from '@/shared/components/ui'
 import {usePolling} from '@/shared/hooks/usePolling'
 import {useCashierSocket} from '@/realtime'
 import type {
@@ -38,9 +27,9 @@ function isRequestCanceled(error: unknown) {
     }
 
     return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
+        requestError.name === 'CanceledError' ||
+        requestError.code === 'ERR_CANCELED' ||
+        requestError.message === 'canceled'
     )
 }
 
@@ -55,45 +44,34 @@ function getTableStatusLabel(status: TableDashboardResponse['status']) {
 }
 
 export default function CashierPaymentsPage() {
-    const [tables, setTables] =
-        useState<TableDashboardResponse[]>([])
+    const [tables, setTables] = useState<TableDashboardResponse[]>([])
 
-    const [selectedTable, setSelectedTable] =
-        useState<TableDashboardResponse | null>(null)
+    const [selectedTable, setSelectedTable] = useState<TableDashboardResponse | null>(
+        null,
+    )
 
-    const [orderDetail, setOrderDetail] =
-        useState<OrderDetailResponse | null>(null)
+    const [orderDetail, setOrderDetail] = useState<OrderDetailResponse | null>(null)
 
-    const [isLoading, setIsLoading] =
-        useState<boolean>(true)
+    const [isLoading, setIsLoading] = useState<boolean>(true)
 
-    const [loadingDetails, setLoadingDetails] =
-        useState<boolean>(false)
+    const [loadingDetails, setLoadingDetails] = useState<boolean>(false)
 
-    const [error, setError] =
-        useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null)
 
-    const [showPaymentModal, setShowPaymentModal] =
-        useState<boolean>(false)
+    const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false)
 
-    const [paymentResult, setPaymentResult] =
-        useState<PaymentResponse | null>(null)
+    const [paymentResult, setPaymentResult] = useState<PaymentResponse | null>(null)
 
-    const [customer, setCustomer] =
-        useState<CustomerInfo | null>(null)
+    const [customer, setCustomer] = useState<CustomerInfo | null>(null)
 
-    const [pointsUsed, setPointsUsed] =
-        useState<number>(0)
+    const [pointsUsed, setPointsUsed] = useState<number>(0)
 
-    const [invoiceSnapshot, setInvoiceSnapshot] =
-        useState<OrderDetailResponse | null>(null)
+    const [invoiceSnapshot, setInvoiceSnapshot] = useState<OrderDetailResponse | null>(
+        null,
+    )
 
     const loadTables = useCallback(
-        async (
-            signal?: AbortSignal,
-            showFullLoading = true,
-            resetError = true,
-        ) => {
+        async (signal?: AbortSignal, showFullLoading = true, resetError = true) => {
             try {
                 if (showFullLoading) {
                     setIsLoading(true)
@@ -136,24 +114,15 @@ export default function CashierPaymentsPage() {
 
                 setError(null)
             } catch (requestError: unknown) {
-                if (
-                    signal?.aborted
-                    || isRequestCanceled(requestError)
-                ) {
+                if (signal?.aborted || isRequestCanceled(requestError)) {
                     return
                 }
 
-                console.error(
-                    '[CASHIER_TABLES_FETCH_ERROR]',
-                    requestError,
-                )
+                console.error('[CASHIER_TABLES_FETCH_ERROR]', requestError)
 
                 setError('Không thể tải danh mục bàn ăn.')
             } finally {
-                if (
-                    showFullLoading
-                    && !signal?.aborted
-                ) {
+                if (showFullLoading && !signal?.aborted) {
                     setIsLoading(false)
                 }
             }
@@ -173,10 +142,7 @@ export default function CashierPaymentsPage() {
                     setLoadingDetails(true)
                 }
 
-                const response = await cashierApi.getOrderDetail(
-                    orderId,
-                    signal,
-                )
+                const response = await cashierApi.getOrderDetail(orderId, signal)
 
                 if (signal?.aborted) {
                     return
@@ -184,26 +150,17 @@ export default function CashierPaymentsPage() {
 
                 setOrderDetail(response.data)
             } catch (requestError: unknown) {
-                if (
-                    signal?.aborted
-                    || isRequestCanceled(requestError)
-                ) {
+                if (signal?.aborted || isRequestCanceled(requestError)) {
                     return
                 }
 
-                console.error(
-                    '[CASHIER_ORDER_DETAIL_FETCH_ERROR]',
-                    requestError,
-                )
+                console.error('[CASHIER_ORDER_DETAIL_FETCH_ERROR]', requestError)
 
                 if (showErrorAlert) {
                     alert('Không thể lấy chi tiết đơn hàng.')
                 }
             } finally {
-                if (
-                    showLoading
-                    && !signal?.aborted
-                ) {
+                if (showLoading && !signal?.aborted) {
                     setLoadingDetails(false)
                 }
             }
@@ -226,31 +183,24 @@ export default function CashierPaymentsPage() {
     usePolling(
         async (signal) => {
             if (
-                !selectedTable?.orderId
-                || selectedTable.status !== 'SERVING'
-                || showPaymentModal
-                || Boolean(paymentResult)
+                !selectedTable?.orderId ||
+                selectedTable.status !== 'SERVING' ||
+                showPaymentModal ||
+                Boolean(paymentResult)
             ) {
                 return
             }
 
-            await loadOrderDetail(
-                selectedTable.orderId,
-                signal,
-                false,
-                false,
-            )
+            await loadOrderDetail(selectedTable.orderId, signal, false, false)
         },
         {
             enabled:
-                Boolean(selectedTable?.orderId)
-                && selectedTable?.status === 'SERVING'
-                && !showPaymentModal
-                && !paymentResult,
+                Boolean(selectedTable?.orderId) &&
+                selectedTable?.status === 'SERVING' &&
+                !showPaymentModal &&
+                !paymentResult,
 
-            intervalMs:
-            REALTIME_CONFIG
-                .cashier.orderDetailIntervalMs,
+            intervalMs: REALTIME_CONFIG.cashier.orderDetailIntervalMs,
             runImmediately: false,
             pauseWhenHidden: true,
 
@@ -259,17 +209,12 @@ export default function CashierPaymentsPage() {
                     return
                 }
 
-                console.error(
-                    '[CASHIER_ORDER_DETAIL_POLL_ERROR]',
-                    requestError,
-                )
+                console.error('[CASHIER_ORDER_DETAIL_POLL_ERROR]', requestError)
             },
         },
     )
 
-    async function handleSelectTable(
-        table: TableDashboardResponse,
-    ) {
+    async function handleSelectTable(table: TableDashboardResponse) {
         if (table.status !== 'SERVING') {
             setSelectedTable(null)
             setOrderDetail(null)
@@ -284,32 +229,21 @@ export default function CashierPaymentsPage() {
         setPointsUsed(0)
 
         if (table.orderId) {
-            await loadOrderDetail(
-                table.orderId,
-                undefined,
-                true,
-                true,
-            )
+            await loadOrderDetail(table.orderId, undefined, true, true)
         }
     }
 
     async function handleDownloadPdf(invoiceId: number) {
         try {
             const response = await cashierApi.downloadInvoicePdf(invoiceId)
-            const blob = new Blob(
-                [response.data],
-                {
-                    type: 'application/pdf',
-                },
-            )
+            const blob = new Blob([response.data], {
+                type: 'application/pdf',
+            })
             const url = window.URL.createObjectURL(blob)
             const link = document.createElement('a')
 
             link.href = url
-            link.setAttribute(
-                'download',
-                `Invoice-${invoiceId}.pdf`,
-            )
+            link.setAttribute('download', `Invoice-${invoiceId}.pdf`)
             document.body.appendChild(link)
             link.click()
             link.remove()
@@ -322,15 +256,15 @@ export default function CashierPaymentsPage() {
 
     const gridLayoutLayout: CSSProperties = selectedTable
         ? {
-            display: 'grid',
-            gridTemplateColumns: '1.4fr 0.6fr',
-            gap: '1.5rem',
-        }
+              display: 'grid',
+              gridTemplateColumns: '1.4fr 0.6fr',
+              gap: '1.5rem',
+          }
         : {
-            display: 'grid',
-            gridTemplateColumns: '1fr',
-            gap: '1.5rem',
-        }
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: '1.5rem',
+          }
 
     if (isLoading) {
         return (
@@ -346,11 +280,7 @@ export default function CashierPaymentsPage() {
             <ErrorState
                 message={error}
                 onRetry={() => {
-                    loadTables(
-                        undefined,
-                        true,
-                        true,
-                    ).catch((requestError) => {
+                    loadTables(undefined, true, true).catch((requestError) => {
                         console.error(requestError)
                     })
                 }}
@@ -359,10 +289,7 @@ export default function CashierPaymentsPage() {
     }
 
     return (
-        <div
-            className="dashboard-page"
-            style={gridLayoutLayout}
-        >
+        <div className="dashboard-page" style={gridLayoutLayout}>
             <PageCard>
                 <PageHeader
                     title="Sơ Đồ Quầy Thu Ngân"
@@ -373,14 +300,12 @@ export default function CashierPaymentsPage() {
                     className="table-grid"
                     style={{
                         display: 'grid',
-                        gridTemplateColumns:
-                            'repeat(4, minmax(0, 1fr))',
+                        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
                         gap: '1rem',
                     }}
                 >
                     {tables.map((table) => {
-                        const isSelected =
-                            selectedTable?.tableId === table.tableId
+                        const isSelected = selectedTable?.tableId === table.tableId
 
                         const isServing = table.status === 'SERVING'
 
@@ -395,9 +320,7 @@ export default function CashierPaymentsPage() {
                                     border: isSelected
                                         ? '2px solid #2563eb'
                                         : '1px solid #e2e8f0',
-                                    background: isServing
-                                        ? '#fff7ed'
-                                        : '#ffffff',
+                                    background: isServing ? '#fff7ed' : '#ffffff',
                                     padding: '1.5rem',
                                     borderRadius: '12px',
                                     display: 'flex',
@@ -424,16 +347,12 @@ export default function CashierPaymentsPage() {
                                     }}
                                 >
                                     ID Đơn:{' '}
-                                    {isServing
-                                        ? table.orderId || 'Đang quét...'
-                                        : 'null'}
+                                    {isServing ? table.orderId || 'Đang quét...' : 'null'}
                                 </span>
 
                                 <small
                                     style={{
-                                        color: isServing
-                                            ? '#ea580c'
-                                            : '#16a34a',
+                                        color: isServing ? '#ea580c' : '#16a34a',
                                         marginTop: 'auto',
                                         fontWeight: 'bold',
                                     }}
@@ -494,11 +413,7 @@ export default function CashierPaymentsPage() {
                         setOrderDetail(null)
                         setCustomer(null)
                         setPointsUsed(0)
-                        void loadTables(
-                            undefined,
-                            true,
-                            true,
-                        )
+                        void loadTables(undefined, true, true)
                     }}
                 />
             )}

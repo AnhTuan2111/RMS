@@ -1,13 +1,12 @@
 package vn.edu.fpt.swp391.g6.rimsapi.config;
 
-import org.springframework.context.annotation.Bean; // đánh dấu 1 method trả về object sẽ được spring quản lý (Bean)
-import org.springframework.context.annotation.Configuration; // đánh dấu class này là 1 lớp cấu hình của spring
-import org.springframework.web.cors.CorsConfiguration; // Class chứa các thiết lập CORS (origin, method, header...)
-import org.springframework.web.cors.CorsConfigurationSource; // Interface đại diện "nguồn" cấu hình CORS mà Spring Security sẽ đọc
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // Implementation cho phép gắn cấu hình CORS theo từng pattern URL
-
 import java.util.List;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 // CorsConfig là một lớp cấu hình của Spring dùng để khai báo chính sách Cross-Origin Resource Sharing (CORS), cho phép frontend và backend có thể giao tiếp với nhau khi chúng chạy trên các origin khác nhau
 // Dòng @Configuration đánh dấu đây là một lớp cấu hình, nghĩa là khi ứng dụng Spring Boot khởi động, cơ chế component scanning sẽ phát hiện lớp này, khởi tạo nó và đọc tất cả các phương thức được đánh dấu @Bean

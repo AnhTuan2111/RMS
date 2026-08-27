@@ -1,6 +1,4 @@
-import {
-    type CSSProperties,
-} from 'react'
+import {type CSSProperties} from 'react'
 import {useNavigate} from 'react-router-dom'
 
 export default function PaymentFailed() {
@@ -8,29 +6,19 @@ export default function PaymentFailed() {
 
     return (
         <div style={pageStyle}>
-            <div
-                className="page-card"
-                style={cardStyle}
-            >
-                <div style={iconStyle}>
-                    ✖
-                </div>
+            <div className="page-card" style={cardStyle}>
+                <div style={iconStyle}>✖</div>
 
-                <h1 style={titleStyle}>
-                    Giao Dịch Thất Bại
-                </h1>
+                <h1 style={titleStyle}>Giao Dịch Thất Bại</h1>
 
                 <p style={descriptionStyle}>
-                    Khách hàng đã hủy giao dịch hoặc có lỗi xảy ra
-                    từ ngân hàng.
+                    Khách hàng đã hủy giao dịch hoặc có lỗi xảy ra từ ngân hàng.
                 </p>
 
                 <button
                     type="button"
                     style={backButtonStyle}
-                    onClick={() =>
-                        navigate('/cashier/payments')
-                    }
+                    onClick={() => navigate('/cashier/payments')}
                 >
                     Quay lại màn hình Thu Ngân
                 </button>

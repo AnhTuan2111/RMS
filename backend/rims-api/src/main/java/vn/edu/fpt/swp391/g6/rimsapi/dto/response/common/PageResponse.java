@@ -1,13 +1,12 @@
 package vn.edu.fpt.swp391.g6.rimsapi.dto.response.common;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
-
-import java.util.List;
-
 
 /**
  * DTO phân trang dùng chung cho mọi API trả về danh sách có phân trang.
@@ -22,13 +21,13 @@ public class PageResponse<T>
 {
     private List<T> content;
 
-    private int page;          // trang hiện tại (bắt đầu từ 0)
+    private int page; // trang hiện tại (bắt đầu từ 0)
 
-    private int size;          // số phần tử mỗi trang
+    private int size; // số phần tử mỗi trang
 
     private long totalElements; // tổng số phần tử (sau khi lọc)
 
-    private int totalPages;    // tổng số trang
+    private int totalPages; // tổng số trang
 
     private boolean first;
 

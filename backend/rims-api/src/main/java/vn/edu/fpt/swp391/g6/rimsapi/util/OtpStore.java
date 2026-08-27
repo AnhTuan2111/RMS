@@ -1,11 +1,10 @@
 package vn.edu.fpt.swp391.g6.rimsapi.util;
 
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Component;
 
 @Component
 public class OtpStore
@@ -20,7 +19,8 @@ public class OtpStore
     public boolean verify(String email, String otp)
     {
         OtpEntry entry = store.get(email);
-        if (entry == null) return false;
+        if (entry == null)
+            return false;
         if (LocalDateTime.now().isAfter(entry.expiresAt()))
         {
             store.remove(email);

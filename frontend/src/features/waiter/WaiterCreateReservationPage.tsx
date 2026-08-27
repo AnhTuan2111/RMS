@@ -1,14 +1,5 @@
-﻿import {
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-    type CSSProperties,
-} from 'react'
-import {
-    useNavigate,
-    useSearchParams,
-} from 'react-router-dom'
+﻿import {useEffect, useMemo, useRef, useState, type CSSProperties} from 'react'
+import {useNavigate, useSearchParams} from 'react-router-dom'
 
 import {
     type CreateReservationRequest,
@@ -20,10 +11,7 @@ import {
 import {getAvailableTimeSlots} from '@/shared/utils/reservationTime'
 
 import {REALTIME_CONFIG} from '@/app/config/realtime'
-import {
-    WaiterHeader,
-    WaiterToast,
-} from './components'
+import {WaiterHeader, WaiterToast} from './components'
 import {usePolling} from '@/shared/hooks/usePolling'
 
 type ToastState = {
@@ -62,25 +50,24 @@ function isRequestCanceled(error: unknown) {
     }
 
     return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
+        requestError.name === 'CanceledError' ||
+        requestError.code === 'ERR_CANCELED' ||
+        requestError.message === 'canceled'
     )
 }
 
-function getRequestErrorMessage(
-    error: unknown,
-    fallback: string,
-) {
+function getRequestErrorMessage(error: unknown, fallback: string) {
     if (typeof error !== 'object' || error === null) {
         return fallback
     }
 
     const requestError = error as {
         response?: {
-            data?: string | {
-                message?: string
-            }
+            data?:
+                | string
+                | {
+                      message?: string
+                  }
         }
         message?: string
     }
@@ -122,51 +109,36 @@ export default function WaiterCreateReservationPage() {
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
 
-    const preselectedTable =
-        Number.parseInt(
-            searchParams.get('tableId') ?? '0',
-            10,
-        )
+    const preselectedTable = Number.parseInt(searchParams.get('tableId') ?? '0', 10)
 
-    const [tables, setTables] =
-        useState<TableDetailResponse[]>([])
+    const [tables, setTables] = useState<TableDetailResponse[]>([])
 
-    const [toast, setToast] =
-        useState<ToastState>(null)
+    const [toast, setToast] = useState<ToastState>(null)
 
-    const [resFormError, setResFormError] =
-        useState('')
+    const [resFormError, setResFormError] = useState('')
 
-    const [rightReservations, setRightReservations] =
-        useState<ReservationResponse[]>([])
+    const [rightReservations, setRightReservations] = useState<ReservationResponse[]>([])
 
-    const [blockedRanges, setBlockedRanges] =
-        useState<TimeRangeResponse[]>([])
+    const [blockedRanges, setBlockedRanges] = useState<TimeRangeResponse[]>([])
 
-    const [resForm, setResForm] =
-        useState<ReservationForm>({
-            customerName: '',
-            phone: '',
-            date: todayString(),
-            time: '08:00',
-            tableId: preselectedTable || 0,
-            note: '',
-        })
+    const [resForm, setResForm] = useState<ReservationForm>({
+        customerName: '',
+        phone: '',
+        date: todayString(),
+        time: '08:00',
+        tableId: preselectedTable || 0,
+        note: '',
+    })
 
-    const [isTablesLoading, setIsTablesLoading] =
-        useState(true)
+    const [isTablesLoading, setIsTablesLoading] = useState(true)
 
-    const [isReservationsLoading, setIsReservationsLoading] =
-        useState(false)
+    const [isReservationsLoading, setIsReservationsLoading] = useState(false)
 
-    const [submitting, setSubmitting] =
-        useState(false)
+    const [submitting, setSubmitting] = useState(false)
 
-    const hasLoadedInitialTablesRef =
-        useRef(false)
+    const hasLoadedInitialTablesRef = useRef(false)
 
-    const hasLoadedInitialReservationsRef =
-        useRef(false)
+    const hasLoadedInitialReservationsRef = useRef(false)
 
     const availableTimeSlots = useMemo(
         () => getAvailableTimeSlots(resForm.date, blockedRanges),
@@ -189,35 +161,24 @@ export default function WaiterCreateReservationPage() {
                 }))
             })
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [availableTimeSlots, resForm.time])
 
-    function showToast(
-        msg: string,
-        type = 'success',
-    ) {
+    function showToast(msg: string, type = 'success') {
         setToast({
             msg,
             type,
         })
 
-        window.setTimeout(
-            () => setToast(null),
-            3000,
-        )
+        window.setTimeout(() => setToast(null), 3000)
     }
 
-    async function loadTables(
-        signal?: AbortSignal,
-        showFullLoading = true,
-    ) {
+    async function loadTables(signal?: AbortSignal, showFullLoading = true) {
         try {
             if (showFullLoading) {
                 setIsTablesLoading(true)
             }
 
-            const response =
-                await waiterApi.getTables(signal)
+            const response = await waiterApi.getTables(signal)
 
             if (signal?.aborted) {
                 return
@@ -225,26 +186,15 @@ export default function WaiterCreateReservationPage() {
 
             setTables(response.data)
         } catch (requestError: unknown) {
-            if (
-                signal?.aborted
-                || isRequestCanceled(requestError)
-            ) {
+            if (signal?.aborted || isRequestCanceled(requestError)) {
                 return
             }
 
-            console.error(
-                '[WAITER_CREATE_RESERVATION_TABLES_ERROR]',
-                requestError,
-            )
+            console.error('[WAITER_CREATE_RESERVATION_TABLES_ERROR]', requestError)
 
-            setResFormError(
-                'Không thể tải danh sách bàn.',
-            )
+            setResFormError('Không thể tải danh sách bàn.')
         } finally {
-            if (
-                showFullLoading
-                && !signal?.aborted
-            ) {
+            if (showFullLoading && !signal?.aborted) {
                 setIsTablesLoading(false)
             }
         }
@@ -255,11 +205,9 @@ export default function WaiterCreateReservationPage() {
         showFullLoading = true,
         override?: Partial<Pick<ReservationForm, 'tableId' | 'date'>>,
     ) {
-        const tableId =
-            override?.tableId ?? resForm.tableId
+        const tableId = override?.tableId ?? resForm.tableId
 
-        const date =
-            override?.date ?? resForm.date
+        const date = override?.date ?? resForm.date
 
         if (!tableId || !date) {
             setRightReservations([])
@@ -271,12 +219,11 @@ export default function WaiterCreateReservationPage() {
                 setIsReservationsLoading(true)
             }
 
-            const response =
-                await waiterApi.getReservationsByTableAndDate(
-                    tableId,
-                    date,
-                    signal,
-                )
+            const response = await waiterApi.getReservationsByTableAndDate(
+                tableId,
+                date,
+                signal,
+            )
 
             if (signal?.aborted) {
                 return
@@ -284,24 +231,15 @@ export default function WaiterCreateReservationPage() {
 
             setRightReservations(response.data ?? [])
         } catch (requestError: unknown) {
-            if (
-                signal?.aborted
-                || isRequestCanceled(requestError)
-            ) {
+            if (signal?.aborted || isRequestCanceled(requestError)) {
                 return
             }
 
-            console.error(
-                '[WAITER_CREATE_RESERVATION_LIST_ERROR]',
-                requestError,
-            )
+            console.error('[WAITER_CREATE_RESERVATION_LIST_ERROR]', requestError)
 
             setRightReservations([])
         } finally {
-            if (
-                showFullLoading
-                && !signal?.aborted
-            ) {
+            if (showFullLoading && !signal?.aborted) {
                 setIsReservationsLoading(false)
             }
         }
@@ -311,11 +249,9 @@ export default function WaiterCreateReservationPage() {
         signal?: AbortSignal,
         override?: Partial<Pick<ReservationForm, 'tableId' | 'date'>>,
     ) {
-        const tableId =
-            override?.tableId ?? resForm.tableId
+        const tableId = override?.tableId ?? resForm.tableId
 
-        const date =
-            override?.date ?? resForm.date
+        const date = override?.date ?? resForm.date
 
         if (!tableId || !date) {
             setBlockedRanges([])
@@ -323,13 +259,12 @@ export default function WaiterCreateReservationPage() {
         }
 
         try {
-            const response =
-                await waiterApi.getBlockedTimeSlots(
-                    tableId,
-                    date,
-                    undefined,
-                    signal,
-                )
+            const response = await waiterApi.getBlockedTimeSlots(
+                tableId,
+                date,
+                undefined,
+                signal,
+            )
 
             if (signal?.aborted) {
                 return
@@ -337,17 +272,11 @@ export default function WaiterCreateReservationPage() {
 
             setBlockedRanges(response.data ?? [])
         } catch (requestError: unknown) {
-            if (
-                signal?.aborted
-                || isRequestCanceled(requestError)
-            ) {
+            if (signal?.aborted || isRequestCanceled(requestError)) {
                 return
             }
 
-            console.error(
-                '[WAITER_BLOCKED_SLOTS_ERROR]',
-                requestError,
-            )
+            console.error('[WAITER_BLOCKED_SLOTS_ERROR]', requestError)
 
             setBlockedRanges([])
         }
@@ -355,21 +284,14 @@ export default function WaiterCreateReservationPage() {
 
     usePolling(
         async (signal) => {
-            const isInitialLoad =
-                !hasLoadedInitialTablesRef.current
+            const isInitialLoad = !hasLoadedInitialTablesRef.current
 
-            await loadTables(
-                signal,
-                isInitialLoad,
-            )
+            await loadTables(signal, isInitialLoad)
 
             hasLoadedInitialTablesRef.current = true
         },
         {
-            intervalMs:
-            REALTIME_CONFIG
-                .waiter
-                .tablesIntervalMs,
+            intervalMs: REALTIME_CONFIG.waiter.tablesIntervalMs,
 
             runImmediately: true,
             pauseWhenHidden: true,
@@ -385,39 +307,27 @@ export default function WaiterCreateReservationPage() {
 
     usePolling(
         async (signal) => {
-            const isInitialLoad =
-                !hasLoadedInitialReservationsRef.current
+            const isInitialLoad = !hasLoadedInitialReservationsRef.current
 
-            await loadReservations(
-                signal,
-                isInitialLoad,
-            )
+            await loadReservations(signal, isInitialLoad)
 
             await loadBlockedSlots(signal)
 
             hasLoadedInitialReservationsRef.current = true
         },
         {
-            intervalMs:
-            REALTIME_CONFIG
-                .waiter
-                .tablesIntervalMs,
+            intervalMs: REALTIME_CONFIG.waiter.tablesIntervalMs,
 
             runImmediately: true,
             pauseWhenHidden: true,
 
             onError: (requestError) => {
-                console.error(
-                    '[WAITER_CREATE_RESERVATION_LIST_POLL_ERROR]',
-                    requestError,
-                )
+                console.error('[WAITER_CREATE_RESERVATION_LIST_POLL_ERROR]', requestError)
             },
         },
     )
 
-    function updateForm(
-        patch: Partial<ReservationForm>,
-    ) {
+    function updateForm(patch: Partial<ReservationForm>) {
         const nextForm = {
             ...resForm,
             ...patch,
@@ -425,70 +335,35 @@ export default function WaiterCreateReservationPage() {
 
         setResForm(nextForm)
 
-        if (
-            'tableId' in patch
-            || 'date' in patch
-        ) {
-            void loadReservations(
-                undefined,
-                true,
-                {
-                    tableId: nextForm.tableId,
-                    date: nextForm.date,
-                },
-            )
+        if ('tableId' in patch || 'date' in patch) {
+            void loadReservations(undefined, true, {
+                tableId: nextForm.tableId,
+                date: nextForm.date,
+            })
 
-            void loadBlockedSlots(
-                undefined,
-                {
-                    tableId: nextForm.tableId,
-                    date: nextForm.date,
-                },
-            )
+            void loadBlockedSlots(undefined, {
+                tableId: nextForm.tableId,
+                date: nextForm.date,
+            })
         }
     }
 
     async function submitReservation() {
-        const {
-            customerName,
-            phone,
-            date,
-            time,
-            tableId,
-            note,
-        } = resForm
+        const {customerName, phone, date, time, tableId, note} = resForm
 
-        if (
-            !customerName.trim()
-            || !phone.trim()
-            || !date
-            || !time
-            || !tableId
-        ) {
-            setResFormError(
-                'Vui lòng điền đầy đủ thông tin bắt buộc.',
-            )
+        if (!customerName.trim() || !phone.trim() || !date || !time || !tableId) {
+            setResFormError('Vui lòng điền đầy đủ thông tin bắt buộc.')
             return
         }
 
-        const timeHour =
-            Number.parseInt(
-                time.split(':')[0] ?? '0',
-                10,
-            )
+        const timeHour = Number.parseInt(time.split(':')[0] ?? '0', 10)
 
-        if (
-            timeHour < 8
-            || timeHour > 20
-        ) {
-            setResFormError(
-                'Giờ đặt bàn phải nằm trong khoảng từ 08:00 đến 20:00.',
-            )
+        if (timeHour < 8 || timeHour > 20) {
+            setResFormError('Giờ đặt bàn phải nằm trong khoảng từ 08:00 đến 20:00.')
             return
         }
 
-        const reservationTime =
-            `${date}T${time}:00`
+        const reservationTime = `${date}T${time}:00`
 
         const payload: CreateReservationRequest = {
             customerName: customerName.trim(),
@@ -515,23 +390,16 @@ export default function WaiterCreateReservationPage() {
                 note: '',
             })
 
-            await loadReservations(
-                undefined,
-                true,
-                {
-                    tableId,
-                    date,
-                },
-            )
+            await loadReservations(undefined, true, {
+                tableId,
+                date,
+            })
         } catch (requestError: unknown) {
             if (isRequestCanceled(requestError)) {
                 return
             }
 
-            console.error(
-                '[WAITER_CREATE_RESERVATION_SUBMIT_ERROR]',
-                requestError,
-            )
+            console.error('[WAITER_CREATE_RESERVATION_SUBMIT_ERROR]', requestError)
 
             setResFormError(
                 getRequestErrorMessage(
@@ -545,9 +413,7 @@ export default function WaiterCreateReservationPage() {
     }
 
     const selectedTableNumber =
-        tables.find(
-            (table) => table.tableId === resForm.tableId,
-        )?.tableNumber ?? '...'
+        tables.find((table) => table.tableId === resForm.tableId)?.tableNumber ?? '...'
 
     return (
         <div className="waiter-container">
@@ -555,22 +421,16 @@ export default function WaiterCreateReservationPage() {
 
             <main className="waiter-main">
                 <div className="waiter-sub-header">
-                    <h2 className="waiter-title">
-                        Đặt Bàn
-                    </h2>
+                    <h2 className="waiter-title">Đặt Bàn</h2>
                 </div>
 
                 <div className="waiter-res-layout">
                     <div className="waiter-card">
-                        <div className="waiter-card-header">
-                            Thông tin đặt bàn
-                        </div>
+                        <div className="waiter-card-header">Thông tin đặt bàn</div>
 
                         <div className="waiter-card-body">
                             {resFormError && (
-                                <div className="waiter-form-error">
-                                    {resFormError}
-                                </div>
+                                <div className="waiter-form-error">{resFormError}</div>
                             )}
 
                             <div className="waiter-form-group">
@@ -581,8 +441,7 @@ export default function WaiterCreateReservationPage() {
                                     maxLength={50}
                                     onChange={(event) =>
                                         updateForm({
-                                            customerName:
-                                            event.target.value,
+                                            customerName: event.target.value,
                                         })
                                     }
                                 />
@@ -596,10 +455,9 @@ export default function WaiterCreateReservationPage() {
                                     pattern="0[0-9]{9}"
                                     onChange={(event) =>
                                         updateForm({
-                                            phone:
-                                                event.target.value
-                                                    .replace(/\D/g, '')
-                                                    .slice(0, 10),
+                                            phone: event.target.value
+                                                .replace(/\D/g, '')
+                                                .slice(0, 10),
                                         })
                                     }
                                 />
@@ -619,8 +477,7 @@ export default function WaiterCreateReservationPage() {
                                         className="waiter-form-input"
                                         onChange={(event) =>
                                             updateForm({
-                                                date:
-                                                event.target.value,
+                                                date: event.target.value,
                                             })
                                         }
                                     />
@@ -638,16 +495,12 @@ export default function WaiterCreateReservationPage() {
                                         className="waiter-form-input"
                                         onChange={(event) =>
                                             updateForm({
-                                                time:
-                                                event.target.value,
+                                                time: event.target.value,
                                             })
                                         }
                                     >
                                         {availableTimeSlots.map((value) => (
-                                            <option
-                                                key={value}
-                                                value={value}
-                                            >
+                                            <option key={value} value={value}>
                                                 {value}
                                             </option>
                                         ))}
@@ -663,28 +516,20 @@ export default function WaiterCreateReservationPage() {
                                     disabled={isTablesLoading}
                                     onChange={(event) =>
                                         updateForm({
-                                            tableId:
-                                                Number.parseInt(
-                                                    event.target.value,
-                                                    10,
-                                                ),
+                                            tableId: Number.parseInt(
+                                                event.target.value,
+                                                10,
+                                            ),
                                         })
                                     }
                                 >
                                     <option value={0}>
-                                        {isTablesLoading
-                                            ? 'Đang tải bàn...'
-                                            : 'Chọn bàn'}
+                                        {isTablesLoading ? 'Đang tải bàn...' : 'Chọn bàn'}
                                     </option>
 
                                     {tables.map((table) => (
-                                        <option
-                                            key={table.tableId}
-                                            value={table.tableId}
-                                        >
-                                            Bàn {table.tableNumber}
-                                            {' '}
-                                            ({table.capacity} chỗ)
+                                        <option key={table.tableId} value={table.tableId}>
+                                            Bàn {table.tableNumber} ({table.capacity} chỗ)
                                         </option>
                                     ))}
                                 </select>
@@ -699,8 +544,7 @@ export default function WaiterCreateReservationPage() {
                                     maxLength={100}
                                     onChange={(event) =>
                                         updateForm({
-                                            note:
-                                            event.target.value,
+                                            note: event.target.value,
                                         })
                                     }
                                 />
@@ -714,22 +558,16 @@ export default function WaiterCreateReservationPage() {
                                         flex: 1,
                                     }}
                                     disabled={submitting}
-                                    onClick={() =>
-                                        void submitReservation()
-                                    }
+                                    onClick={() => void submitReservation()}
                                 >
-                                    {submitting
-                                        ? 'Đang lưu...'
-                                        : 'Lưu đặt bàn'}
+                                    {submitting ? 'Đang lưu...' : 'Lưu đặt bàn'}
                                 </button>
 
                                 <button
                                     type="button"
                                     className="waiter-btn-outline"
                                     disabled={submitting}
-                                    onClick={() =>
-                                        navigate('/waiter/tables')
-                                    }
+                                    onClick={() => navigate('/waiter/tables')}
                                 >
                                     Hủy
                                 </button>
@@ -739,9 +577,7 @@ export default function WaiterCreateReservationPage() {
 
                     <div className="waiter-card">
                         <div className="waiter-card-header">
-                            Lịch đặt cùng ngày
-                            {' '}
-                            (Bàn {selectedTableNumber})
+                            Lịch đặt cùng ngày (Bàn {selectedTableNumber})
                         </div>
 
                         <div className="waiter-card-body waiter-res-list">
@@ -750,40 +586,30 @@ export default function WaiterCreateReservationPage() {
                                     Chọn bàn và ngày để xem lịch đặt.
                                 </p>
                             ) : isReservationsLoading ? (
-                                <p style={emptyTextStyle}>
-                                    Đang tải lịch đặt...
-                                </p>
+                                <p style={emptyTextStyle}>Đang tải lịch đặt...</p>
                             ) : rightReservations.length === 0 ? (
-                                <p style={emptyTextStyle}>
-                                    Không có lịch đặt nào.
-                                </p>
+                                <p style={emptyTextStyle}>Không có lịch đặt nào.</p>
                             ) : (
                                 rightReservations.map((reservation) => {
-                                    const reservationId =
-                                        getReservationId(reservation)
+                                    const reservationId = getReservationId(reservation)
 
                                     const tableNo =
                                         tables.find(
                                             (table) =>
-                                                table.tableId
-                                                === reservation.tableId,
-                                        )?.tableNumber
-                                        ?? reservation.tableNumber
-                                        ?? reservation.tableId
+                                                table.tableId === reservation.tableId,
+                                        )?.tableNumber ??
+                                        reservation.tableNumber ??
+                                        reservation.tableId
 
-                                    const {
-                                        date,
-                                        time,
-                                    } =
-                                        splitReservationTime(
-                                            reservation.reservationTime,
-                                        )
+                                    const {date, time} = splitReservationTime(
+                                        reservation.reservationTime,
+                                    )
 
                                     return (
                                         <div
                                             key={
-                                                reservationId
-                                                ?? `${reservation.phone}-${reservation.reservationTime}`
+                                                reservationId ??
+                                                `${reservation.phone}-${reservation.reservationTime}`
                                             }
                                             className="waiter-res-card"
                                         >
@@ -793,9 +619,7 @@ export default function WaiterCreateReservationPage() {
                                                 </div>
 
                                                 <div className="waiter-res-info">
-                                                    <h4>
-                                                        {reservation.customerName}
-                                                    </h4>
+                                                    <h4>{reservation.customerName}</h4>
 
                                                     <p>
                                                         {reservation.phone}

@@ -34,14 +34,11 @@
     --rims-radius-xl: 20px;
 
     /* Shadow */
-    --rims-shadow-sm:
-            0 1px 3px rgb(15 23 42 / 8%);
+    --rims-shadow-sm: 0 1px 3px rgb(15 23 42 / 8%);
 
-    --rims-shadow-md:
-            0 10px 25px rgb(15 23 42 / 10%);
+    --rims-shadow-md: 0 10px 25px rgb(15 23 42 / 10%);
 
-    --rims-shadow-lg:
-            0 20px 40px rgb(15 23 42 / 14%);
+    --rims-shadow-lg: 0 20px 40px rgb(15 23 42 / 14%);
 
     /* Spacing */
     --rims-space-1: 4px;
@@ -57,12 +54,7 @@
     --rims-topbar-height: 96px;
 
     /* Bootstrap-compatible values */
-    --bs-body-font-family:
-            "Segoe UI",
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            sans-serif;
+    --bs-body-font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
     --bs-body-bg: var(--rims-background);
     --bs-body-color: var(--rims-text);

@@ -3,7 +3,9 @@ import {useEffect, useState} from 'react'
 import {getPublicBestSellingDishes, type PublicBestSellingDish} from '@/shared/api/public'
 
 export default function HomePage() {
-    const [bestSellingDishes, setBestSellingDishes] = useState<PublicBestSellingDish[]>([])
+    const [bestSellingDishes, setBestSellingDishes] = useState<PublicBestSellingDish[]>(
+        [],
+    )
 
     useEffect(() => {
         const controller = new AbortController()
@@ -56,9 +58,9 @@ export default function HomePage() {
 
                     <p className="restaurant-description">
                         Từ lẩu Tứ Xuyên cay tê, dimsum Quảng Đông tinh tế đến hải sản
-                        thượng hạng — Mãn Vị Lâu mang đến hành trình ẩm thực Trung Hoa
-                        đa vùng miền, được chế biến bởi đầu bếp giàu kinh nghiệm với
-                        nguyên liệu tuyển chọn mỗi ngày.
+                        thượng hạng — Mãn Vị Lâu mang đến hành trình ẩm thực Trung Hoa đa
+                        vùng miền, được chế biến bởi đầu bếp giàu kinh nghiệm với nguyên
+                        liệu tuyển chọn mỗi ngày.
                     </p>
 
                     <div className="restaurant-hero-actions">
@@ -80,11 +82,11 @@ export default function HomePage() {
                 </div>
 
                 <p>
-                    Mãn Vị Lâu ra đời với mong muốn mang trọn vẹn tinh hoa ẩm thực
-                    Trung Hoa — từ lẩu vùng miền, dimsum Quảng Đông đến các món
-                    Tứ Xuyên đậm đà — đến từng thực khách. Không gian riêng tư,
-                    giới hạn số bàn để đảm bảo trải nghiệm tinh tế, cùng đầu bếp
-                    tận tâm chế biến từ nguyên liệu tươi ngon mỗi ngày.
+                    Mãn Vị Lâu ra đời với mong muốn mang trọn vẹn tinh hoa ẩm thực Trung
+                    Hoa — từ lẩu vùng miền, dimsum Quảng Đông đến các món Tứ Xuyên đậm đà
+                    — đến từng thực khách. Không gian riêng tư, giới hạn số bàn để đảm bảo
+                    trải nghiệm tinh tế, cùng đầu bếp tận tâm chế biến từ nguyên liệu tươi
+                    ngon mỗi ngày.
                 </p>
             </section>
 
@@ -98,31 +100,46 @@ export default function HomePage() {
                     <article>
                         <span>01</span>
                         <h3>Lẩu vùng miền</h3>
-                        <p>Từ Tứ Xuyên mala cay tê đến hải sản Quảng Đông, phục vụ theo nồi ấm cúng.</p>
+                        <p>
+                            Từ Tứ Xuyên mala cay tê đến hải sản Quảng Đông, phục vụ theo
+                            nồi ấm cúng.
+                        </p>
                     </article>
 
                     <article>
                         <span>02</span>
                         <h3>Dimsum</h3>
-                        <p>Há cảo, xíu mại, bánh bao hấp nóng hổi theo phong cách điểm tâm Quảng Đông.</p>
+                        <p>
+                            Há cảo, xíu mại, bánh bao hấp nóng hổi theo phong cách điểm
+                            tâm Quảng Đông.
+                        </p>
                     </article>
 
                     <article>
                         <span>03</span>
                         <h3>Món Tứ Xuyên</h3>
-                        <p>Hương vị cay tê đặc trưng, đậm đà bản sắc ẩm thực Tây Nam Trung Hoa.</p>
+                        <p>
+                            Hương vị cay tê đặc trưng, đậm đà bản sắc ẩm thực Tây Nam
+                            Trung Hoa.
+                        </p>
                     </article>
 
                     <article>
                         <span>04</span>
                         <h3>Hải sản cao cấp</h3>
-                        <p>Tôm, cua, bào ngư tươi sống chế biến theo phong cách Trung Hoa thượng hạng.</p>
+                        <p>
+                            Tôm, cua, bào ngư tươi sống chế biến theo phong cách Trung Hoa
+                            thượng hạng.
+                        </p>
                     </article>
                 </div>
             </section>
 
             {bestSellingDishes.length > 0 && (
-                <section id="best-selling" className="restaurant-section restaurant-best-selling">
+                <section
+                    id="best-selling"
+                    className="restaurant-section restaurant-best-selling"
+                >
                     <div className="restaurant-section-header">
                         <p className="restaurant-section-label">Tuần này</p>
                         <h2>Top món bán chạy</h2>
@@ -130,8 +147,13 @@ export default function HomePage() {
 
                     <div className="restaurant-best-selling-grid">
                         {bestSellingDishes.map((dish) => (
-                            <article key={dish.rank} className="restaurant-best-selling-card">
-                                <span className="restaurant-best-selling-rank">#{dish.rank}</span>
+                            <article
+                                key={dish.rank}
+                                className="restaurant-best-selling-card"
+                            >
+                                <span className="restaurant-best-selling-rank">
+                                    #{dish.rank}
+                                </span>
                                 <img
                                     src={`/image/${dish.imageUrl}`}
                                     alt={dish.dishName}
@@ -153,17 +175,26 @@ export default function HomePage() {
                     <div className="restaurant-feature-list">
                         <div>
                             <strong>Nguyên liệu tươi mỗi ngày</strong>
-                            <p>Hải sản, rau củ và gia vị được tuyển chọn kỹ lưỡng hằng ngày.</p>
+                            <p>
+                                Hải sản, rau củ và gia vị được tuyển chọn kỹ lưỡng hằng
+                                ngày.
+                            </p>
                         </div>
 
                         <div>
                             <strong>Đầu bếp ẩm thực Trung Hoa</strong>
-                            <p>Đội ngũ đầu bếp giàu kinh nghiệm, am hiểu hương vị đa vùng miền Trung Hoa.</p>
+                            <p>
+                                Đội ngũ đầu bếp giàu kinh nghiệm, am hiểu hương vị đa vùng
+                                miền Trung Hoa.
+                            </p>
                         </div>
 
                         <div>
                             <strong>Không gian đậm chất Trung Hoa</strong>
-                            <p>Thiết kế tinh tế, riêng tư, lý tưởng cho gia đình, bạn bè và đối tác.</p>
+                            <p>
+                                Thiết kế tinh tế, riêng tư, lý tưởng cho gia đình, bạn bè
+                                và đối tác.
+                            </p>
                         </div>
                     </div>
                 </div>

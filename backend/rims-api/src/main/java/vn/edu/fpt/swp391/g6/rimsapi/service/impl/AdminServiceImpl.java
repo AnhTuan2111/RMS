@@ -1,36 +1,5 @@
 package vn.edu.fpt.swp391.g6.rimsapi.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu.CreateCategoryRequest;
-import vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu.CreateDishRequest;
-import vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu.UpdateCategoryRequest;
-import vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu.UpdateDishRequest;
-import vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu.CategoryResponse;
-import vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu.DishResponse;
-import vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu.MenuDashboardResponse;
-import vn.edu.fpt.swp391.g6.rimsapi.dto.response.report.*;
-import vn.edu.fpt.swp391.g6.rimsapi.dto.response.table.TableDetailResponse;
-import vn.edu.fpt.swp391.g6.rimsapi.entity.Category;
-import vn.edu.fpt.swp391.g6.rimsapi.entity.Dish;
-import vn.edu.fpt.swp391.g6.rimsapi.entity.Invoice;
-import vn.edu.fpt.swp391.g6.rimsapi.entity.RestaurantTable;
-import vn.edu.fpt.swp391.g6.rimsapi.enums.OrderShift;
-import vn.edu.fpt.swp391.g6.rimsapi.enums.PaymentMethod;
-import vn.edu.fpt.swp391.g6.rimsapi.repository.CategoryRepository;
-import vn.edu.fpt.swp391.g6.rimsapi.repository.DishRepository;
-import vn.edu.fpt.swp391.g6.rimsapi.repository.InvoiceRepository;
-import vn.edu.fpt.swp391.g6.rimsapi.repository.RestaurantTableRepository;
-import vn.edu.fpt.swp391.g6.rimsapi.repository.projection.BestSellingDishProjection;
-import vn.edu.fpt.swp391.g6.rimsapi.repository.projection.DailyRevenueProjection;
-import vn.edu.fpt.swp391.g6.rimsapi.service.AdminService;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.DayOfWeek;
@@ -42,6 +11,36 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import jakarta.persistence.EntityNotFoundException;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu.CreateCategoryRequest;
+import vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu.CreateDishRequest;
+import vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu.UpdateCategoryRequest;
+import vn.edu.fpt.swp391.g6.rimsapi.dto.request.menu.UpdateDishRequest;
+import vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu.CategoryResponse;
+import vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu.DishResponse;
+import vn.edu.fpt.swp391.g6.rimsapi.dto.response.menu.MenuDashboardResponse;
+import vn.edu.fpt.swp391.g6.rimsapi.dto.response.report.*;
+import vn.edu.fpt.swp391.g6.rimsapi.entity.Category;
+import vn.edu.fpt.swp391.g6.rimsapi.entity.Dish;
+import vn.edu.fpt.swp391.g6.rimsapi.entity.Invoice;
+import vn.edu.fpt.swp391.g6.rimsapi.enums.OrderShift;
+import vn.edu.fpt.swp391.g6.rimsapi.enums.PaymentMethod;
+import vn.edu.fpt.swp391.g6.rimsapi.repository.CategoryRepository;
+import vn.edu.fpt.swp391.g6.rimsapi.repository.DishRepository;
+import vn.edu.fpt.swp391.g6.rimsapi.repository.InvoiceRepository;
+import vn.edu.fpt.swp391.g6.rimsapi.repository.RestaurantTableRepository;
+import vn.edu.fpt.swp391.g6.rimsapi.repository.projection.BestSellingDishProjection;
+import vn.edu.fpt.swp391.g6.rimsapi.repository.projection.DailyRevenueProjection;
+import vn.edu.fpt.swp391.g6.rimsapi.service.AdminService;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +83,7 @@ public class AdminServiceImpl implements AdminService
                     .collect(Collectors.toList());
         } catch (EntityNotFoundException e)
         {
-            throw e;  // Ném lại để GlobalExceptionHandler bắt
+            throw e; // Ném lại để GlobalExceptionHandler bắt
         } catch (Exception e)
         {
             throw new RuntimeException("Không thể lấy danh sách món ăn theo danh mục: " + e.getMessage());
@@ -115,7 +114,7 @@ public class AdminServiceImpl implements AdminService
             return convertToResponse(dish);
         } catch (EntityNotFoundException e)
         {
-            throw e;  // Ném lại để GlobalExceptionHandler bắt
+            throw e; // Ném lại để GlobalExceptionHandler bắt
         } catch (Exception e)
         {
             throw new RuntimeException("Không thể lấy thông tin món ăn: " + e.getMessage());
@@ -153,7 +152,8 @@ public class AdminServiceImpl implements AdminService
 
             // Tìm category theo ID
             Category category = categoryRepository.findById(createDishRequest.getCategoryId())
-                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy danh mục với ID: " + createDishRequest.getCategoryId()));
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Không tìm thấy danh mục với ID: " + createDishRequest.getCategoryId()));
 
             // Tạo mới món ăn
             Dish dish = new Dish();
@@ -170,7 +170,7 @@ public class AdminServiceImpl implements AdminService
 
         } catch (IllegalArgumentException | EntityNotFoundException e)
         {
-            throw e;  // Ném lại để GlobalExceptionHandler bắt
+            throw e; // Ném lại để GlobalExceptionHandler bắt
         } catch (Exception e)
         {
             throw new RuntimeException("Không thể tạo món ăn mới: " + e.getMessage());
@@ -222,7 +222,8 @@ public class AdminServiceImpl implements AdminService
             if (updateDishRequest.getCategoryId() != null)
             {
                 Category category = categoryRepository.findById(updateDishRequest.getCategoryId())
-                        .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy danh mục với ID: " + updateDishRequest.getCategoryId()));
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "Không tìm thấy danh mục với ID: " + updateDishRequest.getCategoryId()));
                 dish.setCategory(category);
             }
 
@@ -237,7 +238,7 @@ public class AdminServiceImpl implements AdminService
 
         } catch (EntityNotFoundException | IllegalArgumentException e)
         {
-            throw e;  // Ném lại để GlobalExceptionHandler bắt
+            throw e; // Ném lại để GlobalExceptionHandler bắt
         } catch (Exception e)
         {
             throw new RuntimeException("Không thể cập nhật món ăn: " + e.getMessage());
@@ -264,13 +265,12 @@ public class AdminServiceImpl implements AdminService
             {
                 // Món đã từng được đặt -> Không cho xóa, bắt dùng "Tạm dừng" thay thế
                 throw new IllegalStateException(
-                        "Món ăn đã phát sinh đơn hàng, không thể xóa. Vui lòng dùng chức năng \"Tạm dừng\" để ẩn món khỏi menu."
-                );
+                        "Món ăn đã phát sinh đơn hàng, không thể xóa. Vui lòng dùng chức năng \"Tạm dừng\" để ẩn món khỏi menu.");
             }
 
         } catch (EntityNotFoundException | IllegalStateException e)
         {
-            throw e;  // Ném lại để GlobalExceptionHandler xử lý
+            throw e; // Ném lại để GlobalExceptionHandler xử lý
         } catch (Exception e)
         {
             throw new RuntimeException("Không thể thực hiện xóa món ăn: " + e.getMessage());
@@ -317,7 +317,7 @@ public class AdminServiceImpl implements AdminService
             return convertToResponse(category);
         } catch (EntityNotFoundException e)
         {
-            throw e;  // Ném lại để GlobalExceptionHandler bắt
+            throw e; // Ném lại để GlobalExceptionHandler bắt
         } catch (Exception e)
         {
             throw new RuntimeException("Không thể lấy thông tin danh mục: " + e.getMessage());
@@ -331,7 +331,8 @@ public class AdminServiceImpl implements AdminService
         {
             if (categoryRepository.existsByName(createCategoryRequest.getName()))
             {
-                throw new IllegalArgumentException("Tên danh mục '" + createCategoryRequest.getName() + "' đã tồn tại!");
+                throw new IllegalArgumentException(
+                        "Tên danh mục '" + createCategoryRequest.getName() + "' đã tồn tại!");
             }
 
             Category category = new Category();
@@ -344,7 +345,7 @@ public class AdminServiceImpl implements AdminService
 
         } catch (IllegalArgumentException e)
         {
-            throw e;  // Ném lại để GlobalExceptionHandler bắt
+            throw e; // Ném lại để GlobalExceptionHandler bắt
         } catch (Exception e)
         {
             throw new RuntimeException("Không thể tạo danh mục mới: " + e.getMessage());
@@ -365,7 +366,8 @@ public class AdminServiceImpl implements AdminService
             if (!category.getName().equals(updateCategoryRequest.getName())
                     && categoryRepository.existsByName(updateCategoryRequest.getName()))
             {
-                throw new IllegalArgumentException("Tên danh mục '" + updateCategoryRequest.getName() + "' đã tồn tại!");
+                throw new IllegalArgumentException(
+                        "Tên danh mục '" + updateCategoryRequest.getName() + "' đã tồn tại!");
             }
 
             // 3. Cập nhật thông tin cơ bản
@@ -447,8 +449,7 @@ public class AdminServiceImpl implements AdminService
             {
                 throw new IllegalStateException(
                         "Không thể xóa danh mục này vì có món ăn đã phát sinh đơn hàng. " +
-                                "Vui lòng dùng chức năng \"Tạm dừng\" để ẩn danh mục."
-                );
+                                "Vui lòng dùng chức năng \"Tạm dừng\" để ẩn danh mục.");
             }
 
             // ✅ LOGIC MỚI: Nếu không có dish nào có order -> Xóa cứng (xóa cả category và dishes)
@@ -493,8 +494,7 @@ public class AdminServiceImpl implements AdminService
                 .collect(Collectors.toList());
 
         var categoryStats = dishRepository.getCategoryStatistics().stream()
-                .map(result ->
-                {
+                .map(result -> {
                     Boolean isCategoryAvailable = (Boolean) result[1];
                     return MenuDashboardResponse.CategoryStatResponse.builder()
                             .categoryName((String) result[0])
@@ -513,7 +513,6 @@ public class AdminServiceImpl implements AdminService
                 .categoryStats(categoryStats)
                 .build();
     }
-
 
     // INVOICE SERVICE
 
@@ -538,8 +537,7 @@ public class AdminServiceImpl implements AdminService
             try
             {
                 normalizedPaymentMethod = PaymentMethod.valueOf(trimmedMethod.toUpperCase(Locale.ROOT));
-            }
-            catch (IllegalArgumentException ex)
+            } catch (IllegalArgumentException ex)
             {
                 throw new IllegalArgumentException("Phương thức thanh toán không hợp lệ: " + paymentMethod);
             }
@@ -558,16 +556,14 @@ public class AdminServiceImpl implements AdminService
                         row.getTableNumber(),
                         row.getPaymentMethod(),
                         row.getAmount(),
-                        row.getPaymentDate()
-                ));
+                        row.getPaymentDate()));
 
         return new InvoiceHistoryPageResponse(
                 historyPage.getContent(),
                 requestedPage,
                 requestedPageSize,
                 historyPage.getTotalElements(),
-                historyPage.getTotalPages()
-        );
+                historyPage.getTotalPages());
     }
 
     private String normalizeFilter(String value)
@@ -589,8 +585,7 @@ public class AdminServiceImpl implements AdminService
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn"));
 
-        InvoiceDetailResponse response =
-                new InvoiceDetailResponse();
+        InvoiceDetailResponse response = new InvoiceDetailResponse();
 
         response.setInvoiceId(invoice.getId());
         response.setOrderId(invoice.getOrder().getId());
@@ -599,20 +594,19 @@ public class AdminServiceImpl implements AdminService
         response.setInvoiceDate(invoice.getInvoiceDate());
 
         response.setPaymentMethod(invoice.getPayments().isEmpty()
-                ? "Không xác định" : invoice.getPayments().getFirst().getPaymentMethod().name());
+                ? "Không xác định"
+                : invoice.getPayments().getFirst().getPaymentMethod().name());
 
-        List<InvoiceItemResponse> items =
-                invoice.getOrder().getOrderItems().stream().map(orderItem ->
-                {
-                    InvoiceItemResponse item = new InvoiceItemResponse();
+        List<InvoiceItemResponse> items = invoice.getOrder().getOrderItems().stream().map(orderItem -> {
+            InvoiceItemResponse item = new InvoiceItemResponse();
 
-                    item.setDishName(orderItem.getDish().getName());
-                    item.setQuantity(orderItem.getQuantity());
-                    item.setUnitPrice(orderItem.getUnitPrice());
-                    item.setAmount(orderItem.getSubTotal());
+            item.setDishName(orderItem.getDish().getName());
+            item.setQuantity(orderItem.getQuantity());
+            item.setUnitPrice(orderItem.getUnitPrice());
+            item.setAmount(orderItem.getSubTotal());
 
-                    return item;
-                }).toList();
+            return item;
+        }).toList();
 
         response.setItems(items);
 
@@ -746,8 +740,7 @@ public class AdminServiceImpl implements AdminService
             items.add(new DailyRevenueItemResponse(
                     getDayLabel(currentDate.getDayOfWeek()),
                     currentDate,
-                    revenueByDate.getOrDefault(currentDate, BigDecimal.ZERO))
-            );
+                    revenueByDate.getOrDefault(currentDate, BigDecimal.ZERO)));
 
             currentDate = currentDate.plusDays(1);
         }
@@ -788,9 +781,7 @@ public class AdminServiceImpl implements AdminService
                             row.getDishName(),
                             row.getImageUrl(),
                             row.getTotalQuantity(),
-                            row.getTotalRevenue()
-                    )
-            );
+                            row.getTotalRevenue()));
         }
 
         return new BestSellingReportResponse(fromDate, toDate, "Khoảng thời gian đã chọn", items);
@@ -852,8 +843,8 @@ public class AdminServiceImpl implements AdminService
                         highestShift.getStartTime(),
                         highestShift.getEndTime(),
                         highestShiftOrderCount,
-                        calculatePercentage(highestShiftOrderCount, totalPaidOrders)
-                ), shifts);
+                        calculatePercentage(highestShiftOrderCount, totalPaidOrders)),
+                shifts);
     }
 
     // Helper
@@ -905,7 +896,8 @@ public class AdminServiceImpl implements AdminService
         return null;
     }
 
-    private List<OrderShiftItemResponse> buildOrderShiftItems(Map<OrderShift, Long> orderCountByShift, long totalPaidOrders)
+    private List<OrderShiftItemResponse> buildOrderShiftItems(Map<OrderShift, Long> orderCountByShift,
+            long totalPaidOrders)
     {
         List<OrderShiftItemResponse> shifts = new ArrayList<>();
 
@@ -919,8 +911,7 @@ public class AdminServiceImpl implements AdminService
                     shift.getStartTime(),
                     shift.getEndTime(),
                     orderCount,
-                    calculatePercentage(orderCount, totalPaidOrders))
-            );
+                    calculatePercentage(orderCount, totalPaidOrders)));
         }
         return shifts;
     }
@@ -968,12 +959,9 @@ public class AdminServiceImpl implements AdminService
     {
         String payload = String.format(
                 "{\"type\":\"MENU_VISIBILITY_CHANGED\",\"dishId\":%d,\"hidden\":%b}",
-                dish.getId(), dish.isHidden()
-        );
+                dish.getId(), dish.isHidden());
         messagingTemplate.convertAndSend("/topic/waiter", payload);
         messagingTemplate.convertAndSend("/topic/kitchen", payload);
     }
 
 }
-
-

@@ -2,7 +2,6 @@ package vn.edu.fpt.swp391.g6.rimsapi.service;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 
-
 public interface JwtService
 {
     String generateAccessToken(int id, String username, String role);
