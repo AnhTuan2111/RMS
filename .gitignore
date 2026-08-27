@@ -26,3 +26,9 @@ replay_pid*
 # Env secrets (local overrides)
 .env
 .env.local
+
+# Cấu hình riêng từng máy: chứa mật khẩu DB, app password Gmail, JWT signer key,
+# VNPay hash secret. Xem application-local.yaml.example để biết cần điền gì.
+application-local.yaml
+application-local.yml
+application-local.properties

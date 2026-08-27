@@ -54,75 +54,75 @@ Hệ thống quản lý nhà hàng gồm 2 phần:
 
 ## 3. Cấu hình Backend
 
-File cấu hình: `backend/rims-api/src/main/resources/application.yaml`
+Cấu hình dùng chung nằm ở `backend/rims-api/src/main/resources/application.yaml` và **được commit**.
+File này chỉ chứa placeholder, không chứa giá trị bí mật nào.
 
-### 3.1. Database (SQL Server)
+### 3.1. Điền secret cho máy của bạn
 
-```yaml
-spring:
-  datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=RIMS_DB;encrypt=true;trustServerCertificate=true
-    username: sa
-    password: <mật khẩu SQL Server của bạn>
+Copy file mẫu rồi điền giá trị thật:
+
+```bash
+cd backend/rims-api/src/main/resources
+cp application-local.yaml.example application-local.yaml
 ```
 
-- Tạo database `RIMS_DB` trên SQL Server (hoặc đổi tên khác rồi sửa `databaseName`).
-- `ddl-auto: create` nghĩa là **Hibernate sẽ tự tạo lại toàn bộ schema mỗi lần khởi động** (xoá dữ liệu cũ). Nếu muốn giữ dữ liệu giữa các lần chạy, đổi thành `update` hoặc `validate` sau khi đã seed dữ liệu lần đầu.
+`application-local.yaml` đã nằm trong `.gitignore` nên không bao giờ bị commit.
+Spring tự nạp file này và ghi đè lên `application.yaml`.
 
-### 3.2. Mail (gửi OTP / thông báo)
+Bốn giá trị bắt buộc phải điền — thiếu là app không khởi động được:
 
-```yaml
-spring:
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: <email gmail>
-    password: <app password 16 ký tự>
-```
+| Khoá | Là gì | Lấy ở đâu |
+|---|---|---|
+| `spring.datasource.password` | Mật khẩu SQL Server | Bạn đặt khi cài SQL Server |
+| `spring.mail.username` / `password` | Tài khoản gửi OTP | App Password 16 ký tự của Gmail, tạo tại [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords) (phải bật xác thực 2 bước trước) |
+| `jwt.signerKey` | Khoá ký JWT | Tự sinh: `openssl rand -base64 48` |
+| `vnpay.hash-secret` | Khoá ký giao dịch VNPay | Trong tài khoản sandbox VNPay |
 
-- Dùng **App Password** của Gmail (không dùng mật khẩu đăng nhập thường), yêu cầu bật xác thực 2 bước cho tài khoản Gmail trước.
+Cách khác nếu không muốn dùng file: đặt biến môi trường `DB_PASSWORD`, `MAIL_USERNAME`,
+`MAIL_PASSWORD`, `JWT_SIGNER_KEY`, `VNPAY_HASH_SECRET`.
 
-### 3.3. JWT
+### 3.2. Database (SQL Server)
 
-```yaml
-jwt:
-  signerKey: "..."
-```
+Tạo database `RIMS_DB` trên SQL Server (hoặc đổi tên rồi sửa biến môi trường `DB_URL`).
 
-- Chuỗi bí mật để ký/giải mã JWT. Nên đổi sang giá trị ngẫu nhiên riêng khi deploy thật.
+Về `ddl-auto`:
 
-### 3.4. VNPay (thanh toán)
+- **Mặc định là `update`** — giữ nguyên dữ liệu giữa các lần khởi động.
+- **Profile `dev` dùng `create`** — dựng lại schema sạch và nạp dữ liệu mẫu.
 
-```yaml
-vnpay:
-  url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-  tmn-code: "..."
-  hash-secret: "..."
-  version: "2.1.0"
-  command: "pay"
-  return-url: "http://localhost:8080/rims/cashier/payments/vnpay-callback"
-```
-
-- Đây là cấu hình **sandbox** VNPay. Khi triển khai production cần đổi `url`, `tmn-code`, `hash-secret` theo tài khoản merchant thật, và `return-url` theo domain thật.
-
-
-### 3.5. Chạy Backend
+### 3.3. Chạy Backend
 
 Từ thư mục `backend/rims-api`:
 
-**Windows:**
+**Lần đầu tiên** (tạo schema + nạp dữ liệu mẫu: tài khoản, bàn, món ăn, 3000 order lịch sử):
+
 ```bash
-mvnw.cmd clean install
-mvnw.cmd spring-boot:run
+# Windows
+mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
+
+# macOS/Linux
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-**macOS/Linux:**
+**Các lần sau** (giữ nguyên dữ liệu — dùng cái này khi demo):
+
 ```bash
-./mvnw clean install
+# Windows
+mvnw.cmd spring-boot:run
+
+# macOS/Linux
 ./mvnw spring-boot:run
 ```
 
+`DatabaseSeeder` chỉ chạy ở profile `dev` vì nó tạo tài khoản với mật khẩu mặc định `123456`.
+Mỗi bước seed đều kiểm tra `count() > 0` nên chạy lại nhiều lần không tạo dữ liệu trùng.
+
 Server mặc định chạy tại: `http://localhost:8080`
+
+### 3.4. VNPay
+
+Cấu hình mặc định trỏ tới **sandbox**. Khi deploy thật cần đổi `vnpay.url`,
+`VNPAY_TMN_CODE`, `VNPAY_HASH_SECRET` theo tài khoản merchant, và `VNPAY_RETURN_URL` theo domain thật.
 
 ## 4. Cấu hình & chạy Frontend
 

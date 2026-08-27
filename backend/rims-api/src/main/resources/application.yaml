@@ -1,22 +1,37 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
+
 spring:
   application:
     name: rims-api
+
+  # File cấu hình riêng của từng máy, KHÔNG commit (đã nằm trong .gitignore).
+  # Copy application-local.yaml.example -> application-local.yaml rồi điền giá trị thật.
+  # Giá trị trong file đó ghi đè lên mọi giá trị bên dưới.
+  config:
+    import: optional:classpath:application-local.yaml
+
+  # Không có giá trị mặc định cho secret: thiếu là app không khởi động được,
+  # tốt hơn là chạy bằng một mật khẩu mặc định nào đó mà không ai để ý.
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=RIMS_DB;encrypt=true;trustServerCertificate=true
-    username: sa
-    password: 123
+    url: ${DB_URL:jdbc:sqlserver://localhost:1433;databaseName=RIMS_DB;encrypt=true;trustServerCertificate=true}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD}
+
   jpa:
     hibernate:
-      ddl-auto: create
+      # update: giữ nguyên dữ liệu giữa các lần khởi động ứng dụng.
+      # Trước đây là "create" nên mỗi lần chạy lại là mất sạch dữ liệu nhập tay.
+      # Profile "dev" bên dưới ghi đè lại thành "create" khi cần schema sạch.
+      ddl-auto: ${DDL_AUTO:update}
     open-in-view: false
     show-sql: false
+
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: hienntthe172532@fpt.edu.vn
-    password: klzyuxcibssnwrpx
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -25,12 +40,27 @@ spring:
             enable: true
 
 jwt:
-  signerKey: "Bkvw045nqvIXbwCtsf9fNAH8olxBeipB"
+  # Chuỗi ngẫu nhiên tối thiểu 32 ký tự. Sinh mới: openssl rand -base64 48
+  signerKey: ${JWT_SIGNER_KEY}
 
 vnpay:
   url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-  tmn-code: "D90AVGT4"
-  hash-secret: "8BJJ73AOD4FMOY3DKHD0ST66RCKY488C"
+  # tmn-code là mã định danh merchant, xuất hiện công khai trong URL thanh toán
+  # nên để mặc định được. hash-secret mới là thứ phải giữ kín.
+  tmn-code: ${VNPAY_TMN_CODE:D90AVGT4}
+  hash-secret: ${VNPAY_HASH_SECRET}
   version: "2.1.0"
   command: "pay"
-  return-url: "http://localhost:8080/rims/cashier/payments/vnpay-callback"
+  return-url: ${VNPAY_RETURN_URL:http://localhost:8080/rims/cashier/payments/vnpay-callback}
+
+---
+# Profile "dev": dựng lại schema sạch và nạp dữ liệu mẫu (DatabaseSeeder chỉ chạy ở đây).
+# Chạy: mvn spring-boot:run -Dspring-boot.run.profiles=dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
