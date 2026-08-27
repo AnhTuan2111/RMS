@@ -1,0 +1,11 @@
+# Các commit chỉ đổi format, không đổi hành vi.
+# git blame bỏ qua chúng để không gán nhầm code của người khác sang tên
+# người chạy formatter.
+#
+# Bật một lần cho repo này:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub tự đọc file này, không cần cấu hình gì thêm.
+
+# style: chuẩn hoá format toàn repo bằng Spotless và Prettier
+f27b5f39924892075a1bc06b14f7ddfc32889dfb
