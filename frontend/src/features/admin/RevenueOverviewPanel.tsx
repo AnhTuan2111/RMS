@@ -8,6 +8,7 @@ import {
     type RevenueReportResponse,
     type WeeklyRevenueChartResponse,
 } from '@/shared/api/admin'
+import {getErrorMessage} from '@/shared/utils/error'
 
 interface WeekOption {
     value: string
@@ -244,25 +245,6 @@ function WeeklyBestSellerImage({
             onError={() => setHasError(true)}
         />
     )
-}
-
-function getApiErrorMessage(error: unknown, fallback: string) {
-    if (typeof error !== 'object' || error === null) {
-        return fallback
-    }
-
-    const response = (
-        error as {
-            response?: {
-                data?: {
-                    error?: string
-                    message?: string
-                }
-            }
-        }
-    ).response
-
-    return response?.data?.message ?? response?.data?.error ?? fallback
 }
 
 function buildShiftRows(report: OrderShiftReportResponse | null): ShiftViewItem[] {
@@ -835,7 +817,7 @@ export default function AdminRevenueOverviewDashboard() {
 
             console.error(error)
             setOverviewError(
-                getApiErrorMessage(
+                getErrorMessage(
                     error,
                     'Không thể tải dashboard tổng quan doanh thu tuần.',
                 ),

@@ -16,58 +16,12 @@ import type {
 } from '@/shared/api/customer'
 import {REALTIME_CONFIG} from '@/app/config/realtime'
 import {usePolling} from '@/shared/hooks/usePolling'
+import {getErrorMessage, isRequestCanceled} from '@/shared/utils/error'
 
 const today = new Date()
 const todayStr = today.toISOString().split('T')[0]
 
 type ReservationTab = 'book' | 'cancel'
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
-}
-
-function getRequestErrorMessage(error: unknown, fallback: string) {
-    if (typeof error !== 'object' || error === null) {
-        return fallback
-    }
-
-    const requestError = error as {
-        response?: {
-            data?:
-                | string
-                | {
-                      message?: string
-                  }
-        }
-        message?: string
-    }
-
-    const responseData = requestError.response?.data
-
-    if (typeof responseData === 'string') {
-        return responseData
-    }
-
-    if (responseData?.message) {
-        return responseData.message
-    }
-
-    return requestError.message || fallback
-}
 
 function isNotFoundError(error: unknown) {
     if (typeof error !== 'object' || error === null) {
@@ -219,9 +173,7 @@ export default function CustomerReservations() {
 
             console.error('[CUSTOMER_RESERVATIONS_TABLES_ERROR]', requestError)
 
-            setTableError(
-                getRequestErrorMessage(requestError, 'Không thể tải danh sách bàn'),
-            )
+            setTableError(getErrorMessage(requestError, 'Không thể tải danh sách bàn'))
 
             setAvailableTables([])
         } finally {
@@ -358,7 +310,7 @@ export default function CustomerReservations() {
 
             console.error('[CUSTOMER_BOOK_RESERVATION_ERROR]', requestError)
 
-            setBookError(getRequestErrorMessage(requestError, 'Đặt bàn thất bại'))
+            setBookError(getErrorMessage(requestError, 'Đặt bàn thất bại'))
         } finally {
             setBookLoading(false)
         }
@@ -388,7 +340,7 @@ export default function CustomerReservations() {
 
             console.error('[CUSTOMER_CANCEL_RESERVATION_ERROR]', requestError)
 
-            setCancelError(getRequestErrorMessage(requestError, 'Hủy đặt bàn thất bại'))
+            setCancelError(getErrorMessage(requestError, 'Hủy đặt bàn thất bại'))
         } finally {
             setCancelingId(null)
         }

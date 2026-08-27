@@ -4,25 +4,7 @@ import {Link, useNavigate} from 'react-router-dom'
 import {login} from '@/shared/api/auth'
 import {useActor} from '@/app/providers/ActorContext'
 import {RoleType} from '@/shared/types/auth'
-import {getErrorMessage} from '@/shared/utils/error'
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
-}
+import {getErrorMessage, isRequestCanceled} from '@/shared/utils/error'
 
 function getRedirectPath(role: RoleType) {
     switch (role) {

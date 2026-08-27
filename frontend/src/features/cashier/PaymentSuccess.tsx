@@ -2,24 +2,7 @@
 import {useNavigate, useSearchParams} from 'react-router-dom'
 
 import {cashierApi} from '@/shared/api/cashier'
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
-}
+import {isRequestCanceled} from '@/shared/utils/error'
 
 export default function PaymentSuccess() {
     const [searchParams] = useSearchParams()

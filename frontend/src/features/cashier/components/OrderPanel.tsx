@@ -2,6 +2,7 @@
 
 import {cashierApi} from '@/shared/api/cashier'
 import type {OrderDetailResponse, TableDashboardResponse} from '@/shared/types/cashier'
+import {isRequestCanceled} from '@/shared/utils/error'
 
 export interface CustomerInfo {
     id: number
@@ -20,24 +21,6 @@ interface OrderPanelProps {
     pointsUsed: number
     onCustomerChange: (customer: CustomerInfo | null) => void
     onPointsUsedChange: (points: number) => void
-}
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
 }
 
 function getHttpStatus(error: unknown) {

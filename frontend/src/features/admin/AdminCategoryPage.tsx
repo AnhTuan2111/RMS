@@ -3,6 +3,7 @@ import {categoryApi, dishApi} from '@/shared/api/admin'
 import type {CategoryResponse, DishResponse, CategoryFormData} from '@/shared/api/admin'
 import {EmptyState, ErrorState, LoadingState} from '@/shared/components/feedback'
 import {PageCard, PageHeader} from '@/shared/components/ui'
+import {getErrorMessage} from '@/shared/utils/error'
 
 type ViewMode = 'LIST' | 'CREATE' | 'EDIT' | 'DETAIL'
 type FilterStatus = 'ALL' | 'ACTIVE' | 'HIDDEN'
@@ -10,26 +11,6 @@ type FilterStatus = 'ALL' | 'ACTIVE' | 'HIDDEN'
 // --- Pagination Config ---
 const ITEMS_PER_PAGE = 5
 const DISH_ITEMS_PER_PAGE = 5 // THÊM: config cho số món hiển thị mỗi trang
-
-type ErrorResponseShape = {
-    response?: {
-        data?: {
-            message?: unknown
-        }
-    }
-}
-
-function getRequestErrorMessage(error: unknown, fallbackMessage: string) {
-    const errorResponse = error as ErrorResponseShape
-
-    const message = errorResponse.response?.data?.message
-
-    if (typeof message === 'string' && message.trim().length > 0) {
-        return message
-    }
-
-    return fallbackMessage
-}
 
 export default function AdminCategoryPage() {
     // --- States ---
@@ -147,10 +128,7 @@ export default function AdminCategoryPage() {
             await loadCategories(true, true)
         } catch (err: unknown) {
             console.error('Lỗi API xử lý danh mục:', err)
-            const errMsg = getRequestErrorMessage(
-                err,
-                'Đã xảy ra lỗi trong quá trình xử lý.',
-            )
+            const errMsg = getErrorMessage(err, 'Đã xảy ra lỗi trong quá trình xử lý.')
             alert(errMsg)
         } finally {
             setIsSubmitting(false)
@@ -166,10 +144,7 @@ export default function AdminCategoryPage() {
             await loadCategories(true, true)
         } catch (err: unknown) {
             console.error('Lỗi khi xóa danh mục:', err)
-            const errMsg = getRequestErrorMessage(
-                err,
-                'Không thể thực hiện xóa danh mục!',
-            )
+            const errMsg = getErrorMessage(err, 'Không thể thực hiện xóa danh mục!')
             alert(errMsg)
             setDeleteModal({open: false, id: null})
         }

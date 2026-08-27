@@ -4,24 +4,7 @@ import {useNavigate, useParams} from 'react-router-dom'
 import {type OrderDetailResponse, waiterApi} from '@/shared/api/waiter'
 import {BackArrow, fmtPrice, WaiterHeader} from './components'
 import {useWaiterSocket} from '@/realtime'
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
-}
+import {isRequestCanceled} from '@/shared/utils/error'
 
 export default function WaiterOrderDetailPage() {
     const navigate = useNavigate()

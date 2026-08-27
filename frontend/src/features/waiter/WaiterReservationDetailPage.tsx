@@ -5,24 +5,7 @@ import {type ReservationResponse, waiterApi} from '@/shared/api/waiter'
 import {REALTIME_CONFIG} from '@/app/config/realtime'
 import {BackArrow, WaiterHeader} from './components'
 import {usePolling} from '@/shared/hooks/usePolling'
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
-}
+import {isRequestCanceled} from '@/shared/utils/error'
 
 function getReservationId(reservation: ReservationResponse) {
     return reservation.reservationId ?? reservation.id

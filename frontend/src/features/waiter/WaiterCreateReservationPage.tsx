@@ -13,6 +13,7 @@ import {getAvailableTimeSlots} from '@/shared/utils/reservationTime'
 import {REALTIME_CONFIG} from '@/app/config/realtime'
 import {WaiterHeader, WaiterToast} from './components'
 import {usePolling} from '@/shared/hooks/usePolling'
+import {getErrorMessage, isRequestCanceled} from '@/shared/utils/error'
 
 type ToastState = {
     msg: string
@@ -36,53 +37,6 @@ function todayString() {
         String(date.getMonth() + 1).padStart(2, '0'),
         String(date.getDate()).padStart(2, '0'),
     ].join('-')
-}
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
-}
-
-function getRequestErrorMessage(error: unknown, fallback: string) {
-    if (typeof error !== 'object' || error === null) {
-        return fallback
-    }
-
-    const requestError = error as {
-        response?: {
-            data?:
-                | string
-                | {
-                      message?: string
-                  }
-        }
-        message?: string
-    }
-
-    const responseData = requestError.response?.data
-
-    if (typeof responseData === 'string') {
-        return responseData
-    }
-
-    if (responseData?.message) {
-        return responseData.message
-    }
-
-    return requestError.message || fallback
 }
 
 function getReservationId(reservation: ReservationResponse) {
@@ -402,10 +356,7 @@ export default function WaiterCreateReservationPage() {
             console.error('[WAITER_CREATE_RESERVATION_SUBMIT_ERROR]', requestError)
 
             setResFormError(
-                getRequestErrorMessage(
-                    requestError,
-                    'Đặt bàn thất bại. Vui lòng thử lại.',
-                ),
+                getErrorMessage(requestError, 'Đặt bàn thất bại. Vui lòng thử lại.'),
             )
         } finally {
             setSubmitting(false)

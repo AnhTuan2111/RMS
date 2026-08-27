@@ -60,17 +60,20 @@ function getMessageFromResponseData(data: unknown) {
         return data
     }
 
+    // Ưu tiên message: GlobalExceptionHandler ở backend đã đặt sẵn câu tiếng Việt
+    // dành cho người dùng. details là map field -> lỗi, chỉ dùng khi không có
+    // message, vì hiển thị thẳng ra sẽ lộ tên field kỹ thuật ("phone: ...").
     if (isApiErrorResponse(data)) {
-        return formatDetails(data.details) ?? data.message ?? data.error
+        return data.message ?? data.error ?? formatDetails(data.details)
     }
 
     if (typeof data === 'object') {
         const responseData = data as ErrorLikeResponse
 
         return (
-            formatDetails(responseData.details) ??
             responseData.message ??
             responseData.error ??
+            formatDetails(responseData.details) ??
             null
         )
     }

@@ -7,6 +7,7 @@ import type {
     PaymentResponse,
 } from '@/shared/types/cashier'
 import type {CustomerInfo} from './OrderPanel'
+import {isRequestCanceled} from '@/shared/utils/error'
 
 interface PaymentModalProps {
     orderId: number
@@ -15,24 +16,6 @@ interface PaymentModalProps {
     pointsUsed: number
     onClose: () => void
     onSuccess: (result: PaymentResponse) => void
-}
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
 }
 
 function formatCurrency(value: number) {

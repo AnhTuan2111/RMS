@@ -8,6 +8,7 @@ import {
 } from '@/shared/api/waiter'
 import {WaiterHeader, WaiterTableCard} from './components'
 import {useWaiterSocket} from '@/realtime'
+import {isRequestCanceled} from '@/shared/utils/error'
 
 type WaiterTableStatus = 'AVAILABLE' | 'SERVING' | 'RESERVED'
 
@@ -83,24 +84,6 @@ function todayString() {
         String(date.getMonth() + 1).padStart(2, '0'),
         String(date.getDate()).padStart(2, '0'),
     ].join('-')
-}
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
 }
 
 function getReservationId(reservation: ReservationResponse) {

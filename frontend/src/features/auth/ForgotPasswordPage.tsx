@@ -2,7 +2,7 @@
 import {Link, useNavigate} from 'react-router-dom'
 
 import {forgotPassword, resetPassword} from '@/shared/api/auth'
-import {getErrorMessage} from '@/shared/utils/error'
+import {getErrorMessage, isRequestCanceled} from '@/shared/utils/error'
 
 type Step = 'email' | 'otp' | 'done'
 
@@ -12,24 +12,6 @@ const STEP_LABELS: Record<Step, string> = {
     email: 'Nhập email',
     otp: 'Xác nhận OTP',
     done: 'Hoàn thành',
-}
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
 }
 
 function isValidEmail(value: string) {

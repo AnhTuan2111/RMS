@@ -6,6 +6,7 @@ import {REALTIME_CONFIG} from '@/app/config/realtime'
 import {EmptyState, ErrorState, LoadingState} from '@/shared/components/feedback'
 import {PageCard, PageHeader} from '@/shared/components/ui'
 import {usePolling} from '@/shared/hooks/usePolling'
+import {isRequestCanceled} from '@/shared/utils/error'
 
 const PAGE_SIZE = 10
 
@@ -15,24 +16,6 @@ type InvoiceFilterParams = {
     keyword: string
     paymentMethod: string
     invoiceCode: string
-}
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
 }
 
 function formatTime(iso: string) {

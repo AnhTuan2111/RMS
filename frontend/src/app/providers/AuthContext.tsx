@@ -11,7 +11,7 @@ import {
 import * as authApi from '@/shared/api/auth'
 import type {AuthUser, LoginRequest} from '@/shared/types/auth'
 import {hasAccessToken} from '@/shared/utils/tokenStorage'
-import {getErrorMessage} from '@/shared/utils/error'
+import {getErrorMessage, isRequestCanceled} from '@/shared/utils/error'
 
 interface AuthContextValue {
     user: AuthUser | null
@@ -24,24 +24,6 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
-}
 
 export function AuthProvider({children}: {children: ReactNode}) {
     const [user, setUser] = useState<AuthUser | null>(null)

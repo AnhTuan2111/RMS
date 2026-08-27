@@ -9,6 +9,7 @@ import {
     type OrderShiftReportResponse,
     type RevenueReportResponse,
 } from '@/shared/api/admin'
+import {getErrorMessage} from '@/shared/utils/error'
 
 type ReportKey = 'revenue' | 'categoryBestsellers' | 'bestsellers' | 'orderShifts'
 
@@ -339,25 +340,6 @@ function parseManualDateForApi(value: string) {
     const parsedDate = parseVietnameseDate(value)
 
     return parsedDate ? formatDateForApi(parsedDate) : null
-}
-
-function getApiErrorMessage(error: unknown, fallback: string) {
-    if (typeof error !== 'object' || error === null) {
-        return fallback
-    }
-
-    const response = (
-        error as {
-            response?: {
-                data?: {
-                    error?: string
-                    message?: string
-                }
-            }
-        }
-    ).response
-
-    return response?.data?.message ?? response?.data?.error ?? fallback
 }
 
 function getRangeLabelFromPreset(preset: RangePreset, selectedWeek?: WeekOption) {
@@ -1562,7 +1544,7 @@ export default function AdminStatisticsPage() {
             }
 
             console.error(error)
-            setRevenueError(getApiErrorMessage(error, 'Không thể tải báo cáo doanh thu.'))
+            setRevenueError(getErrorMessage(error, 'Không thể tải báo cáo doanh thu.'))
         } finally {
             if (showFullLoading && !signal?.aborted) {
                 setIsRevenueLoading(false)
@@ -1597,7 +1579,7 @@ export default function AdminStatisticsPage() {
 
             console.error(error)
             setCategoryBestSellingError(
-                getApiErrorMessage(error, 'Không thể tải danh mục món ăn.'),
+                getErrorMessage(error, 'Không thể tải danh mục món ăn.'),
             )
         }
     }
@@ -1638,10 +1620,7 @@ export default function AdminStatisticsPage() {
 
             console.error(error)
             setCategoryBestSellingError(
-                getApiErrorMessage(
-                    error,
-                    'Không thể tải top món bán chạy theo danh mục.',
-                ),
+                getErrorMessage(error, 'Không thể tải top món bán chạy theo danh mục.'),
             )
         } finally {
             if (showFullLoading && !signal?.aborted) {
@@ -1679,7 +1658,7 @@ export default function AdminStatisticsPage() {
 
             console.error(error)
             setBestSellingError(
-                getApiErrorMessage(error, 'Không thể tải dữ liệu món bán chạy.'),
+                getErrorMessage(error, 'Không thể tải dữ liệu món bán chạy.'),
             )
         } finally {
             if (showFullLoading && !signal?.aborted) {
@@ -1716,7 +1695,7 @@ export default function AdminStatisticsPage() {
 
             console.error(error)
             setOrderShiftError(
-                getApiErrorMessage(
+                getErrorMessage(
                     error,
                     'Không thể tải dữ liệu thống kê đơn hàng theo ca.',
                 ),
@@ -1856,7 +1835,7 @@ export default function AdminStatisticsPage() {
         } catch (error) {
             console.error(error)
             setCustomRangeError(
-                getApiErrorMessage(
+                getErrorMessage(
                     error,
                     'Không thể tải doanh thu theo khoảng thời gian đã chọn.',
                 ),

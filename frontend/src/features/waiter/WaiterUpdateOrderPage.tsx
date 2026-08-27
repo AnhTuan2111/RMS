@@ -17,6 +17,7 @@ import {
 } from '@/shared/api/waiter'
 import {BackArrow, ConfirmModal, fmtPrice, WaiterHeader, WaiterToast} from './components'
 import {useWaiterSocket} from '@/realtime'
+import {getErrorMessage, isRequestCanceled} from '@/shared/utils/error'
 
 type DraftItem = {
     qty: number
@@ -47,60 +48,6 @@ type ChangeSummaryItem = {
     kind: ChangeKind
     qty: number
     note?: string
-}
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
-}
-
-function getRequestErrorMessage(error: unknown, fallback: string) {
-    if (typeof error !== 'object' || error === null) {
-        return fallback
-    }
-
-    const requestError = error as {
-        response?: {
-            data?:
-                | string
-                | {
-                      message?: string
-                      details?: Record<string, string>
-                  }
-        }
-        message?: string
-    }
-
-    const responseData = requestError.response?.data
-
-    if (typeof responseData === 'string') {
-        return responseData
-    }
-
-    if (responseData?.details && Object.keys(responseData.details).length > 0) {
-        return Object.entries(responseData.details)
-            .map(([key, value]) => `${key}: ${value}`)
-            .join('; ')
-    }
-
-    if (responseData?.message) {
-        return responseData.message
-    }
-
-    return requestError.message || fallback
 }
 
 function formatChefNoteTime(value?: string | null) {
@@ -454,7 +401,7 @@ export default function WaiterUpdateOrderPage() {
             console.error('[WAITER_UPDATE_ORDER_SUBMIT_ERROR]', requestError)
 
             showToast(
-                `Cập nhật thất bại: ${getRequestErrorMessage(
+                `Cập nhật thất bại: ${getErrorMessage(
                     requestError,
                     'Lỗi không xác định',
                 )}`,
@@ -557,10 +504,7 @@ export default function WaiterUpdateOrderPage() {
             console.error('[WAITER_UPDATE_ORDER_ACK_NOTE_ERROR]', requestError)
 
             showToast(
-                getRequestErrorMessage(
-                    requestError,
-                    'Không thể xác nhận ghi chú từ bếp.',
-                ),
+                getErrorMessage(requestError, 'Không thể xác nhận ghi chú từ bếp.'),
                 'error',
             )
         } finally {

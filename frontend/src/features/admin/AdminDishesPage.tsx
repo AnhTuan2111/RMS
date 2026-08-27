@@ -4,36 +4,12 @@ import type {DishResponse, CategoryResponse, DishFormData} from '@/shared/api/ad
 import {EmptyState, ErrorState, LoadingState} from '@/shared/components/feedback'
 import {PageCard, PageHeader} from '@/shared/components/ui'
 import {useWaiterSocket} from '@/realtime'
+import {getErrorMessage} from '@/shared/utils/error'
 
 type ModalType = 'NONE' | 'CREATE' | 'VIEW' | 'EDIT' | 'DELETE'
 
 // --- Pagination Config ---
 const ITEMS_PER_PAGE = 5
-
-type ErrorResponseShape = {
-    response?: {
-        data?: {
-            message?: unknown
-            error?: unknown
-        }
-    }
-}
-
-function getRequestErrorMessage(error: unknown, fallbackMessage: string) {
-    const errorResponse = error as ErrorResponseShape
-    const message = errorResponse.response?.data?.message
-    const responseError = errorResponse.response?.data?.error
-
-    if (typeof message === 'string' && message.trim().length > 0) {
-        return message
-    }
-
-    if (typeof responseError === 'string' && responseError.trim().length > 0) {
-        return responseError
-    }
-
-    return fallbackMessage
-}
 
 export default function AdminDishesPage() {
     // --- States ---
@@ -153,7 +129,7 @@ export default function AdminDishesPage() {
             await loadAllData(undefined, true, true)
             alert('Thêm món ăn thành công!')
         } catch (err: unknown) {
-            const errMsg = getRequestErrorMessage(err, 'Lỗi khi thêm món ăn mới!')
+            const errMsg = getErrorMessage(err, 'Lỗi khi thêm món ăn mới!')
             alert(errMsg)
         } finally {
             setIsSubmitting(false)
@@ -197,7 +173,7 @@ export default function AdminDishesPage() {
             await loadAllData(undefined, true, true)
             alert('Cập nhật món ăn thành công! ✅')
         } catch (err: unknown) {
-            const errMsg = getRequestErrorMessage(err, 'Lỗi khi cập nhật món ăn!')
+            const errMsg = getErrorMessage(err, 'Lỗi khi cập nhật món ăn!')
             alert(errMsg)
         } finally {
             setIsSubmitting(false)
@@ -212,7 +188,7 @@ export default function AdminDishesPage() {
             await loadAllData(undefined, true, true)
             alert('Xóa món ăn thành công! 🗑️')
         } catch (err: unknown) {
-            const errMsg = getRequestErrorMessage(err, 'Lỗi khi xóa món ăn!')
+            const errMsg = getErrorMessage(err, 'Lỗi khi xóa món ăn!')
             alert(errMsg)
         }
     }

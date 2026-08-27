@@ -9,6 +9,7 @@ import {
 } from '@/shared/api/waiter'
 import {BackArrow, ConfirmModal, fmtPrice, WaiterHeader, WaiterToast} from './components'
 import {useWaiterSocket} from '@/realtime'
+import {getErrorMessage, isRequestCanceled} from '@/shared/utils/error'
 
 type DraftItem = {
     qty: number
@@ -19,53 +20,6 @@ type ToastState = {
     msg: string
     type: string
 } | null
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
-}
-
-function getRequestErrorMessage(error: unknown, fallback: string) {
-    if (typeof error !== 'object' || error === null) {
-        return fallback
-    }
-
-    const requestError = error as {
-        response?: {
-            data?:
-                | string
-                | {
-                      message?: string
-                  }
-        }
-        message?: string
-    }
-
-    const responseData = requestError.response?.data
-
-    if (typeof responseData === 'string') {
-        return responseData
-    }
-
-    if (responseData?.message) {
-        return responseData.message
-    }
-
-    return requestError.message || fallback
-}
 
 export default function WaiterCreateOrderPage() {
     const navigate = useNavigate()
@@ -254,10 +208,7 @@ export default function WaiterCreateOrderPage() {
 
             console.error('[WAITER_CREATE_ORDER_SUBMIT_ERROR]', requestError)
 
-            showToast(
-                getRequestErrorMessage(requestError, 'Lỗi khi tạo đơn hàng'),
-                'error',
-            )
+            showToast(getErrorMessage(requestError, 'Lỗi khi tạo đơn hàng'), 'error')
         } finally {
             setSubmitting(false)
             setShowConfirm(false)

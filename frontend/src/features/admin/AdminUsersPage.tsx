@@ -2,7 +2,7 @@ import {useCallback, useEffect, useState, type CSSProperties, type ReactNode} fr
 import * as adminApi from '@/shared/api/admin'
 import type {UserResponse} from '@/shared/types/auth'
 import {RoleType} from '@/shared/types/auth'
-import {getErrorMessage} from '@/shared/utils/error'
+import {getErrorMessage, isRequestCanceled} from '@/shared/utils/error'
 import {EmptyState, LoadingState} from '@/shared/components/feedback'
 import {PageCard, PageHeader} from '@/shared/components/ui'
 
@@ -26,24 +26,6 @@ const STAFF_ROLES = [RoleType.CHEF, RoleType.WAITER, RoleType.CASHIER]
 
 type Tab = 'staff' | 'customer'
 type ModalType = 'create-staff' | 'create-customer' | 'edit' | 'detail' | null
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
-}
 
 function isValidPhone(phone: string) {
     return /^0[0-9]{9}$/.test(phone.trim())

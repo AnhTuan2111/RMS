@@ -14,24 +14,7 @@ import type {
 import OrderPanel, {type CustomerInfo} from './components/OrderPanel'
 import PaymentModal from './components/PaymentModal'
 import PaymentResultManager from './components/PaymentResultManager'
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
-}
+import {isRequestCanceled} from '@/shared/utils/error'
 
 function getTableStatusLabel(status: TableDashboardResponse['status']) {
     switch (status) {

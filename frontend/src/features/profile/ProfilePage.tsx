@@ -4,7 +4,7 @@ import * as adminApi from '@/shared/api/admin'
 import * as customerApi from '@/shared/api/customer'
 import {useActor} from '@/app/providers/ActorContext'
 import {RoleType} from '@/shared/types/auth'
-import {getErrorMessage} from '@/shared/utils/error'
+import {getErrorMessage, isRequestCanceled} from '@/shared/utils/error'
 
 type StoredUser = {
     userId: number
@@ -72,24 +72,6 @@ function normalizeCustomerProfile(
         role: profile.role,
         rewardPoints: profile.rewardPoints ?? fallback?.rewardPoints ?? 0,
     }
-}
-
-function isRequestCanceled(error: unknown) {
-    if (typeof error !== 'object' || error === null) {
-        return false
-    }
-
-    const requestError = error as {
-        name?: string
-        code?: string
-        message?: string
-    }
-
-    return (
-        requestError.name === 'CanceledError' ||
-        requestError.code === 'ERR_CANCELED' ||
-        requestError.message === 'canceled'
-    )
 }
 
 export default function ProfilePage() {
