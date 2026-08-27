@@ -1,12 +1,12 @@
 import {type ReactNode, useEffect, useState} from 'react'
 import {useAdminSocket} from '@/realtime/useAdminSocket'
-import {
-    adminApi,
-    type BestSellingDishItem,
-    type OrderShiftItem,
-    type OrderShiftReportResponse,
-    type RevenueReportResponse,
-    type WeeklyRevenueChartResponse,
+import * as adminApi from '@/shared/api/admin'
+import type {
+    BestSellingDishItem,
+    OrderShiftItem,
+    OrderShiftReportResponse,
+    RevenueReportResponse,
+    WeeklyRevenueChartResponse,
 } from '@/shared/api/admin'
 import {getErrorMessage} from '@/shared/utils/error'
 

@@ -8,12 +8,12 @@ import {
 } from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 
-import {
-    type MenuItemResponse,
-    type OrderDetailResponse,
-    type OrderItemStatus,
-    type UpdateOrderItemRequest,
-    waiterApi,
+import * as waiterApi from '@/shared/api/waiter'
+import type {
+    MenuItemResponse,
+    OrderDetailResponse,
+    OrderItemStatus,
+    UpdateOrderItemRequest,
 } from '@/shared/api/waiter'
 import {BackArrow, ConfirmModal, fmtPrice, WaiterHeader, WaiterToast} from './components'
 import {useWaiterSocket} from '@/realtime'

@@ -1,7 +1,7 @@
 ﻿import {type CSSProperties} from 'react'
 import {useNavigate, useSearchParams} from 'react-router-dom'
 
-import {cashierApi} from '@/shared/api/cashier'
+import * as cashierApi from '@/shared/api/cashier'
 import {isRequestCanceled} from '@/shared/utils/error'
 
 export default function PaymentSuccess() {

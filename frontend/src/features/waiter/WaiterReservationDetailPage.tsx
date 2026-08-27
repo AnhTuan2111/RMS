@@ -1,7 +1,8 @@
 ﻿import {useRef, useState, type CSSProperties} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 
-import {type ReservationResponse, waiterApi} from '@/shared/api/waiter'
+import * as waiterApi from '@/shared/api/waiter'
+import type {ReservationResponse} from '@/shared/api/waiter'
 import {REALTIME_CONFIG} from '@/app/config/realtime'
 import {BackArrow, WaiterHeader} from './components'
 import {usePolling} from '@/shared/hooks/usePolling'

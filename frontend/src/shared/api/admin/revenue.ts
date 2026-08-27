@@ -28,61 +28,71 @@ export type {
     WeeklyRevenueChartResponse,
 }
 
-export const revenueApi = {
-    /** Total all-time revenue */
-    getTotalRevenue: (signal?: AbortSignal) =>
-        apiClient.get<RevenueReportResponse>('/admin/revenue/total', {signal}),
+/** Total all-time revenue */
+export const getTotalRevenue = (signal?: AbortSignal) =>
+    apiClient.get<RevenueReportResponse>('/admin/revenue/total', {signal})
 
-    /** Revenue for today */
-    getTodayRevenue: (signal?: AbortSignal) =>
-        apiClient.get<RevenueReportResponse>('/admin/revenue/today', {signal}),
+/** Revenue for today */
 
-    /** Revenue for current week */
-    getWeeklyRevenue: (signal?: AbortSignal) =>
-        apiClient.get<RevenueReportResponse>('/admin/revenue/weekly', {signal}),
+export const getTodayRevenue = (signal?: AbortSignal) =>
+    apiClient.get<RevenueReportResponse>('/admin/revenue/today', {signal})
 
-    /** Revenue for current month */
-    getMonthlyRevenue: (signal?: AbortSignal) =>
-        apiClient.get<RevenueReportResponse>('/admin/revenue/monthly', {signal}),
+/** Revenue for current week */
 
-    /** Revenue for current year */
-    getYearlyRevenue: (signal?: AbortSignal) =>
-        apiClient.get<RevenueReportResponse>('/admin/revenue/yearly', {signal}),
+export const getWeeklyRevenue = (signal?: AbortSignal) =>
+    apiClient.get<RevenueReportResponse>('/admin/revenue/weekly', {signal})
 
-    /** Daily revenue chart data for a date range */
-    getDailyRevenue: (fromDate: string, toDate: string, signal?: AbortSignal) =>
-        apiClient.get<WeeklyRevenueChartResponse>('/admin/revenue/daily', {
-            params: {fromDate, toDate},
-            signal,
-        }),
+/** Revenue for current month */
 
-    /** Revenue for a custom date range */
-    getCustomRevenue: (fromDate: string, toDate: string, signal?: AbortSignal) =>
-        apiClient.get<RevenueReportResponse>('/admin/revenue/custom', {
-            params: {fromDate, toDate},
-            signal,
-        }),
+export const getMonthlyRevenue = (signal?: AbortSignal) =>
+    apiClient.get<RevenueReportResponse>('/admin/revenue/monthly', {signal})
 
-    /** Best-selling dishes for a custom date range */
-    getBestSellingReportBetween: (
-        fromDate: string,
-        toDate: string,
-        categoryId?: number | null,
-        signal?: AbortSignal,
-    ) =>
-        apiClient.get<BestSellingReportResponse>('/admin/revenue/best-selling', {
-            params: {fromDate, toDate, ...(categoryId ? {categoryId} : {})},
-            signal,
-        }),
+/** Revenue for current year */
 
-    /** Order-shift analytics for a custom date range */
-    getOrderShiftReportBetween: (
-        fromDate: string,
-        toDate: string,
-        signal?: AbortSignal,
-    ) =>
-        apiClient.get<OrderShiftReportResponse>('/admin/revenue/order-shifts', {
-            params: {fromDate, toDate},
-            signal,
-        }),
-}
+export const getYearlyRevenue = (signal?: AbortSignal) =>
+    apiClient.get<RevenueReportResponse>('/admin/revenue/yearly', {signal})
+
+/** Daily revenue chart data for a date range */
+
+export const getDailyRevenue = (fromDate: string, toDate: string, signal?: AbortSignal) =>
+    apiClient.get<WeeklyRevenueChartResponse>('/admin/revenue/daily', {
+        params: {fromDate, toDate},
+        signal,
+    })
+
+/** Revenue for a custom date range */
+
+export const getCustomRevenue = (
+    fromDate: string,
+    toDate: string,
+    signal?: AbortSignal,
+) =>
+    apiClient.get<RevenueReportResponse>('/admin/revenue/custom', {
+        params: {fromDate, toDate},
+        signal,
+    })
+
+/** Best-selling dishes for a custom date range */
+
+export const getBestSellingReportBetween = (
+    fromDate: string,
+    toDate: string,
+    categoryId?: number | null,
+    signal?: AbortSignal,
+) =>
+    apiClient.get<BestSellingReportResponse>('/admin/revenue/best-selling', {
+        params: {fromDate, toDate, ...(categoryId ? {categoryId} : {})},
+        signal,
+    })
+
+/** Order-shift analytics for a custom date range */
+
+export const getOrderShiftReportBetween = (
+    fromDate: string,
+    toDate: string,
+    signal?: AbortSignal,
+) =>
+    apiClient.get<OrderShiftReportResponse>('/admin/revenue/order-shifts', {
+        params: {fromDate, toDate},
+        signal,
+    })

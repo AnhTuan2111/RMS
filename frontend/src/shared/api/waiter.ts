@@ -93,79 +93,79 @@ export type ReservationResponse = {
 }
 
 // API calls
-export const waiterApi = {
-    getTables: (signal?: AbortSignal) =>
-        apiClient.get<TableDetailResponse[]>('/waiter/tables', {
-            signal,
-        }),
+export const getTables = (signal?: AbortSignal) =>
+    apiClient.get<TableDetailResponse[]>('/waiter/tables', {
+        signal,
+    })
 
-    getMenu: (signal?: AbortSignal) =>
-        apiClient.get<MenuItemResponse[]>('/waiter/menu', {
-            signal,
-        }),
+export const getMenu = (signal?: AbortSignal) =>
+    apiClient.get<MenuItemResponse[]>('/waiter/menu', {
+        signal,
+    })
 
-    createOrder: (data: CreateOrderRequest) =>
-        apiClient.post<CreateOrderResponse>('/waiter/orders', data),
+export const createOrder = (data: CreateOrderRequest) =>
+    apiClient.post<CreateOrderResponse>('/waiter/orders', data)
 
-    createOrderFromReservation: (reservationId: number, data: CreateOrderRequest) =>
-        apiClient.post<CreateOrderResponse>(
-            `/waiter/reservations/${reservationId}/orders`,
-            data,
-        ),
+export const createOrderFromReservation = (
+    reservationId: number,
+    data: CreateOrderRequest,
+) =>
+    apiClient.post<CreateOrderResponse>(
+        `/waiter/reservations/${reservationId}/orders`,
+        data,
+    )
 
-    updateOrder: (orderId: number, data: UpdateOrderRequest) =>
-        apiClient.put<UpdateOrderResponse>(`/waiter/orders/${orderId}`, data),
+export const updateOrder = (orderId: number, data: UpdateOrderRequest) =>
+    apiClient.put<UpdateOrderResponse>(`/waiter/orders/${orderId}`, data)
 
-    getServingOrders: (tableId: number, signal?: AbortSignal) =>
-        apiClient.get<OrderDetailResponse[]>(`/waiter/detail/${tableId}`, {
-            signal,
-        }),
+export const getServingOrders = (tableId: number, signal?: AbortSignal) =>
+    apiClient.get<OrderDetailResponse[]>(`/waiter/detail/${tableId}`, {
+        signal,
+    })
 
-    createReservation: (data: CreateReservationRequest) =>
-        apiClient.post<string>('/waiter/reservations', data),
+export const createReservation = (data: CreateReservationRequest) =>
+    apiClient.post<string>('/waiter/reservations', data)
 
-    getReservationsByTableAndDate: (
-        tableId: number,
-        date: string,
-        signal?: AbortSignal,
-    ) =>
-        apiClient.get<ReservationResponse[]>(`/waiter/reservation/${tableId}/${date}`, {
-            signal,
-        }),
+export const getReservationsByTableAndDate = (
+    tableId: number,
+    date: string,
+    signal?: AbortSignal,
+) =>
+    apiClient.get<ReservationResponse[]>(`/waiter/reservation/${tableId}/${date}`, {
+        signal,
+    })
 
-    getCurrentReservationByTable: (tableId: number, signal?: AbortSignal) =>
-        apiClient.get<ReservationResponse | null>(
-            `/waiter/reservation/detail/${tableId}`,
-            {
-                signal,
-            },
-        ),
+export const getCurrentReservationByTable = (tableId: number, signal?: AbortSignal) =>
+    apiClient.get<ReservationResponse | null>(`/waiter/reservation/detail/${tableId}`, {
+        signal,
+    })
 
-    getReservationDetail: (reservationId: number, signal?: AbortSignal) =>
-        apiClient.get<ReservationResponse>(`/waiter/reservations/${reservationId}`, {
-            signal,
-        }),
+export const getReservationDetail = (reservationId: number, signal?: AbortSignal) =>
+    apiClient.get<ReservationResponse>(`/waiter/reservations/${reservationId}`, {
+        signal,
+    })
 
-    updateReservation: (reservationId: number, data: CreateReservationRequest) =>
-        apiClient.put<string>(`/waiter/reservations/${reservationId}`, data),
+export const updateReservation = (
+    reservationId: number,
+    data: CreateReservationRequest,
+) => apiClient.put<string>(`/waiter/reservations/${reservationId}`, data)
 
-    cancelReservation: (reservationId: number) =>
-        apiClient.put<string>(`/waiter/reservations/${reservationId}/cancel`),
+export const cancelReservation = (reservationId: number) =>
+    apiClient.put<string>(`/waiter/reservations/${reservationId}/cancel`)
 
-    acknowledgeChefInternalNote: (orderItemId: number) =>
-        apiClient.put<void>(`/waiter/order-items/${orderItemId}/chef-note/acknowledge`),
+export const acknowledgeChefInternalNote = (orderItemId: number) =>
+    apiClient.put<void>(`/waiter/order-items/${orderItemId}/chef-note/acknowledge`)
 
-    getBlockedTimeSlots: (
-        tableId: number,
-        date: string,
-        excludeReservationId?: number,
-        signal?: AbortSignal,
-    ) =>
-        apiClient.get<TimeRangeResponse[]>(`/waiter/tables/${tableId}/blocked-slots`, {
-            params: {
-                date,
-                excludeReservationId,
-            },
-            signal,
-        }),
-}
+export const getBlockedTimeSlots = (
+    tableId: number,
+    date: string,
+    excludeReservationId?: number,
+    signal?: AbortSignal,
+) =>
+    apiClient.get<TimeRangeResponse[]>(`/waiter/tables/${tableId}/blocked-slots`, {
+        params: {
+            date,
+            excludeReservationId,
+        },
+        signal,
+    })

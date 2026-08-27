@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react'
-import {categoryApi, dishApi} from '@/shared/api/admin'
+import * as adminApi from '@/shared/api/admin'
 import type {CategoryResponse, DishResponse, CategoryFormData} from '@/shared/api/admin'
 import {EmptyState, ErrorState, LoadingState} from '@/shared/components/feedback'
 import {PageCard, PageHeader} from '@/shared/components/ui'
@@ -51,8 +51,8 @@ export default function AdminCategoryPage() {
                 }
 
                 const [categoriesData, dishesData] = await Promise.all([
-                    categoryApi.getAllCategories(signal),
-                    dishApi.getAllDishes(signal),
+                    adminApi.getAllCategories(signal),
+                    adminApi.getAllDishes(signal),
                 ])
 
                 const processedDishes = dishesData.data.map((dish) => ({
@@ -110,13 +110,13 @@ export default function AdminCategoryPage() {
             setIsSubmitting(true)
 
             if (view === 'CREATE') {
-                await categoryApi.createCategory({
+                await adminApi.createCategory({
                     name: formData.name.trim(),
                     description: formData.description,
                 })
                 alert('Tạo danh mục mới thành công!')
             } else if (view === 'EDIT' && selectedCategory) {
-                await categoryApi.updateCategory(selectedCategory.id, {
+                await adminApi.updateCategory(selectedCategory.id, {
                     name: formData.name.trim(),
                     description: formData.description,
                     isAvailable: formData.isAvailable,
@@ -138,7 +138,7 @@ export default function AdminCategoryPage() {
     const confirmDelete = async () => {
         if (deleteModal.id === null) return
         try {
-            await categoryApi.deleteCategory(deleteModal.id)
+            await adminApi.deleteCategory(deleteModal.id)
             alert('Xóa danh mục thành công!')
             setDeleteModal({open: false, id: null})
             await loadCategories(true, true)

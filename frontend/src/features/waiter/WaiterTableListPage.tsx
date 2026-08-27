@@ -1,11 +1,8 @@
 import {useCallback, useEffect, useRef, useState, type CSSProperties} from 'react'
 import {useNavigate} from 'react-router-dom'
 
-import {
-    type ReservationResponse,
-    type TableDetailResponse,
-    waiterApi,
-} from '@/shared/api/waiter'
+import * as waiterApi from '@/shared/api/waiter'
+import type {ReservationResponse, TableDetailResponse} from '@/shared/api/waiter'
 import {WaiterHeader, WaiterTableCard} from './components'
 import {useWaiterSocket} from '@/realtime'
 import {isRequestCanceled} from '@/shared/utils/error'

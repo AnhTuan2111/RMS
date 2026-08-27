@@ -1,6 +1,6 @@
 ﻿import {useState, type CSSProperties} from 'react'
 
-import {cashierApi} from '@/shared/api/cashier'
+import * as cashierApi from '@/shared/api/cashier'
 import type {OrderDetailResponse, TableDashboardResponse} from '@/shared/types/cashier'
 import {isRequestCanceled} from '@/shared/utils/error'
 

@@ -1,6 +1,6 @@
 import {useEffect, useState, type CSSProperties} from 'react'
 
-import {cashierApi} from '@/shared/api/cashier'
+import * as cashierApi from '@/shared/api/cashier'
 import type {
     OrderDetailResponse,
     PaymentMethodType,

@@ -1,11 +1,11 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom'
 
-import {
-    type CreateOrderRequest,
-    type MenuItemResponse,
-    type OrderItemRequest,
-    waiterApi,
+import * as waiterApi from '@/shared/api/waiter'
+import type {
+    CreateOrderRequest,
+    MenuItemResponse,
+    OrderItemRequest,
 } from '@/shared/api/waiter'
 import {BackArrow, ConfirmModal, fmtPrice, WaiterHeader, WaiterToast} from './components'
 import {useWaiterSocket} from '@/realtime'

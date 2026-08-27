@@ -1,12 +1,12 @@
 ﻿import {useEffect, useMemo, useRef, useState, type CSSProperties} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 
-import {
-    type CreateReservationRequest,
-    type ReservationResponse,
-    type TableDetailResponse,
-    type TimeRangeResponse,
-    waiterApi,
+import * as waiterApi from '@/shared/api/waiter'
+import type {
+    CreateReservationRequest,
+    ReservationResponse,
+    TableDetailResponse,
+    TimeRangeResponse,
 } from '@/shared/api/waiter'
 import {getAvailableTimeSlots} from '@/shared/utils/reservationTime'
 import {REALTIME_CONFIG} from '@/app/config/realtime'

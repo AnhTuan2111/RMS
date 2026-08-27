@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useState, type FormEvent} from 'react'
-import {categoryApi, dishApi} from '@/shared/api/admin'
+import * as adminApi from '@/shared/api/admin'
 import type {DishResponse, CategoryResponse, DishFormData} from '@/shared/api/admin'
 import {EmptyState, ErrorState, LoadingState} from '@/shared/components/feedback'
 import {PageCard, PageHeader} from '@/shared/components/ui'
@@ -51,8 +51,8 @@ export default function AdminDishesPage() {
                 }
 
                 const [dishRes, catRes] = await Promise.all([
-                    dishApi.getAllDishes(signal),
-                    categoryApi.getAllCategories(signal),
+                    adminApi.getAllDishes(signal),
+                    adminApi.getAllCategories(signal),
                 ])
 
                 setDishes(dishRes.data)
@@ -117,7 +117,7 @@ export default function AdminDishesPage() {
 
         try {
             setIsSubmitting(true)
-            await dishApi.createDish({
+            await adminApi.createDish({
                 name: formData.name.trim(),
                 description: formData.description,
                 price: formData.price,
@@ -160,7 +160,7 @@ export default function AdminDishesPage() {
         }
         try {
             setIsSubmitting(true)
-            await dishApi.updateDish(selectedDish.id, {
+            await adminApi.updateDish(selectedDish.id, {
                 name: formData.name.trim(),
                 description: formData.description,
                 price: formData.price,
@@ -183,7 +183,7 @@ export default function AdminDishesPage() {
     const handleDeleteDish = async () => {
         if (!selectedDish) return
         try {
-            await dishApi.deleteDish(selectedDish.id)
+            await adminApi.deleteDish(selectedDish.id)
             setActiveModal('NONE')
             await loadAllData(undefined, true, true)
             alert('Xóa món ăn thành công! 🗑️')

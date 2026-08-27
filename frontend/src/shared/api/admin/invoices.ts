@@ -29,29 +29,28 @@ export interface InvoiceHistoryFilters {
     customerKeyword?: string
 }
 
-export const invoicesApi = {
-    /** Returns paginated payment history, có filter tùy chọn */
-    getPaymentHistory: (
-        page = 1,
-        pageSize = 10,
-        filters?: InvoiceHistoryFilters,
-        signal?: AbortSignal,
-    ) =>
-        apiClient.get<AdminPaymentHistoryPage>('/admin/invoice/history', {
-            params: {
-                page,
-                pageSize,
-                tableNumber: filters?.tableNumber || undefined,
-                paymentMethod: filters?.paymentMethod || undefined,
-                keyword: filters?.keyword || undefined,
-                customerKeyword: filters?.customerKeyword || undefined,
-            },
-            signal,
-        }),
+/** Returns paginated payment history, có filter tùy chọn */
+export const getPaymentHistory = (
+    page = 1,
+    pageSize = 10,
+    filters?: InvoiceHistoryFilters,
+    signal?: AbortSignal,
+) =>
+    apiClient.get<AdminPaymentHistoryPage>('/admin/invoice/history', {
+        params: {
+            page,
+            pageSize,
+            tableNumber: filters?.tableNumber || undefined,
+            paymentMethod: filters?.paymentMethod || undefined,
+            keyword: filters?.keyword || undefined,
+            customerKeyword: filters?.customerKeyword || undefined,
+        },
+        signal,
+    })
 
-    /** Returns detail for a single invoice */
-    getPaymentDetail: (invoiceId: number, signal?: AbortSignal) =>
-        apiClient.get<AdminPaymentDetail>(`/admin/invoice/${invoiceId}`, {
-            signal,
-        }),
-}
+/** Returns detail for a single invoice */
+
+export const getPaymentDetail = (invoiceId: number, signal?: AbortSignal) =>
+    apiClient.get<AdminPaymentDetail>(`/admin/invoice/${invoiceId}`, {
+        signal,
+    })

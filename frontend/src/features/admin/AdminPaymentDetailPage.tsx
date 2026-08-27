@@ -1,7 +1,8 @@
 import {useCallback, useEffect, useRef, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 
-import {adminApi, type AdminPaymentDetail} from '@/shared/api/admin'
+import * as adminApi from '@/shared/api/admin'
+import type {AdminPaymentDetail} from '@/shared/api/admin'
 import {ErrorState, LoadingState} from '@/shared/components/feedback'
 
 function formatCurrency(value: number) {

@@ -1,7 +1,8 @@
 import {useCallback, useEffect, useState, type CSSProperties} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 
-import {type OrderDetailResponse, waiterApi} from '@/shared/api/waiter'
+import * as waiterApi from '@/shared/api/waiter'
+import type {OrderDetailResponse} from '@/shared/api/waiter'
 import {BackArrow, fmtPrice, WaiterHeader} from './components'
 import {useWaiterSocket} from '@/realtime'
 import {isRequestCanceled} from '@/shared/utils/error'

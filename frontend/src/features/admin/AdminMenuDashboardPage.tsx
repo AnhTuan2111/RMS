@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 
-import {categoryApi, dishApi, menuApi} from '@/shared/api/admin'
+import * as adminApi from '@/shared/api/admin'
 import type {MenuDashboardData} from '@/shared/api/admin'
 import {ErrorState, LoadingState} from '@/shared/components/feedback'
 import {PageCard, PageHeader} from '@/shared/components/ui'
@@ -31,9 +31,9 @@ export default function AdminMenuDashboardPage() {
                 }
 
                 const [menuRes, catRes, allDishesRes] = await Promise.all([
-                    menuApi.getMenuDashboard(signal),
-                    categoryApi.getAllCategories(signal),
-                    dishApi.getAllDishes(signal),
+                    adminApi.getMenuDashboard(signal),
+                    adminApi.getAllCategories(signal),
+                    adminApi.getAllDishes(signal),
                 ])
 
                 const finalCatStats = catRes.data.map((category) => {

@@ -1,6 +1,6 @@
 ﻿import {useCallback, useRef, useState, type CSSProperties} from 'react'
 
-import {cashierApi} from '@/shared/api/cashier'
+import * as cashierApi from '@/shared/api/cashier'
 import type {InvoiceDetail, InvoiceSummary} from '@/shared/types/cashier'
 import {REALTIME_CONFIG} from '@/app/config/realtime'
 import {EmptyState, ErrorState, LoadingState} from '@/shared/components/feedback'

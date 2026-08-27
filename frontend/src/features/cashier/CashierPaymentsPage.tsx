@@ -1,6 +1,6 @@
 import {type CSSProperties, useCallback, useEffect, useState} from 'react'
 
-import {cashierApi} from '@/shared/api/cashier'
+import * as cashierApi from '@/shared/api/cashier'
 import {REALTIME_CONFIG} from '@/app/config/realtime'
 import {ErrorState, LoadingState} from '@/shared/components/feedback'
 import {PageCard, PageHeader} from '@/shared/components/ui'

@@ -1,11 +1,8 @@
 import {useCallback, useEffect, useRef, useState, type CSSProperties} from 'react'
 import {useNavigate} from 'react-router-dom'
 
-import {
-    adminApi,
-    type AdminPaymentHistoryItem,
-    type AdminPaymentMethod,
-} from '@/shared/api/admin'
+import * as adminApi from '@/shared/api/admin'
+import type {AdminPaymentHistoryItem, AdminPaymentMethod} from '@/shared/api/admin'
 import {EmptyState, ErrorState, LoadingState} from '@/shared/components/feedback'
 import {PageCard, PageHeader} from '@/shared/components/ui'
 

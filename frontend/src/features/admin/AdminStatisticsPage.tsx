@@ -1,13 +1,12 @@
 import {useEffect, useRef, useState, type KeyboardEvent} from 'react'
 import {useAdminSocket} from '@/realtime/useAdminSocket'
-import {
-    adminApi,
-    categoryApi,
-    type BestSellingDishItem,
-    type CategoryResponse,
-    type OrderShiftItem,
-    type OrderShiftReportResponse,
-    type RevenueReportResponse,
+import * as adminApi from '@/shared/api/admin'
+import type {
+    BestSellingDishItem,
+    CategoryResponse,
+    OrderShiftItem,
+    OrderShiftReportResponse,
+    RevenueReportResponse,
 } from '@/shared/api/admin'
 import {getErrorMessage} from '@/shared/utils/error'
 
@@ -1557,7 +1556,7 @@ export default function AdminStatisticsPage() {
         signal?: AbortSignal,
     ) {
         try {
-            const {data} = await categoryApi.getAllCategories(signal)
+            const {data} = await adminApi.getAllCategories(signal)
             const nextCategories = data ?? []
             const defaultCategoryId =
                 nextCategories[0]?.id != null ? String(nextCategories[0].id) : 'ALL'
