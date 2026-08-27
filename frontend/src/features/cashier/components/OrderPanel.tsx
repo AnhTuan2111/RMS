@@ -1,14 +1,7 @@
-﻿import {
-    useEffect,
-    useState,
-    type CSSProperties,
-} from 'react'
+﻿import {useState, type CSSProperties} from 'react'
 
 import {cashierApi} from '@/shared/api/cashier'
-import type {
-    OrderDetailResponse,
-    TableDashboardResponse,
-} from '@/shared/types/cashier'
+import type {OrderDetailResponse, TableDashboardResponse} from '@/shared/types/cashier'
 
 export interface CustomerInfo {
     id: number
@@ -41,9 +34,9 @@ function isRequestCanceled(error: unknown) {
     }
 
     return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
+        requestError.name === 'CanceledError' ||
+        requestError.code === 'ERR_CANCELED' ||
+        requestError.message === 'canceled'
     )
 }
 
@@ -69,76 +62,61 @@ const PHONE_REGEX = /^0[0-9]{9}$/
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function OrderPanel({
-                                       selectedTable,
-                                       orderDetail,
-                                       loading,
-                                       onClose,
-                                       onCheckout,
-                                       customer,
-                                       pointsUsed,
-                                       onCustomerChange,
-                                       onPointsUsedChange,
-                                   }: OrderPanelProps) {
-    const itemsList =
-        orderDetail?.orderItems ?? []
+    selectedTable,
+    orderDetail,
+    loading,
+    onClose,
+    onCheckout,
+    customer,
+    pointsUsed,
+    onCustomerChange,
+    onPointsUsedChange,
+}: OrderPanelProps) {
+    const itemsList = orderDetail?.orderItems ?? []
 
-    const totalAmount =
-        orderDetail?.finalAmount ?? 0
+    const totalAmount = orderDetail?.finalAmount ?? 0
 
-    const [isLocking, setIsLocking] =
-        useState(false)
+    const [isLocking, setIsLocking] = useState(false)
 
-    const [lockError, setLockError] =
-        useState<string | null>(null)
+    const [lockError, setLockError] = useState<string | null>(null)
 
+    // Đổi bàn thì lỗi khoá đơn của bàn cũ không còn ý nghĩa nữa.
+    // Chỉnh state ngay trong lúc render theo hướng dẫn của React, thay vì dùng
+    // useEffect — cách cũ tạo thêm một lượt render với lỗi cũ vẫn hiển thị.
+    const [renderedTableId, setRenderedTableId] = useState(selectedTable.tableId)
 
-    const [phoneSearch, setPhoneSearch] =
-        useState('')
+    if (renderedTableId !== selectedTable.tableId) {
+        setRenderedTableId(selectedTable.tableId)
+        setLockError(null)
+    }
 
-    const [phoneError, setPhoneError] =
-        useState<string | null>(null)
+    const [phoneSearch, setPhoneSearch] = useState('')
 
-    const [isSearching, setIsSearching] =
-        useState(false)
+    const [phoneError, setPhoneError] = useState<string | null>(null)
 
-    const [showCreate, setShowCreate] =
-        useState(false)
+    const [isSearching, setIsSearching] = useState(false)
 
-    const [newCusName, setNewCusName] =
-        useState('')
+    const [showCreate, setShowCreate] = useState(false)
 
-    const [newCusEmail, setNewCusEmail] =
-        useState('')
+    const [newCusName, setNewCusName] = useState('')
 
-    const [processingCreate, setProcessingCreate] =
-        useState(false)
+    const [newCusEmail, setNewCusEmail] = useState('')
 
-    const maxPointsAllowed =
-        Math.floor(
-            (totalAmount * 0.5) / 1000,
-        )
+    const [processingCreate, setProcessingCreate] = useState(false)
 
-    const maxPointsCanUse =
-        customer
-            ? Math.min(
-                customer.rewardPoints,
-                maxPointsAllowed,
-            )
-            : 0
+    const maxPointsAllowed = Math.floor((totalAmount * 0.5) / 1000)
+
+    const maxPointsCanUse = customer
+        ? Math.min(customer.rewardPoints, maxPointsAllowed)
+        : 0
 
     const displayStatus =
-        selectedTable.status === 'SERVING'
-            ? 'Đang Phục Vụ'
-            : 'Bàn Trống'
+        selectedTable.status === 'SERVING' ? 'Đang Phục Vụ' : 'Bàn Trống'
 
     const isCreateFormValid =
-        newCusName.trim().length > 0
-        && PHONE_REGEX.test(phoneSearch)
-        && EMAIL_REGEX.test(newCusEmail.trim())
-
-    useEffect(() => {
-        setLockError(null)
-    }, [selectedTable.tableId])
+        newCusName.trim().length > 0 &&
+        PHONE_REGEX.test(phoneSearch) &&
+        EMAIL_REGEX.test(newCusEmail.trim())
 
     function handlePhoneInputChange(raw: string) {
         // Chỉ giữ lại ký tự số
@@ -160,9 +138,7 @@ export default function OrderPanel({
         }
 
         if (!PHONE_REGEX.test(phone)) {
-            setPhoneError(
-                'Số điện thoại không hợp lệ! Phải bắt đầu bằng 0 và đủ 10 số.',
-            )
+            setPhoneError('Số điện thoại không hợp lệ! Phải bắt đầu bằng 0 và đủ 10 số.')
             return
         }
 
@@ -173,13 +149,10 @@ export default function OrderPanel({
         onPointsUsedChange(0)
 
         try {
-            const response =
-                await cashierApi.searchCustomer(phone)
+            const response = await cashierApi.searchCustomer(phone)
 
             if (response?.data) {
-                onCustomerChange(
-                    response.data as CustomerInfo,
-                )
+                onCustomerChange(response.data as CustomerInfo)
             }
         } catch (requestError: unknown) {
             if (isRequestCanceled(requestError)) {
@@ -191,10 +164,7 @@ export default function OrderPanel({
                 return
             }
 
-            console.error(
-                '[CASHIER_CUSTOMER_SEARCH_ERROR]',
-                requestError,
-            )
+            console.error('[CASHIER_CUSTOMER_SEARCH_ERROR]', requestError)
 
             alert('Lỗi tìm kiếm khách hàng!')
         } finally {
@@ -212,20 +182,12 @@ export default function OrderPanel({
             return
         }
 
-        if (
-            !phone
-            || !/^0[0-9]{9}$/.test(phone)
-        ) {
-            alert(
-                'Số điện thoại không hợp lệ! Phải bắt đầu bằng 0 và đủ 10 số.',
-            )
+        if (!phone || !/^0[0-9]{9}$/.test(phone)) {
+            alert('Số điện thoại không hợp lệ! Phải bắt đầu bằng 0 và đủ 10 số.')
             return
         }
 
-        if (
-            !email
-            || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-        ) {
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             alert('Vui lòng nhập email hợp lệ!')
             return
         }
@@ -233,17 +195,14 @@ export default function OrderPanel({
         setProcessingCreate(true)
 
         try {
-            const response =
-                await cashierApi.createCustomerFast({
-                    fullName,
-                    phone,
-                    email,
-                })
+            const response = await cashierApi.createCustomerFast({
+                fullName,
+                phone,
+                email,
+            })
 
             if (response?.data) {
-                onCustomerChange(
-                    response.data as CustomerInfo,
-                )
+                onCustomerChange(response.data as CustomerInfo)
 
                 setShowCreate(false)
 
@@ -254,14 +213,9 @@ export default function OrderPanel({
                 return
             }
 
-            console.error(
-                '[CASHIER_CUSTOMER_CREATE_ERROR]',
-                requestError,
-            )
+            console.error('[CASHIER_CUSTOMER_CREATE_ERROR]', requestError)
 
-            alert(
-                'Lỗi tạo khách hàng. Có thể số điện thoại đã tồn tại!',
-            )
+            alert('Lỗi tạo khách hàng. Có thể số điện thoại đã tồn tại!')
         } finally {
             setProcessingCreate(false)
         }
@@ -277,14 +231,7 @@ export default function OrderPanel({
     }
 
     function handlePointsInputChange(raw: number) {
-        const safeValue =
-            Math.max(
-                0,
-                Math.min(
-                    raw,
-                    maxPointsCanUse,
-                ),
-            )
+        const safeValue = Math.max(0, Math.min(raw, maxPointsCanUse))
 
         onPointsUsedChange(safeValue)
     }
@@ -299,14 +246,10 @@ export default function OrderPanel({
         setIsLocking(true)
 
         try {
-            const response =
-                await cashierApi.processPaymentLock(
-                    orderDetail.orderId,
-                    {
-                        paymentMethod: 'CASH',
-                        amountPaid: 0,
-                    },
-                )
+            const response = await cashierApi.processPaymentLock(orderDetail.orderId, {
+                paymentMethod: 'CASH',
+                amountPaid: 0,
+            })
 
             if (response.data.success) {
                 onCheckout()
@@ -314,20 +257,19 @@ export default function OrderPanel({
             }
 
             setLockError(
-                response.data.message
-                ?? 'Đơn hàng còn món chưa hoàn thành hoặc chưa hủy. Hãy hoàn thành để có thể thanh toán.',
+                response.data.message ??
+                    'Đơn hàng còn món chưa hoàn thành hoặc chưa hủy. Hãy hoàn thành để có thể thanh toán.',
             )
         } catch (requestError: unknown) {
             if (isRequestCanceled(requestError)) {
                 return
             }
 
-            console.error(
-                '[CASHIER_PAYMENT_LOCK_ERROR]',
-                requestError,
-            )
+            console.error('[CASHIER_PAYMENT_LOCK_ERROR]', requestError)
 
-            setLockError('Không thể thực hiện thanh toán đơn hàng.Vui lòng huỷ hoặc hoàn thành các món còn lại!')
+            setLockError(
+                'Không thể thực hiện thanh toán đơn hàng.Vui lòng huỷ hoặc hoàn thành các món còn lại!',
+            )
         } finally {
             setIsLocking(false)
         }
@@ -346,31 +288,21 @@ export default function OrderPanel({
                 // transformOrigin: 'top left',
             }}
         >
-            <button
-                type="button"
-                style={closeButtonStyle}
-                onClick={onClose}
-            >
+            <button type="button" style={closeButtonStyle} onClick={onClose}>
                 ✖
             </button>
 
             <h2>Chi tiết đơn hàng</h2>
 
             <div style={headerInfoStyle}>
-                <strong>
-                    Vị trí: {selectedTable.tableNumber}
-                </strong>
+                <strong>Vị trí: {selectedTable.tableNumber}</strong>
 
-                <span style={statusBadgeStyle}>
-                    {displayStatus}
-                </span>
+                <span style={statusBadgeStyle}>{displayStatus}</span>
             </div>
 
             {selectedTable.status === 'SERVING' && (
                 <div style={customerBoxStyle}>
-                    <h4 style={customerTitleStyle}>
-                        🌟 Tích Điểm Thành Viên
-                    </h4>
+                    <h4 style={customerTitleStyle}>🌟 Tích Điểm Thành Viên</h4>
 
                     <div
                         style={{
@@ -413,12 +345,8 @@ export default function OrderPanel({
                                             ? 'not-allowed'
                                             : 'pointer',
                                 }}
-                                disabled={
-                                    !PHONE_REGEX.test(phoneSearch) || isSearching
-                                }
-                                onClick={() =>
-                                    void handleSearchCustomer()
-                                }
+                                disabled={!PHONE_REGEX.test(phoneSearch) || isSearching}
+                                onClick={() => void handleSearchCustomer()}
                             >
                                 {isSearching ? '...' : 'Tìm'}
                             </button>
@@ -444,8 +372,7 @@ export default function OrderPanel({
                             </p>
 
                             <div style={phoneHintStyle}>
-                                SĐT dùng để đăng ký:{' '}
-                                <strong>{phoneSearch}</strong>
+                                SĐT dùng để đăng ký: <strong>{phoneSearch}</strong>
                             </div>
 
                             <input
@@ -453,11 +380,7 @@ export default function OrderPanel({
                                 placeholder="Tên khách hàng (*)"
                                 style={stackedInputStyle}
                                 value={newCusName}
-                                onChange={(event) =>
-                                    setNewCusName(
-                                        event.target.value,
-                                    )
-                                }
+                                onChange={(event) => setNewCusName(event.target.value)}
                             />
 
                             <input
@@ -465,11 +388,7 @@ export default function OrderPanel({
                                 placeholder="Email (*)"
                                 style={stackedInputStyle}
                                 value={newCusEmail}
-                                onChange={(event) =>
-                                    setNewCusEmail(
-                                        event.target.value,
-                                    )
-                                }
+                                onChange={(event) => setNewCusEmail(event.target.value)}
                             />
 
                             <button
@@ -477,24 +396,16 @@ export default function OrderPanel({
                                 style={{
                                     ...createCustomerButtonStyle,
                                     opacity:
-                                        !isCreateFormValid || processingCreate
-                                            ? 0.6
-                                            : 1,
+                                        !isCreateFormValid || processingCreate ? 0.6 : 1,
                                     cursor:
                                         !isCreateFormValid || processingCreate
                                             ? 'not-allowed'
                                             : 'pointer',
                                 }}
-                                disabled={
-                                    !isCreateFormValid || processingCreate
-                                }
-                                onClick={() =>
-                                    void handleCreateCustomer()
-                                }
+                                disabled={!isCreateFormValid || processingCreate}
+                                onClick={() => void handleCreateCustomer()}
                             >
-                                {processingCreate
-                                    ? 'Đang tạo...'
-                                    : 'Tạo Tài Khoản'}
+                                {processingCreate ? 'Đang tạo...' : 'Tạo Tài Khoản'}
                             </button>
                         </div>
                     )}
@@ -502,8 +413,7 @@ export default function OrderPanel({
                     {customer && (
                         <div style={customerFoundBoxStyle}>
                             <p style={compactParagraphStyle}>
-                                👤 Khách:{' '}
-                                <strong>{customer.fullName}</strong>
+                                👤 Khách: <strong>{customer.fullName}</strong>
                             </p>
 
                             <p style={pointsParagraphStyle}>
@@ -519,9 +429,8 @@ export default function OrderPanel({
 
                             {customer.rewardPoints > 0 && (
                                 <label style={pointsLabelStyle}>
-                                    Sử dụng điểm
-                                    {' '}
-                                    (Tối đa {maxPointsCanUse.toLocaleString()}):
+                                    Sử dụng điểm (Tối đa{' '}
+                                    {maxPointsCanUse.toLocaleString()}):
                                     <input
                                         type="number"
                                         min="0"
@@ -530,9 +439,7 @@ export default function OrderPanel({
                                         value={pointsUsed || ''}
                                         onChange={(event) =>
                                             handlePointsInputChange(
-                                                Number(
-                                                    event.target.value,
-                                                ),
+                                                Number(event.target.value),
                                             )
                                         }
                                     />
@@ -563,10 +470,7 @@ export default function OrderPanel({
                             width: '100%',
                         }}
                     >
-                        <div
-                            className="simple-table-header"
-                            style={orderHeaderStyle}
-                        >
+                        <div className="simple-table-header" style={orderHeaderStyle}>
                             <span style={cellStyle}>Món ăn</span>
                             <span style={cellStyle}>SL</span>
                             <span
@@ -599,9 +503,7 @@ export default function OrderPanel({
                                                 textAlign: 'right',
                                             }}
                                         >
-                                            {formatCurrency(
-                                                item.subTotal,
-                                            )}
+                                            {formatCurrency(item.subTotal)}
                                         </span>
                                     </div>
                                 ))
@@ -622,11 +524,7 @@ export default function OrderPanel({
 
                             <div style={summaryLineStyle}>
                                 <span>Thuế VAT (10%):</span>
-                                <span>
-                                    {formatCurrency(
-                                        orderDetail.vatAmount ?? 0,
-                                    )}
-                                </span>
+                                <span>{formatCurrency(orderDetail.vatAmount ?? 0)}</span>
                             </div>
 
                             {pointsUsed > 0 && (
@@ -636,12 +534,8 @@ export default function OrderPanel({
                                         color: '#059669',
                                     }}
                                 >
-                                    <span>
-                                        Giảm giá ({pointsUsed} điểm):
-                                    </span>
-                                    <span>
-                                        -{formatCurrency(pointsUsed * 1000)}
-                                    </span>
+                                    <span>Giảm giá ({pointsUsed} điểm):</span>
+                                    <span>-{formatCurrency(pointsUsed * 1000)}</span>
                                 </div>
                             )}
                         </div>
@@ -653,17 +547,11 @@ export default function OrderPanel({
                                     color: '#b91c1c',
                                 }}
                             >
-                                {formatCurrency(
-                                    totalAmount - pointsUsed * 1000,
-                                )}
+                                {formatCurrency(totalAmount - pointsUsed * 1000)}
                             </strong>
                         </div>
 
-                        {lockError && (
-                            <div style={lockErrorBoxStyle}>
-                                ⚠️ {lockError}
-                            </div>
-                        )}
+                        {lockError && <div style={lockErrorBoxStyle}>⚠️ {lockError}</div>}
 
                         {selectedTable.status === 'SERVING' && (
                             <button
@@ -675,13 +563,9 @@ export default function OrderPanel({
                                     opacity: isLocking ? 0.7 : 1,
                                 }}
                                 disabled={isLocking}
-                                onClick={() =>
-                                    void handleCheckoutClick()
-                                }
+                                onClick={() => void handleCheckoutClick()}
                             >
-                                {isLocking
-                                    ? 'Đang khóa đơn...'
-                                    : 'CheckOut'}
+                                {isLocking ? 'Đang khóa đơn...' : 'CheckOut'}
                             </button>
                         )}
                     </div>

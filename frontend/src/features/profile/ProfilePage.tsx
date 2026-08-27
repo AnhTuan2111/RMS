@@ -1,9 +1,5 @@
-import {
-    useState,
-    type CSSProperties,
-} from 'react'
+import {useCallback, useEffect, useRef, useState, type CSSProperties} from 'react'
 
-import {REALTIME_CONFIG} from '@/app/config/realtime'
 import * as adminApi from '@/shared/api/admin'
 import * as customerApi from '@/shared/api/customer'
 import {useActor} from '@/app/providers/ActorContext'
@@ -30,8 +26,7 @@ const ROLE_LABELS: Record<string, string> = {
 }
 
 function readStoredUser() {
-    const stored =
-        localStorage.getItem('currentUser')
+    const stored = localStorage.getItem('currentUser')
 
     if (!stored) {
         return null
@@ -49,10 +44,7 @@ function getUserId(user: StoredUser) {
 }
 
 function persistUser(user: StoredUser) {
-    localStorage.setItem(
-        'currentUser',
-        JSON.stringify(user),
-    )
+    localStorage.setItem('currentUser', JSON.stringify(user))
 }
 
 function normalizeCustomerProfile(
@@ -69,26 +61,16 @@ function normalizeCustomerProfile(
     fallback: StoredUser | null,
 ): StoredUser {
     return {
-        userId:
-            profile.userId
-            ?? profile.id
-            ?? fallback?.userId
-            ?? fallback?.id
-            ?? 0,
+        userId: profile.userId ?? profile.id ?? fallback?.userId ?? fallback?.id ?? 0,
 
-        id:
-            profile.id
-            ?? fallback?.id,
+        id: profile.id ?? fallback?.id,
 
         username: profile.username,
         fullName: profile.fullName,
         phone: profile.phone,
         email: profile.email,
         role: profile.role,
-        rewardPoints:
-            profile.rewardPoints
-            ?? fallback?.rewardPoints
-            ?? 0,
+        rewardPoints: profile.rewardPoints ?? fallback?.rewardPoints ?? 0,
     }
 }
 
@@ -104,123 +86,116 @@ function isRequestCanceled(error: unknown) {
     }
 
     return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
+        requestError.name === 'CanceledError' ||
+        requestError.code === 'ERR_CANCELED' ||
+        requestError.message === 'canceled'
     )
 }
 
 export default function ProfilePage() {
     const {actor} = useActor()
 
-    const [savedUser, setSavedUser] =
-        useState<StoredUser | null>(() => readStoredUser())
+    const [savedUser, setSavedUser] = useState<StoredUser | null>(() => readStoredUser())
 
-    const [isEditing, setIsEditing] =
-        useState(false)
+    const [isEditing, setIsEditing] = useState(false)
 
-    const [fullName, setFullName] =
-        useState(savedUser?.fullName ?? '')
+    const [fullName, setFullName] = useState(savedUser?.fullName ?? '')
 
-    const [username, setUsername] =
-        useState(savedUser?.username ?? '')
+    const [username, setUsername] = useState(savedUser?.username ?? '')
 
-    const [email, setEmail] =
-        useState(savedUser?.email ?? '')
+    const [email, setEmail] = useState(savedUser?.email ?? '')
 
-    const [phone, setPhone] =
-        useState(savedUser?.phone ?? '')
+    const [phone, setPhone] = useState(savedUser?.phone ?? '')
 
-    const [updateLoading, setUpdateLoading] =
-        useState(false)
+    const [updateLoading, setUpdateLoading] = useState(false)
 
-    const [updateError, setUpdateError] =
-        useState<string | null>(null)
+    const [updateError, setUpdateError] = useState<string | null>(null)
 
-    const [updateSuccess, setUpdateSuccess] =
-        useState(false)
+    const [updateSuccess, setUpdateSuccess] = useState(false)
 
-    const [showChangePw, setShowChangePw] =
-        useState(false)
+    const [showChangePw, setShowChangePw] = useState(false)
 
-    const [currentPw, setCurrentPw] =
-        useState('')
+    const [currentPw, setCurrentPw] = useState('')
 
-    const [newPw, setNewPw] =
-        useState('')
+    const [newPw, setNewPw] = useState('')
 
-    const [confirmPw, setConfirmPw] =
-        useState('')
+    const [confirmPw, setConfirmPw] = useState('')
 
-    const [pwLoading, setPwLoading] =
-        useState(false)
+    const [pwLoading, setPwLoading] = useState(false)
 
-    const [pwError, setPwError] =
-        useState<string | null>(null)
+    const [pwError, setPwError] = useState<string | null>(null)
 
-    const [pwSuccess, setPwSuccess] =
-        useState(false)
+    const [pwSuccess, setPwSuccess] = useState(false)
 
     const isCustomer =
-        actor === RoleType.CUSTOMER
-        || savedUser?.role === RoleType.CUSTOMER
+        actor === RoleType.CUSTOMER || savedUser?.role === RoleType.CUSTOMER
 
-    const isAdmin =
-        actor === RoleType.ADMIN
-        || savedUser?.role === RoleType.ADMIN
+    const isAdmin = actor === RoleType.ADMIN || savedUser?.role === RoleType.ADMIN
 
     const canEditProfile = isCustomer || isAdmin
 
-    function syncFormFromUser(user: StoredUser) {
+    // Các setter của useState vốn ổn định, nên deps rỗng là đủ.
+    const syncFormFromUser = useCallback((user: StoredUser) => {
         setUsername(user.username)
         setFullName(user.fullName)
         setEmail(user.email ?? '')
         setPhone(user.phone)
-    }
+    }, [])
 
-    async function loadCustomerProfile(
-        signal?: AbortSignal,
-    ) {
-        if (!isCustomer) {
-            return
-        }
+    // loadCustomerProfile ghi lại savedUser. Nếu đưa savedUser/isEditing vào deps thì
+    // effect bên dưới sẽ chạy lại sau mỗi lần fetch -> vòng lặp vô hạn. Giữ chúng
+    // trong ref để đọc được giá trị mới nhất mà không tạo phụ thuộc.
+    const latestProfileRef = useRef({savedUser, isEditing})
 
-        try {
-            const profile =
-                await customerApi.getMyProfile(signal)
+    useEffect(() => {
+        latestProfileRef.current = {savedUser, isEditing}
+    })
 
-            if (signal?.aborted) {
+    const loadCustomerProfile = useCallback(
+        async (signal?: AbortSignal) => {
+            if (!isCustomer) {
                 return
             }
 
-            const nextUser =
-                normalizeCustomerProfile(
-                    profile,
-                    savedUser,
-                )
+            try {
+                const profile = await customerApi.getMyProfile(signal)
 
-            setSavedUser(nextUser)
-            persistUser(nextUser)
+                if (signal?.aborted) {
+                    return
+                }
 
-            if (!isEditing) {
-                syncFormFromUser(nextUser)
+                const {savedUser: latestUser, isEditing: isEditingNow} =
+                    latestProfileRef.current
+
+                const nextUser = normalizeCustomerProfile(profile, latestUser)
+
+                setSavedUser(nextUser)
+                persistUser(nextUser)
+
+                // Đang sửa dở thì không ghi đè những gì người dùng vừa gõ.
+                if (!isEditingNow) {
+                    syncFormFromUser(nextUser)
+                }
+            } catch (requestError: unknown) {
+                if (signal?.aborted || isRequestCanceled(requestError)) {
+                    return
+                }
+
+                console.error('[PROFILE_CUSTOMER_FETCH_ERROR]', requestError)
             }
-        } catch (requestError: unknown) {
-            if (
-                signal?.aborted
-                || isRequestCanceled(requestError)
-            ) {
-                return
-            }
+        },
+        [isCustomer, syncFormFromUser],
+    )
 
-            console.error(
-                '[PROFILE_CUSTOMER_FETCH_ERROR]',
-                requestError,
-            )
-        }
-    }
+    // Điểm thưởng thay đổi mỗi lần khách thanh toán, nhưng savedUser chỉ được ghi lúc
+    // đăng nhập. Không đọc lại từ server thì màn hình sẽ hiển thị điểm cũ mãi.
+    useEffect(() => {
+        const controller = new AbortController()
 
+        void loadCustomerProfile(controller.signal)
 
+        return () => controller.abort()
+    }, [loadCustomerProfile])
 
     if (!savedUser) {
         return (
@@ -241,13 +216,10 @@ export default function ProfilePage() {
         setUpdateError(null)
 
         try {
-            const userId =
-                getUserId(currentUser)
+            const userId = getUserId(currentUser)
 
             if (!userId) {
-                throw new Error(
-                    'Không xác định được tài khoản cần cập nhật.',
-                )
+                throw new Error('Không xác định được tài khoản cần cập nhật.')
             }
 
             const data = {
@@ -266,22 +238,20 @@ export default function ProfilePage() {
                     phone,
                 })
             } else {
-                updated = await adminApi.updateProfile(
-                    userId,
-                    data,
-                )
+                updated = await adminApi.updateProfile(userId, data)
             }
             const nextUser: StoredUser = {
                 ...currentUser,
-                userId: (updated as unknown as Record<string, unknown>).userId as number ?? (updated as unknown as Record<string, unknown>).id as number ?? currentUser.userId,
+                userId:
+                    ((updated as unknown as Record<string, unknown>).userId as number) ??
+                    ((updated as unknown as Record<string, unknown>).id as number) ??
+                    currentUser.userId,
                 username: updated.username,
                 fullName: updated.fullName,
                 email: updated.email,
                 phone: updated.phone,
                 role: updated.role,
-                rewardPoints:
-                    updated.rewardPoints
-                    ?? currentUser.rewardPoints,
+                rewardPoints: updated.rewardPoints ?? currentUser.rewardPoints,
             }
 
             persistUser(nextUser)
@@ -291,23 +261,15 @@ export default function ProfilePage() {
             setIsEditing(false)
             setUpdateSuccess(true)
 
-            window.setTimeout(
-                () => setUpdateSuccess(false),
-                3000,
-            )
+            window.setTimeout(() => setUpdateSuccess(false), 3000)
         } catch (requestError: unknown) {
             if (isRequestCanceled(requestError)) {
                 return
             }
 
-            console.error(
-                '[PROFILE_UPDATE_ERROR]',
-                requestError,
-            )
+            console.error('[PROFILE_UPDATE_ERROR]', requestError)
 
-            setUpdateError(
-                getErrorMessage(requestError),
-            )
+            setUpdateError(getErrorMessage(requestError))
         } finally {
             setUpdateLoading(false)
         }
@@ -339,23 +301,15 @@ export default function ProfilePage() {
             setShowChangePw(false)
             setPwSuccess(true)
 
-            window.setTimeout(
-                () => setPwSuccess(false),
-                3000,
-            )
+            window.setTimeout(() => setPwSuccess(false), 3000)
         } catch (requestError: unknown) {
             if (isRequestCanceled(requestError)) {
                 return
             }
 
-            console.error(
-                '[PROFILE_CHANGE_PASSWORD_ERROR]',
-                requestError,
-            )
+            console.error('[PROFILE_CHANGE_PASSWORD_ERROR]', requestError)
 
-            setPwError(
-                getErrorMessage(requestError),
-            )
+            setPwError(getErrorMessage(requestError))
         } finally {
             setPwLoading(false)
         }
@@ -366,9 +320,7 @@ export default function ProfilePage() {
             <div className="page-header">
                 <div>
                     <h2>Hồ sơ cá nhân</h2>
-                    <p>
-                        Xem và cập nhật thông tin tài khoản của bạn.
-                    </p>
+                    <p>Xem và cập nhật thông tin tài khoản của bạn.</p>
                 </div>
 
                 {!isEditing && canEditProfile && (
@@ -383,33 +335,22 @@ export default function ProfilePage() {
             </div>
 
             {updateSuccess && (
-                <div style={successStyle}>
-                    ✓ Cập nhật hồ sơ thành công!
-                </div>
+                <div style={successStyle}>✓ Cập nhật hồ sơ thành công!</div>
             )}
 
-            {pwSuccess && (
-                <div style={successStyle}>
-                    ✓ Đổi mật khẩu thành công!
-                </div>
-            )}
+            {pwSuccess && <div style={successStyle}>✓ Đổi mật khẩu thành công!</div>}
 
             <div style={cardStyle}>
                 <div style={profileHeaderStyle}>
                     <div style={avatarStyle}>
-                        {currentUser.fullName
-                            .charAt(0)
-                            .toUpperCase()}
+                        {currentUser.fullName.charAt(0).toUpperCase()}
                     </div>
 
                     <div>
-                        <h3 style={profileNameStyle}>
-                            {currentUser.fullName}
-                        </h3>
+                        <h3 style={profileNameStyle}>{currentUser.fullName}</h3>
 
                         <span style={roleBadgeStyle}>
-                            {ROLE_LABELS[currentUser.role]
-                                ?? currentUser.role}
+                            {ROLE_LABELS[currentUser.role] ?? currentUser.role}
                         </span>
                     </div>
                 </div>
@@ -441,22 +382,17 @@ export default function ProfilePage() {
 
                             <EditField
                                 label="Số điện thoại *"
-                                value={phone} pattern="0[0-9]{9}"
+                                value={phone}
+                                pattern="0[0-9]{9}"
                                 placeholder="0xxxxxxxxx"
                                 onChange={setPhone}
                             />
                         </>
                     ) : (
                         <>
-                            <ProfileField
-                                label="Họ tên"
-                                value={currentUser.fullName}
-                            />
+                            <ProfileField label="Họ tên" value={currentUser.fullName} />
 
-                            <ProfileField
-                                label="Username"
-                                value={currentUser.username}
-                            />
+                            <ProfileField label="Username" value={currentUser.username} />
 
                             <ProfileField
                                 label="Email"
@@ -479,10 +415,7 @@ export default function ProfilePage() {
                 </div>
 
                 {updateError && (
-                    <div
-                        className="auth-error"
-                        style={profileErrorStyle}
-                    >
+                    <div className="auth-error" style={profileErrorStyle}>
                         {updateError}
                     </div>
                 )}
@@ -505,13 +438,9 @@ export default function ProfilePage() {
                             type="button"
                             className="primary-button"
                             disabled={updateLoading}
-                            onClick={() =>
-                                void handleSaveProfile()
-                            }
+                            onClick={() => void handleSaveProfile()}
                         >
-                            {updateLoading
-                                ? 'Đang lưu...'
-                                : 'Lưu thay đổi'}
+                            {updateLoading ? 'Đang lưu...' : 'Lưu thay đổi'}
                         </button>
                     </div>
                 )}
@@ -521,9 +450,7 @@ export default function ProfilePage() {
                 <div style={passwordCardStyle}>
                     <div style={passwordHeaderStyle}>
                         <div>
-                            <h3 style={passwordTitleStyle}>
-                                Đổi mật khẩu
-                            </h3>
+                            <h3 style={passwordTitleStyle}>Đổi mật khẩu</h3>
 
                             <p style={passwordSubtitleStyle}>
                                 Cập nhật mật khẩu để bảo mật tài khoản
@@ -533,18 +460,14 @@ export default function ProfilePage() {
                         <button
                             type="button"
                             className={
-                                showChangePw
-                                    ? 'secondary-button'
-                                    : 'primary-button'
+                                showChangePw ? 'secondary-button' : 'primary-button'
                             }
                             onClick={() => {
                                 setShowChangePw(!showChangePw)
                                 setPwError(null)
                             }}
                         >
-                            {showChangePw
-                                ? 'Hủy'
-                                : 'Đổi mật khẩu'}
+                            {showChangePw ? 'Hủy' : 'Đổi mật khẩu'}
                         </button>
                     </div>
 
@@ -574,20 +497,14 @@ export default function ProfilePage() {
                                 onChange={setConfirmPw}
                             />
 
-                            {pwError && (
-                                <div className="auth-error">
-                                    {pwError}
-                                </div>
-                            )}
+                            {pwError && <div className="auth-error">{pwError}</div>}
 
                             <div style={passwordActionStyle}>
                                 <button
                                     type="button"
                                     className="primary-button"
                                     disabled={pwLoading}
-                                    onClick={() =>
-                                        void handleChangePassword()
-                                    }
+                                    onClick={() => void handleChangePassword()}
                                 >
                                     {pwLoading
                                         ? 'Đang xử lý...'
@@ -603,26 +520,22 @@ export default function ProfilePage() {
 }
 
 function ProfileField({
-                          label,
-                          value,
-                          readOnly,
-                      }: {
+    label,
+    value,
+    readOnly,
+}: {
     label: string
     value: string
     readOnly?: boolean
 }) {
     return (
         <div style={profileFieldStyle}>
-            <span style={profileFieldLabelStyle}>
-                {label}
-            </span>
+            <span style={profileFieldLabelStyle}>{label}</span>
 
             <span
                 style={{
                     ...profileFieldValueStyle,
-                    color: readOnly
-                        ? '#9ca3af'
-                        : '#111827',
+                    color: readOnly ? '#9ca3af' : '#111827',
                 }}
             >
                 {value}
@@ -632,30 +545,25 @@ function ProfileField({
 }
 
 function EditField({
-                       label,
-                       value,
-                       onChange,
-                       placeholder,
-                       type = 'text',
-                   }: {
+    label,
+    value,
+    onChange,
+    placeholder,
+    pattern,
+    type = 'text',
+}: {
     label: string
     value: string
     onChange: (value: string) => void
     placeholder?: string
+    pattern?: string
     type?: string
 }) {
-    const [visible, setVisible] =
-        useState(false)
+    const [visible, setVisible] = useState(false)
 
-    const isPassword =
-        type === 'password'
+    const isPassword = type === 'password'
 
-    const inputType =
-        isPassword
-            ? visible
-                ? 'text'
-                : 'password'
-            : type
+    const inputType = isPassword ? (visible ? 'text' : 'password') : type
 
     return (
         <label style={editFieldStyle}>
@@ -666,50 +574,31 @@ function EditField({
                     type={inputType}
                     value={value}
                     placeholder={placeholder}
+                    pattern={pattern}
                     style={{
                         ...editInputStyle,
-                        padding: isPassword
-                            ? '10px 40px 10px 12px'
-                            : '10px 12px',
+                        padding: isPassword ? '10px 40px 10px 12px' : '10px 12px',
                     }}
-                    onChange={(event) =>
-                        onChange(event.target.value)
-                    }
+                    onChange={(event) => onChange(event.target.value)}
                 />
 
                 {isPassword && (
                     <button
                         type="button"
-                        aria-label={
-                            visible
-                                ? 'Ẩn mật khẩu'
-                                : 'Hiện mật khẩu'
-                        }
-                        title={
-                            visible
-                                ? 'Ẩn mật khẩu'
-                                : 'Hiện mật khẩu'
-                        }
+                        aria-label={visible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                        title={visible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                         style={eyeButtonStyle}
-                        onClick={() =>
-                            setVisible((current) => !current)
-                        }
+                        onClick={() => setVisible((current) => !current)}
                         onMouseEnter={(event) => {
-                            event.currentTarget.style.color =
-                                '#4f46e5'
-                            event.currentTarget.style.backgroundColor =
-                                '#eef2ff'
+                            event.currentTarget.style.color = '#4f46e5'
+                            event.currentTarget.style.backgroundColor = '#eef2ff'
                         }}
                         onMouseLeave={(event) => {
-                            event.currentTarget.style.color =
-                                '#9ca3af'
-                            event.currentTarget.style.backgroundColor =
-                                'transparent'
+                            event.currentTarget.style.color = '#9ca3af'
+                            event.currentTarget.style.backgroundColor = 'transparent'
                         }}
                     >
-                        {visible
-                            ? <EyeOffIcon />
-                            : <EyeIcon />}
+                        {visible ? <EyeOffIcon /> : <EyeIcon />}
                     </button>
                 )}
             </div>
@@ -730,11 +619,7 @@ function EyeIcon() {
             strokeLinejoin="round"
         >
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-            <circle
-                cx="12"
-                cy="12"
-                r="3"
-            />
+            <circle cx="12" cy="12" r="3" />
         </svg>
     )
 }
@@ -752,12 +637,7 @@ function EyeOffIcon() {
             strokeLinejoin="round"
         >
             <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.62 21.62 0 0 1 5.06-6.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a21.6 21.6 0 0 1-3.22 4.36M14.12 14.12a3 3 0 1 1-4.24-4.24" />
-            <line
-                x1="1"
-                y1="1"
-                x2="23"
-                y2="23"
-            />
+            <line x1="1" y1="1" x2="23" y2="23" />
         </svg>
     )
 }

@@ -1,23 +1,8 @@
-import {
-    useCallback,
-    useEffect,
-    useState,
-    type CSSProperties,
-} from 'react'
-import {
-    useNavigate,
-    useParams,
-} from 'react-router-dom'
+import {useCallback, useEffect, useState, type CSSProperties} from 'react'
+import {useNavigate, useParams} from 'react-router-dom'
 
-import {
-    type OrderDetailResponse,
-    waiterApi,
-} from '@/shared/api/waiter'
-import {
-    BackArrow,
-    fmtPrice,
-    WaiterHeader,
-} from './components'
+import {type OrderDetailResponse, waiterApi} from '@/shared/api/waiter'
+import {BackArrow, fmtPrice, WaiterHeader} from './components'
 import {useWaiterSocket} from '@/realtime'
 
 function isRequestCanceled(error: unknown) {
@@ -32,9 +17,9 @@ function isRequestCanceled(error: unknown) {
     }
 
     return (
-        requestError.name === 'CanceledError'
-        || requestError.code === 'ERR_CANCELED'
-        || requestError.message === 'canceled'
+        requestError.name === 'CanceledError' ||
+        requestError.code === 'ERR_CANCELED' ||
+        requestError.message === 'canceled'
     )
 }
 
@@ -42,25 +27,16 @@ export default function WaiterOrderDetailPage() {
     const navigate = useNavigate()
     const {tableId} = useParams()
 
-    const tableIdNumber =
-        Number.parseInt(tableId ?? '0', 10)
+    const tableIdNumber = Number.parseInt(tableId ?? '0', 10)
 
-    const [servingOrders, setServingOrders] =
-        useState<OrderDetailResponse[]>([])
+    const [servingOrders, setServingOrders] = useState<OrderDetailResponse[]>([])
 
-    const [isLoading, setIsLoading] =
-        useState(true)
+    const [isLoading, setIsLoading] = useState(true)
 
-    const [error, setError] =
-        useState<string | null>(null)
-
-
+    const [error, setError] = useState<string | null>(null)
 
     const loadServingOrders = useCallback(
-        async (
-            signal?: AbortSignal,
-            showFullLoading = true,
-        ) => {
+        async (signal?: AbortSignal, showFullLoading = true) => {
             if (!tableIdNumber) {
                 setServingOrders([])
                 setError('Không xác định được bàn.')
@@ -75,11 +51,7 @@ export default function WaiterOrderDetailPage() {
 
                 setError(null)
 
-                const response =
-                    await waiterApi.getServingOrders(
-                        tableIdNumber,
-                        signal,
-                    )
+                const response = await waiterApi.getServingOrders(tableIdNumber, signal)
 
                 if (signal?.aborted) {
                     return
@@ -87,22 +59,22 @@ export default function WaiterOrderDetailPage() {
 
                 setServingOrders(response.data)
 
-                // Đánh dấu đã xem các ghi chú nội bộ của chef chưa được ack
-                const unacknowledgedItems = response.data
+                // Đánh dấu đã xem các ghi chú nội bộ của chef chưa được ack.
+                // orderItemId là optional trong response, lọc bỏ trước khi gọi API.
+                const unacknowledgedItemIds = response.data
                     .flatMap((order) => order.orderItems)
                     .filter(
                         (item) =>
-                            item.chefInternalNote
-                            && !item.chefInternalNoteAcknowledgedAt,
+                            item.chefInternalNote && !item.chefInternalNoteAcknowledgedAt,
                     )
+                    .map((item) => item.orderItemId)
+                    .filter((itemId): itemId is number => itemId != null)
 
-                if (unacknowledgedItems.length > 0 && !signal?.aborted) {
+                if (unacknowledgedItemIds.length > 0 && !signal?.aborted) {
                     await Promise.all(
-                        unacknowledgedItems.map((item) =>
+                        unacknowledgedItemIds.map((itemId) =>
                             waiterApi
-                                .acknowledgeChefInternalNote(
-                                    item.orderItemId,
-                                )
+                                .acknowledgeChefInternalNote(itemId)
                                 .catch((requestError) => {
                                     console.error(
                                         '[WAITER_ACK_CHEF_NOTE_ERROR]',
@@ -113,26 +85,15 @@ export default function WaiterOrderDetailPage() {
                     )
                 }
             } catch (requestError: unknown) {
-                if (
-                    signal?.aborted
-                    || isRequestCanceled(requestError)
-                ) {
+                if (signal?.aborted || isRequestCanceled(requestError)) {
                     return
                 }
 
-                console.error(
-                    '[WAITER_ORDER_DETAIL_FETCH_ERROR]',
-                    requestError,
-                )
+                console.error('[WAITER_ORDER_DETAIL_FETCH_ERROR]', requestError)
 
-                setError(
-                    'Không thể tải chi tiết đơn hàng của bàn.',
-                )
+                setError('Không thể tải chi tiết đơn hàng của bàn.')
             } finally {
-                if (
-                    showFullLoading
-                    && !signal?.aborted
-                ) {
+                if (showFullLoading && !signal?.aborted) {
                     setIsLoading(false)
                 }
             }
@@ -155,10 +116,7 @@ export default function WaiterOrderDetailPage() {
         () => void loadServingOrders(undefined, false),
     )
 
-    const orderItems =
-        servingOrders.flatMap(
-            (order) => order.orderItems,
-        )
+    const orderItems = servingOrders.flatMap((order) => order.orderItems)
 
     return (
         <div className="waiter-container">
@@ -166,24 +124,16 @@ export default function WaiterOrderDetailPage() {
 
             <main className="waiter-main">
                 <div className="waiter-sub-header">
-                    <BackArrow
-                        onClick={() =>
-                            navigate('/waiter/tables')
-                        }
-                    />
+                    <BackArrow onClick={() => navigate('/waiter/tables')} />
 
-                    <h2 className="waiter-title">
-                        Bàn: {tableIdNumber || '—'}
-                    </h2>
+                    <h2 className="waiter-title">Bàn: {tableIdNumber || '—'}</h2>
 
                     <button
                         type="button"
                         className="waiter-action-btn"
                         disabled={!tableIdNumber}
                         onClick={() =>
-                            navigate(
-                                `/waiter/tables/${tableIdNumber}/order/edit`,
-                            )
+                            navigate(`/waiter/tables/${tableIdNumber}/order/edit`)
                         }
                     >
                         Cập nhật đơn hàng
@@ -192,9 +142,7 @@ export default function WaiterOrderDetailPage() {
 
                 <div className="waiter-detail-layout">
                     <div className="waiter-card">
-                        <div className="waiter-card-header">
-                            Danh sách món
-                        </div>
+                        <div className="waiter-card-header">Danh sách món</div>
 
                         <div
                             className="waiter-card-body"
@@ -214,10 +162,7 @@ export default function WaiterOrderDetailPage() {
                                         type="button"
                                         className="waiter-action-btn"
                                         onClick={() =>
-                                            void loadServingOrders(
-                                                undefined,
-                                                true,
-                                            )
+                                            void loadServingOrders(undefined, true)
                                         }
                                     >
                                         Thử lại
@@ -230,59 +175,56 @@ export default function WaiterOrderDetailPage() {
                             ) : (
                                 <table className="waiter-table-custom">
                                     <thead>
-                                    <tr>
-                                        <th>Món</th>
-                                        <th>SL</th>
-                                        <th>Đơn giá</th>
-                                        <th>Trạng thái</th>
-                                    </tr>
+                                        <tr>
+                                            <th>Món</th>
+                                            <th>SL</th>
+                                            <th>Đơn giá</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
                                     </thead>
 
                                     <tbody>
-                                    {orderItems.map((item) => (
-                                        <tr key={item.orderItemId}>
-                                            <td>
-                                                {item.dishName}
+                                        {orderItems.map((item) => (
+                                            <tr key={item.orderItemId}>
+                                                <td>
+                                                    {item.dishName}
 
-                                                {item.note && (
-                                                    <div style={noteStyle}>
-                                                        {item.note}
-                                                    </div>
-                                                )}
+                                                    {item.note && (
+                                                        <div style={noteStyle}>
+                                                            {item.note}
+                                                        </div>
+                                                    )}
 
-                                                {item.status === 'CANCELLED'
-                                                    && item.cancelReason && (
-                                                    <div style={cancelReasonStyle}>
-                                                        Lý do hủy:{' '}
-                                                        {item.cancelReason}
-                                                    </div>
-                                                )}
+                                                    {item.status === 'CANCELLED' &&
+                                                        item.cancelReason && (
+                                                            <div
+                                                                style={cancelReasonStyle}
+                                                            >
+                                                                Lý do hủy:{' '}
+                                                                {item.cancelReason}
+                                                            </div>
+                                                        )}
 
-                                                {item.chefInternalNote && (
-                                                    <div style={chefNoteStyle}>
-                                                        Chef:{' '}
-                                                        {item.chefInternalNote}
-                                                    </div>
-                                                )}
-                                            </td>
+                                                    {item.chefInternalNote && (
+                                                        <div style={chefNoteStyle}>
+                                                            Chef: {item.chefInternalNote}
+                                                        </div>
+                                                    )}
+                                                </td>
 
-                                            <td>
-                                                {item.quantity}
-                                            </td>
+                                                <td>{item.quantity}</td>
 
-                                            <td>
-                                                {fmtPrice(item.unitPrice)}
-                                            </td>
+                                                <td>{fmtPrice(item.unitPrice)}</td>
 
-                                            <td>
+                                                <td>
                                                     <span
                                                         className={`waiter-badge waiter-badge-${(item.status ?? '').toLowerCase()}`}
                                                     >
                                                         {item.status}
                                                     </span>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                </td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             )}
