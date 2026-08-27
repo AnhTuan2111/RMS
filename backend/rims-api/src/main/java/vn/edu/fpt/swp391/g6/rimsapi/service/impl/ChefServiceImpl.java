@@ -12,10 +12,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.transaction.Transactional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.kitchen.ChefDashboardResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.dto.response.kitchen.KitchenOrderResponse;
@@ -28,6 +27,7 @@ import vn.edu.fpt.swp391.g6.rimsapi.entity.Dish;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.Order;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.OrderItem;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.OrderItemStatus;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.ResourceNotFoundException;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.DishRepository;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.OrderItemRepository;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.OrderRepository;
@@ -45,6 +45,7 @@ public class ChefServiceImpl implements ChefService
     private final WebSocketBroadcaster webSocketBroadcaster;
 
     @Override
+    @Transactional(readOnly = true)
     public List<KitchenOrderResponse> getKitchenOrders()
     {
         return orderItemRepository
@@ -56,6 +57,7 @@ public class ChefServiceImpl implements ChefService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DishDetailResponse getDishDetail(
             Long orderItemId)
     {
@@ -132,6 +134,7 @@ public class ChefServiceImpl implements ChefService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DishListResponse> getDishList()
     {
         return dishRepository.findByIsHiddenFalse()
@@ -168,7 +171,7 @@ public class ChefServiceImpl implements ChefService
         Dish dish = dishRepository
                 .findById(dishId)
                 .orElseThrow(
-                        () -> new RuntimeException(
+                        () -> new ResourceNotFoundException(
                                 "Không tìm thấy món ăn"));
 
         if (available == null)
@@ -196,6 +199,7 @@ public class ChefServiceImpl implements ChefService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ChefDashboardResponse getDashboard()
     {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
@@ -245,6 +249,7 @@ public class ChefServiceImpl implements ChefService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<KitchenOrderResponse> getCompletedOrders()
     {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
@@ -259,6 +264,7 @@ public class ChefServiceImpl implements ChefService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CancelledOrderResponse> getCancelledOrders()
     {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // MỚI
@@ -328,6 +334,7 @@ public class ChefServiceImpl implements ChefService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<GroupedKitchenOrderResponse> getGroupedKitchenOrders()
     {
         List<OrderItem> preparingItems = orderItemRepository
@@ -522,7 +529,7 @@ public class ChefServiceImpl implements ChefService
         return orderItemRepository
                 .findById(orderItemId)
                 .orElseThrow(
-                        () -> new RuntimeException(
+                        () -> new ResourceNotFoundException(
                                 "Không tìm thấy món trong đơn hàng"));
     }
 

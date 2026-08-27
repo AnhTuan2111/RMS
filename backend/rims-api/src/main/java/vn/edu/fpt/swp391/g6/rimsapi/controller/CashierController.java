@@ -6,6 +6,8 @@ import java.util.Map;
 import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,11 +29,16 @@ import vn.edu.fpt.swp391.g6.rimsapi.service.InvoicePdfService;
 @RestController
 @RequestMapping("/rims/cashier")
 @RequiredArgsConstructor
+@Slf4j
 public class CashierController
 {
 
     private final CashierService cashierService;
     private final InvoicePdfService invoicePdfService;
+
+    /** Địa chỉ frontend để redirect người dùng sau khi VNPay trả kết quả về. */
+    @Value("${app.frontend-url:http://localhost:5173}")
+    private String frontendUrl;
 
     // API 1 xem danh sách 12 bàn
     @GetMapping("/tables")
@@ -111,19 +118,19 @@ public class CashierController
             if ("00".equals(vnp_ResponseCode))
             {
                 Long invoiceId = cashierService.processVnPaySuccess(vnp_TxnRef);
-                String frontendSuccessUrl = "http://localhost:5173/payment-success?invoiceId=" + invoiceId;
-                response.sendRedirect(frontendSuccessUrl);
+                response.sendRedirect(frontendUrl + "/payment-success?invoiceId=" + invoiceId);
             } else
             {
                 cashierService.processVnPayFailed(vnp_TxnRef);
-                response.sendRedirect("http://localhost:5173/payment-failed");
+                response.sendRedirect(frontendUrl + "/payment-failed");
             }
         } catch (Exception e)
         {
-            e.printStackTrace();
-            // MỚI: luôn redirect về trang failed thay vì để trình duyệt treo trắng,
-            // kể cả khi processVnPaySuccess/processVnPayFailed tự throw (VD: callback gọi lại lần 2)
-            response.sendRedirect("http://localhost:5173/payment-failed");
+            // Try/catch ở đây là cố ý: VNPay gọi vào bằng trình duyệt của khách, nên phải
+            // luôn redirect về trang kết quả thay vì để GlobalExceptionHandler trả JSON lỗi.
+            log.error("Xử lý callback VNPay thất bại, tham số: {}", vnpayParams, e);
+
+            response.sendRedirect(frontendUrl + "/payment-failed");
         }
     }
 

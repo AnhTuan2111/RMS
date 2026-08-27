@@ -22,8 +22,8 @@ import vn.edu.fpt.swp391.g6.rimsapi.entity.RestaurantTable;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.User;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.ReservationStatus;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.TableStatus;
-import vn.edu.fpt.swp391.g6.rimsapi.exception.GlobalExceptionHandler;
-import vn.edu.fpt.swp391.g6.rimsapi.exception.GlobalExceptionHandler.ResourceNotFoundException;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.BusinessRuleException;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.ResourceNotFoundException;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.OrderRepository;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.ReservationRepository;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.RestaurantTableRepository;
@@ -64,7 +64,7 @@ public class CustomerServiceImpl implements CustomerService
 
         if (time.isBefore(openTime) || time.isAfter(closeTime))
         {
-            throw new GlobalExceptionHandler.BusinessException("Nhà hàng chỉ nhận đặt bàn trong khoảng 08:00 - 20:00");
+            throw new BusinessRuleException("Nhà hàng chỉ nhận đặt bàn trong khoảng 08:00 - 20:00");
         }
 
         // Chặn 1 khách có nhiều hơn 1 đặt bàn đang hoạt động trong cùng 1 ngày
@@ -185,6 +185,7 @@ public class CustomerServiceImpl implements CustomerService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean checkCustomerReservationByUser(Integer userId, String date)
     {
         try
@@ -204,6 +205,7 @@ public class CustomerServiceImpl implements CustomerService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CustomerReservationResponse> getCurrentReservationByUser(Integer userId)
     {
         log.info("Customer ID: {} lấy đặt bàn hiện tại", userId);

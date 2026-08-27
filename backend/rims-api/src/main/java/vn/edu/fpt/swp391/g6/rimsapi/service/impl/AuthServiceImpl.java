@@ -37,6 +37,7 @@ public class AuthServiceImpl implements AuthService
     private final RevokedTokenRepository revokedTokenRepository;
 
     @Override
+    @Transactional
     public AuthenticationResponse login(AuthenticationRequest loginRequest)
     {
         User user = userRepository.findByUsername(loginRequest.getUsername())
@@ -103,6 +104,7 @@ public class AuthServiceImpl implements AuthService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserProfileResponse getCurrentUser(UserPrincipal principal)
     {
         User user = userRepository.findById(principal.getId())

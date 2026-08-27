@@ -39,6 +39,11 @@ spring:
           starttls:
             enable: true
 
+app:
+  # Địa chỉ frontend. Dùng cho cả CORS allowed origin lẫn redirect sau khi VNPay
+  # trả kết quả về. Khi deploy thật chỉ cần đổi một chỗ này.
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+
 jwt:
   # Chuỗi ngẫu nhiên tối thiểu 32 ký tự. Sinh mới: openssl rand -base64 48
   signerKey: ${JWT_SIGNER_KEY}

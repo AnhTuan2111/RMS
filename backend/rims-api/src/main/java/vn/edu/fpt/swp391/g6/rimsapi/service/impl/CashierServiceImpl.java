@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,10 @@ import vn.edu.fpt.swp391.g6.rimsapi.dto.response.table.TableDashboardResponse;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.*;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.OrderItem;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.*;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.BusinessRuleException;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.ConflictException;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.ResourceNotFoundException;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.TechnicalException;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.*;
 import vn.edu.fpt.swp391.g6.rimsapi.service.CashierService;
 import vn.edu.fpt.swp391.g6.rimsapi.util.WebSocketBroadcaster;
@@ -85,7 +88,7 @@ public class CashierServiceImpl implements CashierService
     public OrderDetailResponse getOrderDetail(Long orderId)
     {
         Order order = orderRepository.findOrderWithDetailsById(orderId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng tương ứng"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng tương ứng"));
 
         // 1. Lọc danh sách OrderItem chỉ lấy món đã COMPLETED
         List<OrderItemResponse> itemResponses = order.getOrderItems().stream()
@@ -128,7 +131,7 @@ public class CashierServiceImpl implements CashierService
     public PaymentResponse processPayment(Long orderId, PaymentRequest request)
     {
         Order order = orderRepository.findOrderWithDetailsById(orderId) // ĐỔI: cần load kèm orderItems
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng"));
 
         // Idempotent: nếu đã LOCKED sẵn (Cashier bấm lại/F5) thì trả về luôn, không làm gì thêm
         if (order.getStatus() == OrderStatus.LOCKED)
@@ -141,7 +144,7 @@ public class CashierServiceImpl implements CashierService
 
         if (order.getStatus() != OrderStatus.SERVING)
         {
-            throw new RuntimeException("Đơn hàng này đã thanh toán xong hoặc không tồn tại!");
+            throw new ConflictException("Đơn hàng này đã thanh toán xong hoặc không tồn tại!");
         }
 
         List<OrderItem> items = order.getOrderItems() != null ? order.getOrderItems() : List.of();
@@ -196,11 +199,11 @@ public class CashierServiceImpl implements CashierService
     public PaymentResponse completeCashPayment(Long orderId, PaymentRequest request)
     {
         Order order = orderRepository.findOrderForUpdateWithItems(orderId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng"));
 
         if (order.getStatus() != OrderStatus.LOCKED)
         {
-            throw new RuntimeException("Đơn hàng chưa được chốt (LOCKED) hoặc đã thanh toán xong!");
+            throw new ConflictException("Đơn hàng chưa được chốt (LOCKED) hoặc đã thanh toán xong!");
         }
 
         BigDecimal totalBeforeVat = calculateActualTotal(order);
@@ -222,7 +225,7 @@ public class CashierServiceImpl implements CashierService
         BigDecimal amountPaid = BigDecimal.valueOf(request.getAmountPaid());
         if (amountPaid.compareTo(previewFinalAmount) < 0)
         {
-            throw new RuntimeException("Khách đưa thiếu tiền!");
+            throw new BusinessRuleException("Khách đưa thiếu tiền!");
         }
 
         Invoice invoice = new Invoice();
@@ -269,7 +272,7 @@ public class CashierServiceImpl implements CashierService
     public PaymentResponse unlockOrder(Long orderId)
     {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng"));
 
         if (order.getStatus() == OrderStatus.LOCKED)
         {
@@ -320,11 +323,11 @@ public class CashierServiceImpl implements CashierService
     public VNPayResponse createVNPayPaymentUrl(Long orderId, Integer customerId, Integer pointsUsed)
     {
         Order order = orderRepository.findOrderWithDetailsById(orderId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng"));
 
         if (order.getStatus() != OrderStatus.SERVING && order.getStatus() != OrderStatus.LOCKED)
         {
-            throw new RuntimeException("Đơn hàng này đã thanh toán xong hoặc không hợp lệ!");
+            throw new ConflictException("Đơn hàng này đã thanh toán xong hoặc không hợp lệ!");
         }
 
         // ĐÃ SỬA: Lấy tổng tiền thực tế của các món COMPLETED
@@ -332,7 +335,7 @@ public class CashierServiceImpl implements CashierService
 
         if (totalBeforeVat == null || totalBeforeVat.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Đơn hàng chưa có món ăn hoàn thành (Tổng tiền = 0đ)!");
+            throw new ConflictException("Đơn hàng chưa có món ăn hoàn thành (Tổng tiền = 0đ)!");
         }
 
         BigDecimal vatAmount = totalBeforeVat.multiply(new BigDecimal("0.10"));
@@ -347,13 +350,13 @@ public class CashierServiceImpl implements CashierService
             {
                 if (customer.getRewardPoints() < pointsUsed)
                 {
-                    throw new RuntimeException("Khách hàng không đủ điểm!");
+                    throw new BusinessRuleException("Khách hàng không đủ điểm!");
                 }
                 BigDecimal discount = new BigDecimal(pointsUsed).multiply(new BigDecimal("1000"));
                 BigDecimal maxDiscount = finalAmount.multiply(new BigDecimal("0.5"));
                 if (discount.compareTo(maxDiscount) > 0)
                 {
-                    throw new RuntimeException("Số điểm sử dụng vượt quá 50% hóa đơn cho phép!");
+                    throw new BusinessRuleException("Số điểm sử dụng vượt quá 50% hóa đơn cho phép!");
                 }
                 finalAmount = finalAmount.subtract(discount);
                 if (finalAmount.compareTo(BigDecimal.ZERO) < 0)
@@ -424,7 +427,7 @@ public class CashierServiceImpl implements CashierService
             }
         } catch (Exception e)
         {
-            throw new RuntimeException("Lỗi mã hóa dữ liệu VNPay", e);
+            throw new TechnicalException("Lỗi mã hóa dữ liệu VNPay", e);
         }
 
         String queryUrl = query.toString();
@@ -447,12 +450,12 @@ public class CashierServiceImpl implements CashierService
         Long orderId = Long.parseLong(parts[1]);
 
         Order order = orderRepository.findOrderForUpdateWithItems(orderId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng từ VNPay"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng từ VNPay"));
 
         // Chặn xử lý trùng nếu VNPay gọi callback nhiều hơn 1 lần cho cùng giao dịch
         if (order.getStatus() == OrderStatus.COMPLETED)
         {
-            throw new RuntimeException("Đơn hàng này đã được thanh toán rồi!");
+            throw new ConflictException("Đơn hàng này đã được thanh toán rồi!");
         }
 
         // ĐÃ SỬA: Tính lại VAT dựa trên tổng tiền thực tế của các món COMPLETED
@@ -516,7 +519,7 @@ public class CashierServiceImpl implements CashierService
     {
         if (userRepository.existsByPhone(phone))
         {
-            throw new RuntimeException("Số điện thoại này đã tồn tại!");
+            throw new ConflictException("Số điện thoại này đã tồn tại!");
         }
         User user = new User();
         user.setFullName(fullName);
@@ -528,16 +531,7 @@ public class CashierServiceImpl implements CashierService
         user.setRewardPoints(0);
         user.setActive(true);
 
-        try
-        {
-            return userRepository.save(user);
-        } catch (DataIntegrityViolationException e)
-        {
-            // Bắt trường hợp race condition: 2 request cùng tạo 1 SĐT gần như đồng thời,
-            // request đầu đã pass check existsByPhone nhưng request thứ 2 mới thực sự save trước.
-            // DB tự chặn nhờ unique constraint trên cột phone — chuyển thành message thân thiện.
-            throw new RuntimeException("Số điện thoại này đã tồn tại!");
-        }
+        return userRepository.save(user);
     }
 
     // Danh sách hóa đơn HÔM NAY cho Cashier, có filter theo bàn/từ khóa khách/phương thức/mã HĐ.
@@ -608,7 +602,7 @@ public class CashierServiceImpl implements CashierService
     public CashierInvoiceDetailResponse getInvoiceDetailForCashier(Long invoiceId)
     {
         Invoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hóa đơn"));
 
         Order order = invoice.getOrder();
 
@@ -734,13 +728,13 @@ public class CashierServiceImpl implements CashierService
         {
             if (customer.getRewardPoints() < safePointsUsed)
             {
-                throw new RuntimeException("Khách hàng không đủ điểm!");
+                throw new BusinessRuleException("Khách hàng không đủ điểm!");
             }
             BigDecimal discount = new BigDecimal(safePointsUsed).multiply(new BigDecimal("1000"));
             BigDecimal maxDiscount = finalAmount.multiply(new BigDecimal("0.5"));
             if (discount.compareTo(maxDiscount) > 0)
             {
-                throw new RuntimeException("Số điểm sử dụng vượt quá 50% hóa đơn cho phép!");
+                throw new BusinessRuleException("Số điểm sử dụng vượt quá 50% hóa đơn cho phép!");
             }
             customer.setRewardPoints(customer.getRewardPoints() - safePointsUsed);
             finalAmount = finalAmount.subtract(discount);

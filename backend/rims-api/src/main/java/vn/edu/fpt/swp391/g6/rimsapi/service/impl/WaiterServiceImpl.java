@@ -30,7 +30,7 @@ import vn.edu.fpt.swp391.g6.rimsapi.enums.OrderItemStatus;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.OrderStatus;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.ReservationStatus;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.TableStatus;
-import vn.edu.fpt.swp391.g6.rimsapi.exception.GlobalExceptionHandler;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.BusinessRuleException;
 import vn.edu.fpt.swp391.g6.rimsapi.exception.TableNotAvailableException;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.*;
 import vn.edu.fpt.swp391.g6.rimsapi.service.WaiterService;
@@ -51,6 +51,7 @@ public class WaiterServiceImpl implements WaiterService
     private final WebSocketBroadcaster webSocketBroadcaster;
 
     @Override
+    @Transactional(readOnly = true)
     public List<TableDetailResponse> getAllTables()
     {
         List<RestaurantTable> tables = restaurantTableRepository.findAll();
@@ -339,6 +340,7 @@ public class WaiterServiceImpl implements WaiterService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MenuItemResponse> getMenu()
     {
         return dishRepository.findByIsHiddenFalse().stream()
@@ -355,6 +357,7 @@ public class WaiterServiceImpl implements WaiterService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderDetailResponse> getServingOrders(int tableId)
     {
         List<Order> orders = orderRepository.findServingOrdersWithDetails(tableId);
@@ -411,7 +414,7 @@ public class WaiterServiceImpl implements WaiterService
 
         if (time.isBefore(openTime) || time.isAfter(closeTime))
         {
-            throw new GlobalExceptionHandler.BusinessException("Nhà hàng chỉ nhận đặt bàn trong khoảng 08:00 - 20:00");
+            throw new BusinessRuleException("Nhà hàng chỉ nhận đặt bàn trong khoảng 08:00 - 20:00");
         }
 
         // Chặn 1 số điện thoại có nhiều hơn 1 đặt bàn đang hoạt động trong cùng 1 ngày
@@ -468,6 +471,7 @@ public class WaiterServiceImpl implements WaiterService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReservationDetailResponse> viewReservationsByTableAndTime(int tableId, LocalDate date)
     {
         LocalDateTime start = date.atStartOfDay();
@@ -481,6 +485,7 @@ public class WaiterServiceImpl implements WaiterService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ReservationDetailResponse viewReservationDetail(Long reservationId)
     {
         return reservationRepository.findById(reservationId)
@@ -490,6 +495,7 @@ public class WaiterServiceImpl implements WaiterService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ReservationDetailResponse getCurrentReservationByTable(int tableId)
     {
         RestaurantTable table = restaurantTableRepository.findById(tableId)

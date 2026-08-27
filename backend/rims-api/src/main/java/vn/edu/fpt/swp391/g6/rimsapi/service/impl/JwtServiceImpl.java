@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import vn.edu.fpt.swp391.g6.rimsapi.exception.InvalidTokenException;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.TechnicalException;
 import vn.edu.fpt.swp391.g6.rimsapi.service.JwtService;
 
 @Service
@@ -52,7 +53,7 @@ public class JwtServiceImpl implements JwtService
             return signClaims(claimsSet);
         } catch (JOSEException e)
         {
-            throw new RuntimeException("Không thể tạo access token", e);
+            throw new TechnicalException("Không thể tạo access token", e);
         }
     }
 
@@ -73,7 +74,7 @@ public class JwtServiceImpl implements JwtService
             return signClaims(claimsSet);
         } catch (JOSEException e)
         {
-            throw new RuntimeException("Không thể tạo refresh token", e);
+            throw new TechnicalException("Không thể tạo refresh token", e);
         }
     }
 
@@ -134,7 +135,8 @@ public class JwtServiceImpl implements JwtService
             return claims.getStringClaim(CLAIM_USERNAME);
         } catch (ParseException e)
         {
-            throw new RuntimeException(e);
+            // Token không parse được nghĩa là client gửi token hỏng -> 401, không phải 500.
+            throw new InvalidTokenException("Token không hợp lệ");
         }
     }
 
@@ -146,7 +148,7 @@ public class JwtServiceImpl implements JwtService
             return claims.getStringClaim(CLAIM_ROLE);
         } catch (ParseException e)
         {
-            throw new RuntimeException(e);
+            throw new InvalidTokenException("Token không hợp lệ");
         }
     }
 

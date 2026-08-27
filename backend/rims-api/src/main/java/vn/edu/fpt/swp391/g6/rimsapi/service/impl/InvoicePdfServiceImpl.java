@@ -5,9 +5,6 @@ import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
-
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfPCell;
@@ -16,6 +13,7 @@ import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import vn.edu.fpt.swp391.g6.rimsapi.entity.Invoice;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.Order;
@@ -23,6 +21,8 @@ import vn.edu.fpt.swp391.g6.rimsapi.entity.OrderItem;
 import vn.edu.fpt.swp391.g6.rimsapi.entity.Payment;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.OrderItemStatus;
 import vn.edu.fpt.swp391.g6.rimsapi.enums.PaymentMethod;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.ResourceNotFoundException;
+import vn.edu.fpt.swp391.g6.rimsapi.exception.TechnicalException;
 import vn.edu.fpt.swp391.g6.rimsapi.repository.InvoiceRepository;
 import vn.edu.fpt.swp391.g6.rimsapi.service.InvoicePdfService;
 
@@ -39,7 +39,7 @@ public class InvoicePdfServiceImpl implements InvoicePdfService
     {
         // Load fresh bên trong transaction hiện tại -> session còn sống
         Invoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hóa đơn: " + invoiceId));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hóa đơn: " + invoiceId));
 
         Document document = new Document(PageSize.A6, 10, 10, 15, 15);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -223,8 +223,7 @@ public class InvoicePdfServiceImpl implements InvoicePdfService
             document.close();
         } catch (Exception e)
         {
-            e.printStackTrace();
-            throw new RuntimeException("Lỗi khi tạo file PDF: " + e.getMessage());
+            throw new TechnicalException("Không dựng được file PDF hoá đơn", e);
         }
 
         return out.toByteArray();

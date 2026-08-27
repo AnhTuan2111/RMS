@@ -2,6 +2,7 @@ package vn.edu.fpt.swp391.g6.rimsapi.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -16,6 +17,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class CorsConfig // Cross-origin resource sharing
 {
 
+    /** Cùng giá trị với app.frontend-url dùng ở CashierController, khai báo một chỗ duy nhất. */
+    @Value("${app.frontend-url:http://localhost:5173}")
+    private String frontendUrl;
+
     // Annotation này thông báo cho Spring rằng giá trị trả về của phương thức không phải chỉ là một đối tượng Java thông thường mà sẽ trở thành một Bean được quản lý trong IoC Container.
     // Khi ứng dụng khởi động, Spring chỉ gọi phương thức này một lần (đối với Bean có phạm vi Singleton mặc định), lưu kết quả vào ApplicationContext và sau đó mọi thành phần cần đến CorsConfigurationSource đều sẽ sử dụng cùng một instance này
     // Trong trường hợp của Spring Security, khi tính năng CORS được bật thông qua http.cors(...), framework sẽ tự động tìm Bean có kiểu CorsConfigurationSource, đọc toàn bộ cấu hình bên trong và áp dụng vào quá trình xử lý request trước khi request được chuyển đến Controller.
@@ -28,7 +33,7 @@ public class CorsConfig // Cross-origin resource sharing
         CorsConfiguration configuration = new CorsConfiguration();
 
         // khai khai báo danh sách các Origin được phép truy cập API. Trong CORS, Origin không chỉ là tên miền mà còn bao gồm cả giao thức (HTTP hoặc HTTPS) và cổng (port)
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of(frontendUrl));
 
         // Quy định những phương thức HTTP nào được phép sử dụng khi frontend gửi request tới server.
         // Mỗi phương thức HTTP đại diện cho một mục đích khác nhau: GET dùng để lấy dữ liệu, POST dùng để tạo mới tài nguyên, PUT dùng để cập nhật toàn bộ tài nguyên, PATCH dùng để cập nhật một phần dữ liệu, còn DELETE dùng để xóa dữ liệu.

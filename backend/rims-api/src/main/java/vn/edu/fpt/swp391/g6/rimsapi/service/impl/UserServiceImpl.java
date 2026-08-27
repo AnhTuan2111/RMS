@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import vn.edu.fpt.swp391.g6.rimsapi.dto.request.auth.UpdateProfileRequest;
@@ -48,6 +49,7 @@ public class UserServiceImpl implements UserService
 
     // ===================== EXISTING =====================
     @Override
+    @Transactional(readOnly = true)
     public List<UserResponse> getAllUsers()
     {
         return userRepository.findAll().stream()
@@ -56,6 +58,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserProfileResponse getProfile(Integer id)
     {
         User user = findUserById(id);
@@ -63,6 +66,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional
     public UserProfileResponse updateProfile(Integer id, UpdateProfileRequest request)
     {
         User user = findUserById(id);
@@ -90,6 +94,7 @@ public class UserServiceImpl implements UserService
     // ===================== NEW =====================
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<UserResponse> getStaffAccounts(String keyword, Boolean active, int page, int size)
     {
         // Danh sách "nhân viên" hiển thị cho admin không bao gồm chính tài khoản ADMIN
@@ -100,6 +105,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<UserResponse> getCustomerAccounts(String keyword, Boolean active, int page, int size)
     {
         var spec = UserSpecifications.filter(List.of(RoleType.CUSTOMER), null, keyword, active);
@@ -116,6 +122,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional
     public UserResponse createStaff(CreateStaffRequest request)
     {
         if (request.getRole() == RoleType.CUSTOMER)
@@ -137,12 +144,14 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse getAccountDetail(Integer id)
     {
         return convertToResponse(findUserById(id));
     }
 
     @Override
+    @Transactional
     public UserResponse updateAccount(Integer id, UpdateAccountRequest request)
     {
         User user = findUserById(id);
@@ -194,6 +203,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional
     public void setAccountStatus(Integer id, SetAccountStatusRequest request)
     {
         User user = findUserById(id);
@@ -206,6 +216,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional
     public void changePassword(UserPrincipal principal, ChangePasswordRequest request)
     {
         User user = findUserById(principal.getId());
@@ -218,6 +229,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional
     public void sendForgotPasswordOtp(ForgotPasswordRequest request)
     {
         User user = userRepository.findByEmail(request.getEmail())
@@ -234,6 +246,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional
     public void verifyOtpAndResetPassword(VerifyOtpRequest request)
     {
         if (!otpStore.verify(request.getEmail(), request.getOtp()))
@@ -250,6 +263,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional
     public UserResponse register(CreateCustomerRequest request)
     {
         validateUniqueFields(request.getUsername(), request.getEmail(), request.getPhone());
@@ -268,6 +282,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional
     public UserResponse createCustomer(CreateCustomerRequest request)
     {
         validateUniqueFields(request.getUsername(), request.getEmail(), request.getPhone());
