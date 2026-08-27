@@ -1,5 +1,6 @@
 ﻿import {useEffect, useMemo, useState} from 'react'
 import {getCancelledOrders, type CancelledOrderResponse} from '@/shared/api/chef'
+import {ErrorState, LoadingState} from '@/shared/components/feedback'
 
 const ITEMS_PER_PAGE = 20
 
@@ -149,24 +150,16 @@ export default function CancelledOrdersPage() {
     }, [totalPages, safeCurrentPage])
 
     if (isLoading) {
-        return <section className="page-card">Đang tải danh sách món đã hủy...</section>
+        return <LoadingState title="Đang tải danh sách món đã hủy..." />
     }
 
     if (error) {
         return (
-            <section className="page-card">
-                <h2>Lỗi tải dữ liệu</h2>
-
-                <p className="modal-error">{error}</p>
-
-                <button
-                    type="button"
-                    className="primary-button"
-                    onClick={() => void loadCancelledOrders()}
-                >
-                    Thử lại
-                </button>
-            </section>
+            <ErrorState
+                title="Lỗi tải dữ liệu"
+                message={error}
+                onRetry={() => void loadCancelledOrders()}
+            />
         )
     }
 
