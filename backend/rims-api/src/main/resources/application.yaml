@@ -15,8 +15,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: hienntthe172532@fpt.edu.vn
-    password: klzyuxcibssnwrpx
+    username: 
+    password: 
     properties:
       mail:
         smtp:
@@ -25,8 +25,7 @@ spring:
             enable: true
 
 jwt:
-  signerKey: "Bkvw045nqvIXbwCtsf9fNAH8olxBeipB"
-
+  signerKey: 
 vnpay:
   url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   tmn-code: "D90AVGT4"
